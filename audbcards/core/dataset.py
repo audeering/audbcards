@@ -26,13 +26,10 @@ class Dataset:
             self,
             name: str,
             version: str,
-            repository: str,
-            host: str,
     ):
         self.name = name
         self.version = version
-        self.repository = repository
-        self.host = host
+        self.repository = audb.repository(name, version)
 
         self.header = audb.info.header(
             name,
@@ -216,7 +213,7 @@ class Dataset:
     def publication(self) -> str:
         r"""Date and author uploading dataset to repository."""
         url = (
-            f'{self.host}/{self.repository}/{self.name}/'
+            f'{self.repository.host}/{self.repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
         )
         path = audfactory.path(url)
@@ -227,12 +224,12 @@ class Dataset:
     def repository_link(self) -> str:
         r"""Repository name with link to dataset in Artifactory web UI."""
         url = (
-            f'{self.host}/'
+            f'{self.repository.host}/'
             f'webapp/#/artifacts/browse/tree/General/'
-            f'{self.repository}/'
+            f'{self.repository.name}/'
             f'{self.name}'
         )
-        return f'`{self.repository} <{url}>`__'
+        return f'`{self.repository.name} <{url}>`__'
 
     @property
     def sampling_rates(self) -> str:
