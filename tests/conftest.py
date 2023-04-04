@@ -11,11 +11,12 @@ import audiofile
 
 
 pytest.NAME = 'db'
+pytest.REPOSITORY = None
 pytest.VERSION = '1.0.0'
 
 
 @pytest.fixture
-def db(tmpdir, scope='function'):
+def publish_db(tmpdir, scope='session', autouse=True):
     r"""Publish a test database.
 
     The database will use ``pytest.NAME`` as name
@@ -27,6 +28,10 @@ def db(tmpdir, scope='function'):
     the database was published to.
 
     """
+    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    audb.config.CACHE_ROOT = cache
+    audb.config.SHARED_CACHE = cache
+
     db_path = audeer.mkdir(audeer.path(tmpdir, pytest.NAME))
 
     db = audformat.Database(
@@ -110,4 +115,14 @@ def db(tmpdir, scope='function'):
     audb.config.REPOSITORIES = [repository]
     audb.publish(db_path, pytest.VERSION, repository)
 
-    return db
+    # Make repository variable available in tests
+    pytest.REPOSITORY = repository
+
+
+@pytest.fixture
+def db(scope='function', autouse=True):
+    return audb.load(
+        pytest.NAME,
+        version=pytest.VERSION,
+        verbose=False,
+    )

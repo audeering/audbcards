@@ -11,8 +11,6 @@ def test_db_fixture(db):
         pytest.NAME,
         version=pytest.VERSION,
         verbose=False,
-        full_path=False,
+        full_path=True,
     )
-    # Remove field added by audb
-    del db_loaded.meta['audb']
     assert db_loaded == db
