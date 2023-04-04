@@ -120,7 +120,7 @@ def publish_db(tmpdir, scope='session', autouse=True):
 
 
 @pytest.fixture
-def db(scope='function', autouse=True):
+def db(scope='function'):
     return audb.load(
         pytest.NAME,
         version=pytest.VERSION,
