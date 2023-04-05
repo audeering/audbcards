@@ -16,7 +16,7 @@ def test_db_fixture(db):
     assert audb.repository(pytest.NAME, pytest.VERSION) == pytest.REPOSITORY
 
 
-def test_publish_db_fixture(publish_db):
+def test_publish_db_fixture():
 
     db_loaded = audb.load(
         pytest.NAME,
