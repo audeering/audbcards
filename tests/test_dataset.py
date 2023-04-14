@@ -13,6 +13,7 @@ def test_datacard_from_template_class(db, default_template):
     _ = dc._render_template()
 
 
+@pytest.mark.skip(reason="obsolete: directory sideeffect")
 def test_datacard_from_template(db, default_template):
 
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
