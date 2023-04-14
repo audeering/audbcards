@@ -42,7 +42,7 @@ def publish_db(tmpdir, scope='session', autouse=True):
         source='https://github.com/audeering/audbcards',
         usage='unrestricted',
         expires=None,
-        languages='eng',
+        languages=['eng', 'de'],
         description='Example database.',
         author='H Wierstorf, C Geng, B E Abrougui',
         organization='audEERING',
