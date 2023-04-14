@@ -497,6 +497,60 @@ class Dataset:
         return scheme_data
 
 
+class Datacard(object):
+
+    def __init__(self, dataset: Dataset):
+
+        self._dataset = dataset
+
+    @property
+    def props(self) -> dict:
+        props = self._dataset.properties()
+        return props
+
+    def _render_template(self):
+
+        t_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
+                                         trim_blocks=True)
+        environment.filters.update(zip=zip,
+                                   tw=self._trim_trailing_whitespace,
+                                   )
+        template = environment.get_template("datacard.j2")
+        # props = dataset.properties()
+        content = template.render(self.props)
+        return content
+
+    @staticmethod
+    def _trim_trailing_whitespace(x: list):
+        """J2 filter to get rid or trailing empty table entries within a row.
+
+        Trims last entry if present.
+
+        Args:
+            x: untrimmed single scheme table row
+        Returns:
+            trimmed single scheme table row
+        """
+
+        if x[-1] == '':
+            x.pop()
+
+        return x
+
+    def save(self, ofpath=None):
+        """save content to rst."""
+
+        content = self._render_template()
+
+        if ofpath is None:
+            ofpath = f'datasets/{self._dataset.name}_from_template.rst'
+
+        with open(ofpath, mode="w", encoding="utf-8") as fp:
+            fp.write(content)
+            print(f"... wrote {ofpath}")
+
+
 def create_datacard_page_from_template(dataset: Dataset):
     r"""Create a dedicated sub-page for the data card.
 
