@@ -1,5 +1,7 @@
 import datetime
+import email
 import os
+import pkg_resources
 import shutil
 import typing
 
@@ -225,7 +227,11 @@ class Dataset:
             ts = os.stat(url).st_ctime
             date_created = datetime.datetime.utcfromtimestamp(ts)
             date_created = date_created.strftime("%Y-%m-%d")
-            creator = os.getlogin()
+            # get creator from pkginfo
+            resource_package = "audbcards"
+            pkg_info = pkg_resources.get_distribution(resource_package).get_metadata('PKG-INFO')
+            msg = email.message_from_string(pkg_info)
+            creator = msg.get('Author').split(',')[0]
             publication = f'{date_created} by {creator}'
         else:
             path = audfactory.path(url)
