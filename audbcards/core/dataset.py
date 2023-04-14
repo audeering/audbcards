@@ -1,6 +1,9 @@
+import datetime
 import os
 import shutil
 import typing
+
+import jinja2
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -284,6 +287,259 @@ class Dataset:
         branch = 'main'
         url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
         return f'`{self.version} <{url}>`__'
+
+    """Additions to class """
+    def properties(self):
+        """Get list of properties of the object."""
+
+        class_items = self.__class__.__dict__.items()
+        props = dict((k, getattr(self, k))
+                     for k, v in class_items
+                     if isinstance(v, property))
+
+        props['name'] = self.name
+        props['player'] = self.player(self.example)
+
+        return props
+
+    @property
+    def source(self) -> str:
+        r"""Source of the database."""
+        return self.header.source
+
+    @property
+    def description(self) -> str:
+        r"""Source of the database."""
+        return self.header.description
+
+    @property
+    def usage(self) -> str:
+        r"""Usage of the database."""
+        return self.header.usage
+
+    @property
+    def languages(self) -> typing.List[str]:
+        r"""Languages of the database."""
+        return self.header.languages
+
+    @property
+    def author(self) -> typing.List[str]:
+        r"""Authors of the database."""
+        return self.header.author
+
+    @property
+    def tables(self) -> typing.List[str]:
+        """List od Tables in db."""
+        db = self.header
+        tables = list(db)
+        return tables
+
+    @property
+    def columns(self) -> typing.List[str]:
+        db = self.header
+        columns = [list(db[table_id].columns) for table_id in self.tables]
+        columns = [x for x in map(", ".join, columns)]
+        return columns
+
+    @property
+    def types(self) -> typing.List[str]:
+        types = []
+        db = self.header
+        for table_id in self.tables:
+            table = db[table_id]
+            if isinstance(table, audformat.MiscTable):
+                types.append('misc')
+            else:
+                types.append(table.type)
+
+        return types
+
+    def _scheme_to_list(self, scheme_id):
+
+        db = self.header
+        scheme_info = self.scheme_info
+
+        scheme = db.schemes[scheme_id]
+
+        data_dict = {
+            'ID': scheme_id,
+            'Dtype': scheme.dtype,
+        }
+        data = [scheme_id, scheme.dtype]
+        #  minimum, maximum, labels, mappings = "", "", "", ""
+
+        minimum, maximum = None, None
+        labels = None
+
+        # can use 'Minimum' in scheme_info['columns'] later on
+        if scheme_info["has_minimums"]:
+            minimum = scheme.minimum or ''
+            data_dict['Min'] = minimum
+        if scheme_info["has_maximums"]:
+            maximum = scheme.maximum or ''
+            data_dict['Max'] = maximum
+        if scheme_info["has_labels"]:
+            if scheme.labels is None:
+                labels = []
+            else:
+                labels = sorted(scheme._labels_to_list())
+                labels = [str(label) for label in labels]
+                # Avoid `_` at end of label,
+                # as this has special meaning in RST (link)
+                labels = [
+                    label[:-1] + r'\_'
+                    if label.endswith('_')
+                    else label
+                    for label in labels
+                ]
+                labels = limit_presented_samples(
+                    labels,
+                    15,
+                    replacement_text='[...]',
+                )
+                labels = ", ".join(labels)
+            scheme_info['Labels'] = labels
+
+        data.append(minimum)
+        data.append(maximum)
+        data.append(labels)
+        data_dict['Labels'] = labels
+        if scheme_info["has_mappings"]:
+            if not isinstance(scheme.labels, (str, dict)):
+                mappings = ''
+            else:
+                labels = scheme._labels_to_dict()
+                # Mappings can contain a single mapping
+                # or a deeper nestings.
+                # In the first case we just present ✓,
+                # in the second case the keys of the nested dict.
+                # {'f': 'female', 'm': 'male'}
+                # or
+                # {'s1': {'gender': 'male', 'age': 21}}
+                mappings = list(labels.values())
+                if isinstance(mappings[0], dict):
+                    # e.g. {'s1': {'gender': 'male', 'age': 21}}
+                    mappings = sorted(list(mappings[0].keys()))
+                    mappings = f'{", ".join(mappings)}'
+                else:
+                    # e.g. {'f': 'female', 'm': 'male'}
+                    mappings = '✓'
+
+        data.append(mappings)
+        data_dict['Mappings'] = mappings
+
+        # data = [x if x != [] else "" for x in data]
+        # data = [x for x in data if x is not None]
+        # data = ', '.join(['"'+x+'"' for x in data])
+        return data_dict
+
+    @property
+    def scheme_info(self) -> dict:
+
+        db = self.header
+        scheme_info = {}
+
+        if len(db.schemes) > 0:
+            has_minimums = any(
+                [db.schemes[s].minimum is not None for s in db.schemes]
+            )
+            has_maximums = any(
+                [db.schemes[s].maximum is not None for s in db.schemes]
+            )
+            has_labels = any(
+                [db.schemes[s].labels is not None for s in db.schemes]
+            )
+            has_mappings = any(
+                [
+                    isinstance(db.schemes[s].labels, (str, dict))
+                    for s in db.schemes
+                ]
+            )
+
+        columns = ['ID', 'Dtype']
+        header_line = '   :header: ID,Dtype'
+        if has_minimums:
+            header_line += ',Min'
+            columns.append('Min')
+        if has_maximums:
+            header_line += ',Max'
+            columns.append('Max')
+        if has_labels:
+            header_line += ',Labels'
+            columns.append('Labels')
+        if has_mappings:
+            header_line += ',Mappings'
+            columns.append('Mappings')
+
+        scheme_info['header_line'] = header_line
+        scheme_info['has_minimums'] = has_minimums
+        scheme_info['has_maximums'] = has_maximums
+        scheme_info['has_labels'] = has_labels
+        scheme_info['has_mappings'] = has_mappings
+
+        scheme_info['columns'] = columns
+        return scheme_info
+
+    @property
+    def dataset_schemes(self) -> list:
+
+        db = self.header
+        dataset_schemes = []
+        for scheme_id in db.schemes:
+            dataset_scheme = self._scheme_to_list(scheme_id)
+            dataset_schemes.append(dataset_scheme)
+
+        cols = self.scheme_info['columns']
+        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
+        filter = data.applymap(lambda d: d == [])
+        data.mask(filter, other='', inplace=True)
+        scheme_data = np.array(data).tolist()
+        return scheme_data
+
+
+def create_datacard_page_from_template(dataset: Dataset):
+    r"""Create a dedicated sub-page for the data card.
+
+
+    This creates the RST file ``docs/datasets/{dataset}.rst``
+    containing the data card for the given dataset.
+
+    If an audio example is provided for the dataset
+    it is copied to the build destination
+    under ``build/html/datasets/{dataset}``.
+
+    """
+
+    def _trim_trailing_whitespace(x: list):
+        """J2 filter to get rid or trailing empty table entries within a row.
+
+        Trims last entry if present.
+
+        Args:
+            x: untrimmed single scheme table row
+        Returns:
+            trimmed single scheme table row
+        """
+
+        if x[-1] == '':
+            x.pop()
+
+        return x
+
+    t_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
+                                     trim_blocks=True)
+    environment.filters.update(zip=zip,
+                               tw=_trim_trailing_whitespace,
+                               )
+    template = environment.get_template("datacard.j2")
+    props = dataset.properties()
+    content = template.render(props)
+
+    rst_file = f'datasets/{dataset.name}_from_template.rst'
+    with open(rst_file, mode="w", encoding="utf-8") as fp:
+        fp.write(content)
+        print(f"... wrote {rst_file}")
 
 
 def create_datacard_page(dataset: Dataset):
