@@ -216,9 +216,20 @@ class Dataset:
             f'{self.repository.host}/{self.repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
         )
-        path = audfactory.path(url)
-        stat = path.stat()
-        return f'{stat.ctime:%Y-%m-%d} by {stat.created_by}'
+
+        if self.repository.backend == 'file-system':
+            stat = os.stat(url)
+            ts = os.stat(url).st_ctime
+            date_created = datetime.datetime.utcfromtimestamp(ts)
+            date_created = date_created.strftime("%Y-%m-%d")
+            creator = os.getlogin()
+            publication = f'{date_created} by {creator}'
+        else:
+            path = audfactory.path(url)
+            stat = path.stat()
+            publication = f'{stat.ctime:%Y-%m-%d} by {stat.created_by}'
+
+        return publication
 
     @property
     def repository_link(self) -> str:
