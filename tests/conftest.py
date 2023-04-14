@@ -14,6 +14,9 @@ pytest.NAME = 'db'
 pytest.REPOSITORY = None
 pytest.VERSION = '1.0.0'
 
+pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
+pytest.TEMPLATE_DIR = audeer.mkdir(os.path.join(pytest.ROOT, 'templates'))
+
 
 @pytest.fixture
 def publish_db(tmpdir, scope='session', autouse=True):
@@ -126,3 +129,13 @@ def db(publish_db, scope='function'):
         version=pytest.VERSION,
         verbose=False,
     )
+
+
+@pytest.fixture
+def default_template(scope='function'):
+
+    fpath = os.path.join(pytest.TEMPLATE_DIR, 'db.rst')
+    with open(fpath, 'r') as file:
+        template_truth = file.read().rstrip()
+
+    return template_truth
