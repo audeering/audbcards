@@ -229,8 +229,9 @@ class Dataset:
             date_created = date_created.strftime("%Y-%m-%d")
             # get creator from pkginfo
             resource_package = "audbcards"
-            pkg_info = pkg_resources.get_distribution(resource_package).get_metadata('PKG-INFO')
-            msg = email.message_from_string(pkg_info)
+            pkg_info = pkg_resources.get_distribution(resource_package)
+            info = pkg_info.get_metadata('PKG-INFO')
+            msg = email.message_from_string(info)
             creator = msg.get('Author').split(',')[0]
             publication = f'{date_created} by {creator}'
         else:
