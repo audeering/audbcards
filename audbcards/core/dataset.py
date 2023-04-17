@@ -18,7 +18,6 @@ import audformat
 import audiofile
 import audplot
 
-
 # Configuration -----------------------------------------------------------
 CACHE = audeer.mkdir('./cache')
 BUILD = audeer.path('..', 'build', 'html')
@@ -524,7 +523,6 @@ class Datacard(object):
                                    tw=self._trim_trailing_whitespace,
                                    )
         template = environment.get_template("datacard.j2")
-        # props = dataset.properties()
         content = template.render(self.props)
         return content
 
@@ -781,6 +779,61 @@ def create_datacard_page(dataset: Dataset):
                             mappings = '✓'
                         fp.write(f', "{mappings}"')
                 fp.write('\n')
+
+
+def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
+                                       of_basename: str = 'datasets'):
+    r"""Create overview page of datasets.
+
+    Args:
+        datasets: list of datasets
+        of_basename: str
+    """
+
+    tuples = [
+        (
+            dataset.name_link,
+            dataset.short_description,
+            dataset.license_link,
+            dataset.version,
+            dataset.schemes,
+        )
+        for dataset in datasets
+    ]
+    df = pd.DataFrame.from_records(
+        tuples,
+        columns=['name', 'description', 'license', 'version', 'schemes'],
+        index='name',
+    )
+    csv_file = f'{of_basename}.csv'
+    df.to_csv(csv_file)
+
+    # Create RST file showing CSV file
+    # and adding links to all data cards
+    rst_file = f'{of_basename}.rst'
+
+    t_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
+                                     trim_blocks=True)
+
+    data = [
+        (
+            dataset.name,
+            dataset.version,
+        )
+        for dataset in datasets
+    ]
+
+    data = {
+        'data': data,
+    }
+
+    template = environment.get_template("datasets.j2")
+    content = template.render(data)
+
+    with open(rst_file, mode="w", encoding="utf-8") as fp:
+        fp.write(content)
+        print(f"... wrote {rst_file}")
 
 
 def create_datasets_page(datasets: typing.Sequence):
