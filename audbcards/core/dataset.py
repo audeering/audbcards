@@ -1,7 +1,7 @@
+import configparser
 import datetime
-import email
 import os
-import pkg_resources
+import random
 import shutil
 import typing
 
@@ -222,16 +222,14 @@ class Dataset:
         )
 
         if self.repository.backend == 'file-system':
-            stat = os.stat(url)
             ts = os.stat(url).st_ctime
             date_created = datetime.datetime.utcfromtimestamp(ts)
             date_created = date_created.strftime("%Y-%m-%d")
-            # get creator from pkginfo
-            resource_package = "audbcards"
-            pkg_info = pkg_resources.get_distribution(resource_package)
-            info = pkg_info.get_metadata('PKG-INFO')
-            msg = email.message_from_string(info)
-            creator = msg.get('Author').split(',')[0]
+            cf = configparser.ConfigParser()
+            cf.read('setup.cfg')
+            authors = cf['metadata']['Author']
+            creators = authors.split(', ')
+            creator = random.choice(creators)
             publication = f'{date_created} by {creator}'
         else:
             path = audfactory.path(url)
