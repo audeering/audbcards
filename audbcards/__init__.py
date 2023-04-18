@@ -1,5 +1,6 @@
 from audbcards.core.dataset import (
     Dataset,
+    Datacard,
 )
 
 
