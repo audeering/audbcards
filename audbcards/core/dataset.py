@@ -566,37 +566,8 @@ def create_datacard_page_from_template(dataset: Dataset):
     under ``build/html/datasets/{dataset}``.
 
     """
-
-    def _trim_trailing_whitespace(x: list):
-        """J2 filter to get rid or trailing empty table entries within a row.
-
-        Trims last entry if present.
-
-        Args:
-            x: untrimmed single scheme table row
-        Returns:
-            trimmed single scheme table row
-        """
-
-        if x[-1] == '':
-            x.pop()
-
-        return x
-
-    t_dir = os.path.join(os.path.dirname(__file__), 'templates')
-    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
-                                     trim_blocks=True)
-    environment.filters.update(zip=zip,
-                               tw=_trim_trailing_whitespace,
-                               )
-    template = environment.get_template("datacard.j2")
-    props = dataset.properties()
-    content = template.render(props)
-
-    rst_file = f'datasets/{dataset.name}_from_template.rst'
-    with open(rst_file, mode="w", encoding="utf-8") as fp:
-        fp.write(content)
-        print(f"... wrote {rst_file}")
+    dc = Datacard(dataset)
+    _ = dc._render_template()
 
 
 def create_datacard_page(dataset: Dataset):
