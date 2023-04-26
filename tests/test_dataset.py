@@ -335,6 +335,6 @@ def test_dataset(tmpdir, db):
                         fp.write(f', "{mappings}"')
                 fp.write('\n')
 
-    # Check if generated images are exactly the same (pixel-wise)
+    # Check if generated rst files are exactly the same
     assert open(rst_file, 'rb').read(
     ) == open(f'datasets/{dataset.name}.rst', 'rb').read()
