@@ -111,3 +111,46 @@ def test_dataset(db):
     expected_version_link = f'`{pytest.VERSION} <{url}>`__'
     assert dataset.version_link == expected_version_link
 
+
+def test_dataset_player(tmpdir, db):
+    # Default build folder
+    build = audeer.path('..', 'build', 'html')
+
+    # Init Dataset object and player
+    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
+    played_file = dataset.example
+    player_str = dataset.player(played_file, waveform=True)
+
+    # Generate expected player
+    expected_player_str = ''
+    # Check if file has been copied under the build folder
+    dst_dir = f'{build}/datasets/{db.name}'
+    assert os.path.exists(os.path.join(dst_dir, played_file))
+
+    # Add plot of waveform
+    signal, sampling_rate = audiofile.read(
+        os.path.join(dst_dir, played_file),
+        always_2d=True,
+    )
+    plt.figure(figsize=[3, .5])
+    ax = plt.subplot(111)
+    audplot.waveform(signal[0, :], ax=ax)
+    audbcards.core.dataset.set_plot_margins()
+    plt.savefig(f'{os.path.join(tmpdir, db.name)}.png')
+    plt.close()
+
+    # Check if generated images are exactly the same (pixel-wise)
+    assert open(f'{db.name}.png', 'rb').read(
+    ) == open(f'{os.path.join(tmpdir, db.name)}.png', 'rb').read()
+
+    # Check if the generated player_str is the same
+    expected_player_str += (
+        f'.. image:: ../{db.name}.png\n'
+        '\n'
+    )
+    expected_player_str += (
+        '.. raw:: html\n'
+        '\n'
+        f'    <p><audio controls src="{db.name}/{played_file}"></audio></p>'
+    )
+    assert expected_player_str == player_str
