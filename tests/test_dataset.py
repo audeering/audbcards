@@ -9,6 +9,7 @@ import audbcards
 import audplot
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -28,7 +29,7 @@ def test_dataset(db):
         pytest.NAME,
         version=pytest.VERSION,
     )
-    # pd.testing.assert_frame_equal(dataset.deps(), expected_deps())
+    pd.testing.assert_frame_equal(dataset.deps(), expected_deps())
 
     # archives
     assert dataset.archives == str(len(db.files))
