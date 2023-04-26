@@ -26,6 +26,7 @@ def test_dataset(db):
     expected_header = audb.info.header(
         pytest.NAME,
         version=pytest.VERSION,
+        cache_root=CACHE,
     )
     assert str(dataset.header) == str(expected_header)
     expected_deps = audb.dependencies(
