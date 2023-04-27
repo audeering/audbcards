@@ -32,7 +32,7 @@ class Dataset:
         self.version = version
         self.repository = audb.repository(name, version)
         self.cache_root = audeer.path(
-            cache_root or audb.default_cache_root(shared=True)
+            cache_root or audb.default_cache_root(shared=False)
         )
 
         self.header = audb.info.header(
