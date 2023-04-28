@@ -28,9 +28,9 @@ def publish_db(tmpdir, scope='session', autouse=True):
     the database was published to.
 
     """
-    # cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
-    # audb.config.CACHE_ROOT = cache
-    # audb.config.SHARED_CACHE = cache
+    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    audb.config.CACHE_ROOT = cache
+    audb.config.SHARED_CACHE = cache
 
     db_path = audeer.mkdir(audeer.path(tmpdir, pytest.NAME))
 
