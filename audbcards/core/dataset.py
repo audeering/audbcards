@@ -58,7 +58,9 @@ class Dataset:
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
-            audeer.rmdir(audeer.path(self.audb_cache_root, name, other_version))
+            audeer.rmdir(
+                audeer.path(self.audb_cache_root, name, other_version)
+            )
 
     @property
     def archives(self) -> str:
