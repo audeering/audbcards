@@ -1,4 +1,5 @@
 import os
+import posixpath
 
 import pytest
 
@@ -64,9 +65,10 @@ def test_dataset(tmpdir, db):
         range(len(durations)),
         key=lambda n: abs(durations[n] - median_duration)
     )
-    expected_example = '/'.join(
-        db.files[expected_example_index].split('/')[-2:]
-    )
+    expected_example = audeer.path(
+        db.files[expected_example_index]
+    ).replace(os.sep, posixpath.sep)
+    expected_example = '/'.join(expected_example.split('/')[-2:])
     assert dataset.example == expected_example
 
     # files
