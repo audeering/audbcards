@@ -5,7 +5,6 @@ import pytest
 import audeer
 import audiofile
 import audb
-import audformat
 import audbcards
 import audplot
 
