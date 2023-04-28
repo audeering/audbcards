@@ -111,7 +111,7 @@ def test_dataset(tmpdir, db):
     # short_description
     max_desc_length = 150
     expected_description = db.description if (
-            len(db.description) < max_desc_length
+        len(db.description) < max_desc_length
     ) else f'{db.description[:max_desc_length - 3]}...'
     assert dataset.short_description == expected_description
 
@@ -161,6 +161,7 @@ def test_dataset(tmpdir, db):
     # Check if the generated player_str and the expected matches
     assert expected_player_str == player_str
 
+    # todo: uncomment when publication and repo_link are fixed
     # Test create_datacard_page()
     # Create datacard page using developed method
     # Requires `datasets` folder to exist
