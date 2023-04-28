@@ -87,8 +87,8 @@ def publish_db(tmpdir, scope='session', autouse=True):
     )
     index = audformat.segmented_index(
         files=['data/f0.wav', 'data/f0.wav', 'data/f1.wav', 'data/f1.wav'],
-        starts=[0, 1, 0, 1],
-        ends=[1, 2, 1, 2],
+        starts=[0, 0.5, 0, 1],
+        ends=[0.5, 1, 1, 2],
     )
     db['segments'] = audformat.Table(index)
     db['segments']['emotion'] = audformat.Column(scheme_id='emotion')
@@ -97,11 +97,11 @@ def publish_db(tmpdir, scope='session', autouse=True):
     # Create audio files and store database
     np.random.seed(1)
     sampling_rate = 8000
-    duration = 2
-    for file in list(db['files'].index):
+    durations = [1, 2]
+    for i, file in enumerate(list(db['files'].index)):
         path = audeer.path(db_path, file)
         audeer.mkdir(os.path.dirname(path))
-        signal = np.random.normal(0, .1, (1, duration * sampling_rate))
+        signal = np.random.normal(0, .1, (1, durations[i] * sampling_rate))
         audiofile.write(path, signal, sampling_rate, normalize=True)
     db.save(db_path)
 
