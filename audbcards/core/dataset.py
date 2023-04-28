@@ -27,25 +27,23 @@ class Dataset:
             name: str,
             version: str,
             cache_root: str = './cache',
-            audb_cache_root: str = None,
     ):
         self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
-        self.cache_root = audeer.path(cache_root)
-        self.audb_cache_root = audeer.path(audb_cache_root
-                                           ) or audb.default_cache_root()
+        self.cache_root = audeer.path(cache_root
+                                      ) or audb.default_cache_root()
 
         self.header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
-            cache_root=self.audb_cache_root,
+            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
-            cache_root=self.audb_cache_root,
+            cache_root=self.cache_root,
             verbose=False,
         )
 
@@ -53,13 +51,13 @@ class Dataset:
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
         versions = audeer.list_dir_names(
-            audeer.path(self.audb_cache_root, name),
+            audeer.path(self.cache_root, name),
             basenames=True,
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(
-                audeer.path(self.audb_cache_root, name, other_version)
+                audeer.path(self.cache_root, name, other_version)
             )
 
     @property
@@ -133,7 +131,7 @@ class Dataset:
                 self.name,
                 media,
                 version=self.version,
-                cache_root=self.audb_cache_root,
+                cache_root=self.cache_root,
                 verbose=False,
             )
         except:  # noqa: E722
@@ -184,7 +182,7 @@ class Dataset:
         player_str = ''
         # Move file to build folder
         src_dir = (
-            f'{self.audb_cache_root}/'
+            f'{self.cache_root}/'
             f'{audb.flavor_path(self.name, self.version)}'
         )
         dst_dir = f'{BUILD}/datasets/{self.name}'
