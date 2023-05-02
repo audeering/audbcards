@@ -15,7 +15,7 @@ import audplot
 
 
 # Configuration -----------------------------------------------------------
-CACHE = audeer.mkdir('./cache')
+
 BUILD = audeer.path('..', 'build', 'html')
 
 
@@ -26,21 +26,23 @@ class Dataset:
             self,
             name: str,
             version: str,
+            cache_root: str = './cache',
     ):
         self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
+        self.cache_root = audeer.path(cache_root)
 
         self.header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
-            cache_root=CACHE,
+            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
-            cache_root=CACHE,
+            cache_root=self.cache_root,
             verbose=False,
         )
 
@@ -48,12 +50,14 @@ class Dataset:
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
         versions = audeer.list_dir_names(
-            audeer.path(CACHE, name),
+            audeer.path(self.cache_root, name),
             basenames=True,
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
-            audeer.rmdir(audeer.path(CACHE, name, other_version))
+            audeer.rmdir(
+                audeer.path(self.cache_root, name, other_version)
+            )
 
     @property
     def archives(self) -> str:
@@ -126,7 +130,7 @@ class Dataset:
                 self.name,
                 media,
                 version=self.version,
-                cache_root=CACHE,
+                cache_root=self.cache_root,
                 verbose=False,
             )
         except:  # noqa: E722
@@ -177,7 +181,8 @@ class Dataset:
         player_str = ''
         # Move file to build folder
         src_dir = (
-            f'{CACHE}/{audb.flavor_path(self.name, self.version)}'
+            f'{self.cache_root}/'
+            f'{audb.flavor_path(self.name, self.version)}'
         )
         dst_dir = f'{BUILD}/datasets/{self.name}'
         audeer.mkdir(os.path.join(dst_dir, os.path.dirname(file)))
