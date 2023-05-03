@@ -6,6 +6,7 @@ import pytest
 import audeer
 import audiofile
 import audb
+import audformat
 import audbcards
 import audplot
 
@@ -162,181 +163,92 @@ def test_dataset(tmpdir, db):
     # Check if the generated player_str and the expected matches
     assert expected_player_str == player_str
 
-    # todo: uncomment when publication and repo_link are fixed
-    # Test create_datacard_page()
-    # Create datacard page using developed method
-    # Requires `datasets` folder to exist
-    # audeer.mkdir('./datasets')
-    # audbcards.core.dataset.create_datacard_page(dataset)
-    # # Generate expected page to use for comparison
-    # rst_file = f'datasets/expected_{pytest.NAME}.rst'
-    # with open(rst_file, 'w') as fp:
-    #     # Link to page
-    #     fp.write(f'.. _{pytest.NAME}:\n')
-    #     fp.write('\n')
-    #
-    #     # Heading
-    #     fp.write(f'{pytest.NAME}\n')
-    #     fp.write('-' * len(pytest.NAME))
-    #     fp.write('\n\n')
-    #
-    #     # Author
-    #     if db.author is not None:
-    #         fp.write(f'Created by {db.author}\n')
-    #         fp.write('\n\n')
-    #
-    #     # Overview table
-    #     fp.write('============= ======================\n')
-    #     fp.write(f'version       {expected_version_link}\n')
-    #     fp.write(f'license       {expected_license_link}\n')
-    #     fp.write(f'source        {db.source}\n')
-    #     fp.write(f'usage         {db.usage}\n')
-    #     if db.languages is not None:
-    #         fp.write(f'languages     {", ".join(db.languages)}\n')
-    #     fp.write(f'format        {expected_formats}\n')
-    #     fp.write(f'channel       {expected_channels}\n')
-    #     fp.write(f'sampling rate {expected_sampling_rates}\n')
-    #     fp.write(f'bit depth     {expected_bit_depths}\n')
-    #     fp.write(f'duration      {expected_duration}\n')
-    #     fp.write(f'files         {expected_files}\n')
-    #     # repository_link and publication are currently
-    #     # ingested from the dataset object as we're not
-    #     # testing them separately for now
-    #     fp.write(f'repository    {dataset.repository_link}\n')
-    #     fp.write(f'published     {dataset.publication}\n')
-    #     fp.write('============= ======================\n')
-    #     fp.write('\n\n')
-    #
-    #     # Description
-    #     if (
-    #             db.description is not None
-    #             and len(db.description) > 0
-    #     ):
-    #         description = db.description.replace('|', r'\|')
-    #         fp.write('Description\n')
-    #         fp.write('^^^^^^^^^^^\n')
-    #         fp.write('\n')
-    #         fp.write(description)
-    #         fp.write('\n\n')
-    #
-    #     # Audio example
-    #     file = expected_example
-    #     if len(file) > 0:
-    #         fp.write('Example\n')
-    #         fp.write('^^^^^^^\n')
-    #         fp.write('\n')
-    #         fp.write(f':file:`{file}`\n')
-    #         fp.write('\n')
-    #         fp.write(f'{expected_player_str}\n')
-    #         fp.write('\n')
-    #
-    #     # Tables
-    #     tables = list(db)
-    #     types = []
-    #     for table_id in tables:
-    #         table = db[table_id]
-    #         if isinstance(table, audformat.MiscTable):
-    #             types.append('misc')
-    #         else:
-    #             types.append(table.type)
-    #     columns = [list(db[table_id].columns) for table_id in tables]
-    #     fp.write('Tables\n')
-    #     fp.write('^^^^^^\n')
-    #     fp.write('\n')
-    #     fp.write('.. csv-table::\n')
-    #     fp.write('   :header: ID,Type,Columns\n')
-    #     fp.write('   :widths: 20, 10, 70\n')
-    #     fp.write('\n')
-    #     for table, type_, column in zip(tables, types, columns):
-    #         fp.write(f'    "{table}", "{type_}", "{", ".join(column)}"\n')
-    #     fp.write('\n\n')
-    #
-    #     # Schemes
-    #     if len(db.schemes) > 0:
-    #         has_minimums = any(
-    #             [db.schemes[s].minimum is not None for s in db.schemes]
-    #         )
-    #         has_maximums = any(
-    #             [db.schemes[s].maximum is not None for s in db.schemes]
-    #         )
-    #         has_labels = any(
-    #             [db.schemes[s].labels is not None for s in db.schemes]
-    #         )
-    #         has_mappings = any(
-    #             [
-    #                 isinstance(db.schemes[s].labels, (str, dict))
-    #                 for s in db.schemes
-    #             ]
-    #         )
-    #         header_line = '   :header: ID,Dtype'
-    #         if has_minimums:
-    #             header_line += ',Min'
-    #         if has_maximums:
-    #             header_line += ',Max'
-    #         if has_labels:
-    #             header_line += ',Labels'
-    #         if has_mappings:
-    #             header_line += ',Mappings'
-    #         header_line += '\n'
-    #         fp.write('Schemes\n')
-    #         fp.write('^^^^^^^\n')
-    #         fp.write('\n')
-    #         fp.write('.. csv-table::\n')
-    #         fp.write(header_line)
-    #         fp.write('\n')
-    #         for scheme_id in db.schemes:
-    #             fp.write(f'    "{scheme_id}", ')
-    #             scheme = db.schemes[scheme_id]
-    #             fp.write(f'"{scheme.dtype}"')
-    #             if has_minimums:
-    #                 minimum = scheme.minimum or ''
-    #                 fp.write(f', "{minimum}"')
-    #             if has_maximums:
-    #                 maximum = scheme.maximum or ''
-    #                 fp.write(f', "{maximum}"')
-    #             if has_labels:
-    #                 if scheme.labels is None:
-    #                     labels = []
-    #                 else:
-    #                     labels = sorted(scheme._labels_to_list())
-    #                     labels = [str(label) for label in labels]
-    #                     # Avoid `_` at end of label,
-    #                     # as this has special meaning in RST (link)
-    #                     labels = [
-    #                         label[:-1] + r'\_'
-    #                         if label.endswith('_')
-    #                         else label
-    #                         for label in labels
-    #                     ]
-    #                     labels = audbcards.core.dataset.limit_presented_samples(
-    #                         labels,
-    #                         15,
-    #                         replacement_text='[...]',
-    #                     )
-    #                 fp.write(f', "{", ".join(labels)}"')
-    #             if has_mappings:
-    #                 if not isinstance(scheme.labels, (str, dict)):
-    #                     mappings = ''
-    #                 else:
-    #                     labels = scheme._labels_to_dict()
-    #                     # Mappings can contain a single mapping
-    #                     # or a deeper nestings.
-    #                     # In the first case we just present ✓,
-    #                     # in the second case the keys of the nested dict.
-    #                     # {'f': 'female', 'm': 'male'}
-    #                     # or
-    #                     # {'s1': {'gender': 'male', 'age': 21}}
-    #                     mappings = list(labels.values())
-    #                     if isinstance(mappings[0], dict):
-    #                         # e.g. {'s1': {'gender': 'male', 'age': 21}}
-    #                         mappings = sorted(list(mappings[0].keys()))
-    #                         mappings = f'{", ".join(mappings)}'
-    #                     else:
-    #                         # e.g. {'f': 'female', 'm': 'male'}
-    #                         mappings = '✓'
-    #                     fp.write(f', "{mappings}"')
-    #             fp.write('\n')
-    #
-    # # Check if generated rst files are exactly the same
-    # assert open(rst_file, 'rb').read(
-    # ) == open(f'datasets/{dataset.name}.rst', 'rb').read()
+
+@pytest.mark.parametrize(
+    'scheme_names, scheme_dtypes, labels',
+    [
+        (
+            ['emotion', 'age', 'gender', 'language', 'speaker'],
+            ['str', 'int', 'str', 'str', 'int'],
+            [
+                ['happy', 'sad'],
+                None,
+                ['female', 'male'],
+                ['DE', 'EN'],
+                'speaker',
+            ],
+        ),
+    ]
+)
+def test_format_schemes(scheme_names, scheme_dtypes, labels):
+    expected_scheme_str_dict = {
+        scheme: f'{scheme}: [' for scheme in scheme_names
+    }
+    # Init database to contain schemes
+    db = audformat.Database(name=pytest.NAME)
+    for i, scheme_name in enumerate(scheme_names):
+        # Create actual schemes
+        if scheme_name == 'speaker':
+            db['speaker'] = audformat.MiscTable(pd.Index(
+                [0],
+                dtype='Int8',
+                name='speaker'
+            ))
+            db['speaker']['age'] = audformat.Column(scheme_id='age')
+            db['speaker']['gender'] = audformat.Column(scheme_id='gender')
+            db['speaker']['language'] = audformat.Column(scheme_id='language')
+        db.schemes[scheme_name] = audformat.Scheme(
+            dtype=scheme_dtypes[i],
+            labels=labels[i],
+        )
+        # Generate expected formatted scheme string
+        if scheme_name == 'emotion':
+            for label in labels[i]:
+                expected_scheme_str_dict[scheme_name] += f'{label}, '
+            expected_scheme_str_dict[
+                scheme_name
+            ] = f'{expected_scheme_str_dict[scheme_name][:-2]}], '
+        elif scheme_name == 'speaker':
+            for speaker_scheme in scheme_names:
+                if speaker_scheme not in ['speaker', 'emotion']:
+                    expected_scheme_str_dict[
+                        scheme_name
+                    ] += f'{speaker_scheme}, '
+            expected_scheme_str_dict[
+                scheme_name
+            ] = f'{expected_scheme_str_dict[scheme_name][:-2]}], '
+
+        else:
+            expected_scheme_str_dict[scheme_name] = f'{scheme_name}, '
+    # Construct the string object
+    scheme_names.remove('speaker')
+    scheme_names.insert(1, 'speaker')
+    expected_scheme_str = ''
+    for scheme_name in scheme_names:
+        expected_scheme_str += expected_scheme_str_dict[scheme_name]
+    # Remove the ", " at the end
+    expected_scheme_str = expected_scheme_str[:-2]
+    # Generate scheme str with format_scheme()
+    scheme_str = audbcards.core.dataset.format_schemes(db.schemes)
+    assert scheme_str == expected_scheme_str
+
+
+@pytest.mark.parametrize(
+    'sample',
+    [
+        ['a', 'b', 'c', 'd', 'e']
+    ]
+)
+@pytest.mark.parametrize(
+    'limit, replacement_text, expected',
+    [
+        (2, '...', ['a', '...', 'e']),
+        (2, '###', ['a', '###', 'e']),
+        (4, '...', ['a', 'b', '...', 'd', 'e']),
+    ]
+)
+def test_limit_presented_samples(sample, limit, replacement_text, expected):
+    limited_sample = audbcards.core.dataset.limit_presented_samples(
+        sample, limit, replacement_text
+    )
+    assert limited_sample == expected
