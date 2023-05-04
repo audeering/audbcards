@@ -15,11 +15,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-CACHE = './cache'
 BUILD = audeer.path('..', 'build', 'html')
 
 
-def test_dataset(tmpdir, db):
+def test_dataset(cache, tmpdir, db):
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
 
     # __init__
@@ -29,13 +28,13 @@ def test_dataset(tmpdir, db):
     expected_header = audb.info.header(
         pytest.NAME,
         version=pytest.VERSION,
-        cache_root=CACHE,
+        cache_root=cache,
     )
     assert str(dataset.header) == str(expected_header)
     expected_deps = audb.dependencies(
         pytest.NAME,
         version=pytest.VERSION,
-        cache_root=CACHE,
+        cache_root=cache,
     )
     pd.testing.assert_frame_equal(dataset.deps(), expected_deps())
 

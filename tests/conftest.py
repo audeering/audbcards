@@ -16,6 +16,11 @@ pytest.VERSION = '1.0.0'
 
 
 @pytest.fixture
+def cache(tmpdir, scope='function'):
+    return audeer.mkdir(audeer.path(tmpdir, 'cache'))
+
+
+@pytest.fixture
 def publish_db(tmpdir, scope='session', autouse=True):
     r"""Publish a test database.
 
@@ -75,11 +80,11 @@ def publish_db(tmpdir, scope='session', autouse=True):
         description='Speaker IDs.',
     )
     index = audformat.filewise_index([
-        'data/f0.wav', 'data/f1.wav', 'data/f2.wav'
+        'data/f0.wav', 'data/f1.wav'
     ])
     db['files'] = audformat.Table(index)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
-    db['files']['speaker'].set([0, 1, 0])
+    db['files']['speaker'].set([0, 1])
 
     # Table 'segments'
     db.schemes['emotion'] = audformat.Scheme(
@@ -88,21 +93,18 @@ def publish_db(tmpdir, scope='session', autouse=True):
         description='Emotional class.',
     )
     index = audformat.segmented_index(
-        files=['data/f0.wav', 'data/f0.wav', 'data/f1.wav', 'data/f1.wav',
-               'data/f2.wav', 'data/f2.wav'],
-        starts=[0, 0.5, 0, 1, 0, 3],
-        ends=[0.5, 1, 1, 2, 3, 5],
+        files=['data/f0.wav', 'data/f0.wav', 'data/f1.wav', 'data/f1.wav'],
+        starts=[0, 0.5, 0, 150],
+        ends=[0.5, 1, 150, 301],
     )
     db['segments'] = audformat.Table(index)
     db['segments']['emotion'] = audformat.Column(scheme_id='emotion')
-    db['segments']['emotion'].set([
-        'neutral', 'neutral', 'happy', 'angry', 'neutral', 'happy'
-    ])
+    db['segments']['emotion'].set(['neutral', 'neutral', 'happy', 'angry'])
 
     # Create audio files and store database
     np.random.seed(1)
     sampling_rate = 8000
-    durations = [1, 2, 5]
+    durations = [1, 301]
     for i, file in enumerate(list(db['files'].index)):
         path = audeer.path(db_path, file)
         audeer.mkdir(os.path.dirname(path))
