@@ -68,7 +68,9 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.duration == expected_duration
 
     # example
-    # path to audio file from database
+    # Relative path to audio file from database
+    # as written in the dependencies table,
+    # for example data/file.wav
     durations = [d.total_seconds() for d in db.files_duration(db.files)]
     median_duration = np.median([d for d in durations if 0.5 < d < 300])
     expected_example_index = min(
@@ -79,6 +81,7 @@ def test_dataset(cache, tmpdir, db):
         db.files[expected_example_index]
     ).replace(os.sep, posixpath.sep)
     expected_example = '/'.join(expected_example.split('/')[-2:])
+    raise ValueError(expected_example)
     assert dataset.example == expected_example
 
     # files
