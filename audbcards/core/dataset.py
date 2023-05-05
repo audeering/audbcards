@@ -31,7 +31,7 @@ class Dataset:
         self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
-        self.cache_root = audeer.path(cache_root)
+        self.cache_root = audeer.mkdir(audeer.path(cache_root))
 
         self.header = audb.info.header(
             name,
@@ -517,10 +517,10 @@ def format_schemes(
 ):
     """Convert schemes object into string.
 
-    It lists the main annotaton schemes
+    It lists the main annotation schemes
     of the datasets,
     and collects additional information
-    on schemes calles `emotion` and `speaker`.
+    on schemes calls `emotion` and `speaker`.
 
     """
     # Filter schemes
