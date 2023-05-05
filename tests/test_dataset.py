@@ -81,7 +81,6 @@ def test_dataset(cache, tmpdir, db):
         db.files[expected_example_index]
     ).replace(os.sep, posixpath.sep)
     expected_example = '/'.join(expected_example.split('/')[-2:])
-    raise ValueError(expected_example)
     assert dataset.example == expected_example
 
     # files
