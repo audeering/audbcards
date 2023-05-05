@@ -41,10 +41,14 @@ def test_dataset(cache, tmpdir, db):
         version=pytest.VERSION,
         cache_root=cache,
     )
-    pd.testing.assert_frame_equal(dataset.deps(), expected_deps())
+    expected_df = expected_deps()
+    pd.testing.assert_frame_equal(dataset.deps(), expected_df)
 
     # archives
-    assert dataset.archives == str(len(db.files))
+    expected_archives = str(
+        len(expected_df.loc[expected_deps.media].archive.unique())
+    )
+    assert dataset.archives == expected_archives
 
     # bit depths
     expected_bit_depths = ', '.join(set([
