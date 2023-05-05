@@ -19,7 +19,12 @@ BUILD = audeer.path('..', 'build', 'html')
 
 
 def test_dataset(cache, tmpdir, db):
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
+    dataset_cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    dataset = audbcards.Dataset(
+        pytest.NAME,
+        pytest.VERSION,
+        cache_root=dataset_cache,
+    )
 
     # __init__
     assert dataset.name == pytest.NAME
