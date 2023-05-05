@@ -176,7 +176,7 @@ def test_dataset(cache, tmpdir, db):
 
 
 @pytest.mark.parametrize(
-    'scheme_names, scheme_dtypes, labels',
+    'scheme_names, scheme_dtypes, labels, expected',
     [
         (
             ['emotion', 'age', 'gender', 'language', 'speaker'],
@@ -188,13 +188,25 @@ def test_dataset(cache, tmpdir, db):
                 ['DE', 'EN'],
                 'speaker',
             ],
+            'emotion: [happy, sad], speaker: [age, gender, language], '
+            'age, gender, language'
+        ),
+        (
+            ['emotion', 'age', 'gender', 'speaker', 'audio_quality'],
+            ['str', 'int', 'str', 'int', 'str'],
+            [
+                ['happy', 'sad'],
+                None,
+                ['female', 'male'],
+                'speaker',
+                ['good', 'bad']
+            ],
+            'emotion: [happy, sad], speaker: [age, gender], '
+            'age, audio_quality, gender'
         ),
     ]
 )
-def test_format_schemes(scheme_names, scheme_dtypes, labels):
-    expected_scheme_str_dict = {
-        scheme: f'{scheme}: [' for scheme in scheme_names
-    }
+def test_format_schemes(scheme_names, scheme_dtypes, labels, expected):
     # Init database to contain schemes
     db = audformat.Database(name=pytest.NAME)
     for i, scheme_name in enumerate(scheme_names):
@@ -205,43 +217,21 @@ def test_format_schemes(scheme_names, scheme_dtypes, labels):
                 dtype='Int8',
                 name='speaker'
             ))
-            db['speaker']['age'] = audformat.Column(scheme_id='age')
-            db['speaker']['gender'] = audformat.Column(scheme_id='gender')
-            db['speaker']['language'] = audformat.Column(scheme_id='language')
+            if 'age' in scheme_names:
+                db['speaker']['age'] = audformat.Column(scheme_id='age')
+            if 'gender' in scheme_names:
+                db['speaker']['gender'] = audformat.Column(scheme_id='gender')
+            if 'language' in scheme_names:
+                db['speaker']['language'] = audformat.Column(
+                    scheme_id='language'
+                )
         db.schemes[scheme_name] = audformat.Scheme(
             dtype=scheme_dtypes[i],
             labels=labels[i],
         )
-        # Generate expected formatted scheme string
-        if scheme_name == 'emotion':
-            for label in labels[i]:
-                expected_scheme_str_dict[scheme_name] += f'{label}, '
-            expected_scheme_str_dict[
-                scheme_name
-            ] = f'{expected_scheme_str_dict[scheme_name][:-2]}], '
-        elif scheme_name == 'speaker':
-            for speaker_scheme in scheme_names:
-                if speaker_scheme not in ['speaker', 'emotion']:
-                    expected_scheme_str_dict[
-                        scheme_name
-                    ] += f'{speaker_scheme}, '
-            expected_scheme_str_dict[
-                scheme_name
-            ] = f'{expected_scheme_str_dict[scheme_name][:-2]}], '
-
-        else:
-            expected_scheme_str_dict[scheme_name] = f'{scheme_name}, '
-    # Construct the string object
-    scheme_names.remove('speaker')
-    scheme_names.insert(1, 'speaker')
-    expected_scheme_str = ''
-    for scheme_name in scheme_names:
-        expected_scheme_str += expected_scheme_str_dict[scheme_name]
-    # Remove the ", " at the end
-    expected_scheme_str = expected_scheme_str[:-2]
     # Generate scheme str with format_scheme()
     scheme_str = audbcards.core.dataset.format_schemes(db.schemes)
-    assert scheme_str == expected_scheme_str
+    assert scheme_str == expected
 
 
 @pytest.mark.parametrize(
