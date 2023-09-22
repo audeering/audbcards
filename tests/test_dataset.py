@@ -55,4 +55,4 @@ def test_create_datasets_page(db):
 
     datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
     create_datasets_page_from_template(datasets,
-                                       of_basename='datasets_from_template')
+                                       ofbase='datasets_from_template')

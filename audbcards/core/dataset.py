@@ -756,12 +756,16 @@ def create_datacard_page(dataset: Dataset):
 
 
 def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
-                                       of_basename: str = 'datasets'):
+                                       ofbase: str = 'datasets'):
     r"""Create overview page of datasets.
 
     Args:
         datasets: list of datasets
-        of_basename: str
+        ofbase: basename of the file written to disk
+
+    ofbase: written to disk in both csv and rst formats.
+    Final outfilenames consist of ofbase plus extension.
+
     """
 
     tuples = [
@@ -779,12 +783,12 @@ def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
         columns=['name', 'description', 'license', 'version', 'schemes'],
         index='name',
     )
-    csv_file = f'{of_basename}.csv'
+    csv_file = f'{ofbase}.csv'
     df.to_csv(csv_file)
 
     # Create RST file showing CSV file
     # and adding links to all data cards
-    rst_file = f'{of_basename}.rst'
+    rst_file = f'{ofbase}.rst'
 
     t_dir = os.path.join(os.path.dirname(__file__), 'templates')
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
