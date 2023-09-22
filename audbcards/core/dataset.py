@@ -538,8 +538,16 @@ class Datacard(object):
 
         return x
 
-    def save(self, ofpath=None):
-        """Save content to rst."""
+    def save(self, ofpath: str = None):
+        """Save content of rendered template to rst.
+
+        Args:
+            ofpath: filepath to save rendered template to
+        Returns:
+            None
+
+        if ofpath is specified, the directory must exist.
+        """
 
         content = self._render_template()
 
