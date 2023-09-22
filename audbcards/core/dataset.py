@@ -567,7 +567,7 @@ def create_datacard_page_from_template(dataset: Dataset):
 
     """
     dc = Datacard(dataset)
-    _ = dc._render_template()
+    return dc._render_template()
 
 
 def create_datacard_page(dataset: Dataset):
