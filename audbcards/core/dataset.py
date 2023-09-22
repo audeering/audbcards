@@ -539,7 +539,7 @@ class Datacard(object):
         return x
 
     def save(self, ofpath=None):
-        """save content to rst."""
+        """Save content to rst."""
 
         content = self._render_template()
 
