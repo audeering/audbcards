@@ -429,12 +429,9 @@ class Dataset:
                     # e.g. {'f': 'female', 'm': 'male'}
                     mappings = '✓'
 
-        data.append(mappings)
-        data_dict['Mappings'] = mappings
+            data.append(mappings)
+            data_dict['Mappings'] = mappings
 
-        # data = [x if x != [] else "" for x in data]
-        # data = [x for x in data if x is not None]
-        # data = ', '.join(['"'+x+'"' for x in data])
         return data_dict
 
     @property
