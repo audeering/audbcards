@@ -786,8 +786,6 @@ def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
     csv_file = f'{ofbase}.csv'
     df.to_csv(csv_file)
 
-    # Create RST file showing CSV file
-    # and adding links to all data cards
     rst_file = f'{ofbase}.rst'
 
     t_dir = os.path.join(os.path.dirname(__file__), 'templates')
