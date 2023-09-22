@@ -526,7 +526,7 @@ class Datacard(object):
 
     @staticmethod
     def _trim_trailing_whitespace(x: list):
-        """J2 filter to get rid or trailing empty table entries within a row.
+        """J2 filter to get rid of trailing empty table entries within a row.
 
         Trims last entry if present.
 
