@@ -1,5 +1,6 @@
 import configparser
 import datetime
+import functools
 import os
 import random
 import shutil
@@ -511,8 +512,15 @@ class Datacard(object):
 
     @property
     def props(self) -> dict:
+        """slot to hold superclass properties for rendering."""
         props = self._dataset.properties()
         return props
+
+    @functools.cached_property
+    def content(self):
+        """Property Accessor for rendered jinja2 content."""
+
+        return self._render_template()
 
     def _render_template(self):
 
@@ -556,30 +564,12 @@ class Datacard(object):
         if ofpath is specified, the directory must exist.
         """
 
-        content = self._render_template()
-
         if ofpath is None:
             ofpath = f'datasets/{self._dataset.name}_from_template.rst'
 
         with open(ofpath, mode="w", encoding="utf-8") as fp:
-            fp.write(content)
+            fp.write(self.content)
             print(f"... wrote {ofpath}")
-
-
-def create_datacard_page_from_template(dataset: Dataset):
-    r"""Create a dedicated sub-page for the data card.
-
-
-    This creates the RST file ``docs/datasets/{dataset}.rst``
-    containing the data card for the given dataset.
-
-    If an audio example is provided for the dataset
-    it is copied to the build destination
-    under ``build/html/datasets/{dataset}``.
-
-    """
-    dc = Datacard(dataset)
-    return dc._render_template()
 
 
 def create_datacard_page(dataset: Dataset):
