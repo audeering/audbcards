@@ -5,7 +5,6 @@ db
 
 Created by H Wierstorf, C Geng, B E Abrougui
 
-
 ============= ======================
 version       `1.0.0 <https://github.com/audeering/db/blob/main/CHANGELOG.md>`__
 license       `CC0-1.0 <https://creativecommons.org/publicdomain/zero/1.0/>`__
@@ -21,7 +20,6 @@ files         2
 repository    `data-local </tmp/pytest-of-cgeng/pytest-20/test_template_render0/repo/webapp/#/artifacts/browse/tree/General/data-local/db>`__
 published     2023-04-05 by cgeng
 ============= ======================
-
 
 Description
 ^^^^^^^^^^^
@@ -49,7 +47,6 @@ Tables
     "files", "filewise", "speaker"
     "segments", "segmented", "emotion"
     "speaker", "misc", "age, gender"
-
 
 Schemes
 ^^^^^^^

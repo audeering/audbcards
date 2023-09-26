@@ -1,5 +1,6 @@
 import configparser
 import datetime
+import functools
 import os
 import random
 import shutil
@@ -19,7 +20,7 @@ import audiofile
 import audplot
 
 # Configuration -----------------------------------------------------------
-CACHE = audeer.mkdir('./cache')
+
 BUILD = audeer.path('..', 'build', 'html')
 
 
@@ -30,21 +31,23 @@ class Dataset:
             self,
             name: str,
             version: str,
+            cache_root: str = './cache',
     ):
         self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
+        self.cache_root = audeer.mkdir(audeer.path(cache_root))
 
         self.header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
-            cache_root=CACHE,
+            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
-            cache_root=CACHE,
+            cache_root=self.cache_root,
             verbose=False,
         )
 
@@ -52,12 +55,14 @@ class Dataset:
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
         versions = audeer.list_dir_names(
-            audeer.path(CACHE, name),
+            audeer.path(self.cache_root, name),
             basenames=True,
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
-            audeer.rmdir(audeer.path(CACHE, name, other_version))
+            audeer.rmdir(
+                audeer.path(self.cache_root, name, other_version)
+            )
 
     @property
     def archives(self) -> str:
@@ -130,7 +135,7 @@ class Dataset:
                 self.name,
                 media,
                 version=self.version,
-                cache_root=CACHE,
+                cache_root=self.cache_root,
                 verbose=False,
             )
         except:  # noqa: E722
@@ -181,7 +186,8 @@ class Dataset:
         player_str = ''
         # Move file to build folder
         src_dir = (
-            f'{CACHE}/{audb.flavor_path(self.name, self.version)}'
+            f'{self.cache_root}/'
+            f'{audb.flavor_path(self.name, self.version)}'
         )
         dst_dir = f'{BUILD}/datasets/{self.name}'
         audeer.mkdir(os.path.join(dst_dir, os.path.dirname(file)))
@@ -429,12 +435,9 @@ class Dataset:
                     # e.g. {'f': 'female', 'm': 'male'}
                     mappings = '✓'
 
-        data.append(mappings)
-        data_dict['Mappings'] = mappings
+            data.append(mappings)
+            data_dict['Mappings'] = mappings
 
-        # data = [x if x != [] else "" for x in data]
-        # data = [x for x in data if x is not None]
-        # data = ', '.join(['"'+x+'"' for x in data])
         return data_dict
 
     @property
@@ -509,24 +512,33 @@ class Datacard(object):
 
     @property
     def props(self) -> dict:
+        """slot to hold superclass properties for rendering."""
         props = self._dataset.properties()
         return props
+
+    @functools.cached_property
+    def content(self):
+        """Property Accessor for rendered jinja2 content."""
+
+        return self._render_template()
 
     def _render_template(self):
 
         t_dir = os.path.join(os.path.dirname(__file__), 'templates')
         environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
                                          trim_blocks=True)
-        environment.filters.update(zip=zip,
-                                   tw=self._trim_trailing_whitespace,
-                                   )
+        # Provide Jinja filter access to Python build-ins/functions
+        environment.filters.update(
+            zip=zip,
+            tw=self._trim_trailing_whitespace,
+        )
         template = environment.get_template("datacard.j2")
         content = template.render(self.props)
         return content
 
     @staticmethod
     def _trim_trailing_whitespace(x: list):
-        """J2 filter to get rid or trailing empty table entries within a row.
+        """J2 filter to get rid of trailing empty table entries within a row.
 
         Trims last entry if present.
 
@@ -541,33 +553,23 @@ class Datacard(object):
 
         return x
 
-    def save(self, ofpath=None):
-        """save content to rst."""
+    def save(self, ofpath: str = None):
+        """Save content of rendered template to rst.
 
-        content = self._render_template()
+        Args:
+            ofpath: filepath to save rendered template to
+        Returns:
+            None
+
+        if ofpath is specified, the directory must exist.
+        """
 
         if ofpath is None:
             ofpath = f'datasets/{self._dataset.name}_from_template.rst'
 
         with open(ofpath, mode="w", encoding="utf-8") as fp:
-            fp.write(content)
+            fp.write(self.content)
             print(f"... wrote {ofpath}")
-
-
-def create_datacard_page_from_template(dataset: Dataset):
-    r"""Create a dedicated sub-page for the data card.
-
-
-    This creates the RST file ``docs/datasets/{dataset}.rst``
-    containing the data card for the given dataset.
-
-    If an audio example is provided for the dataset
-    it is copied to the build destination
-    under ``build/html/datasets/{dataset}``.
-
-    """
-    dc = Datacard(dataset)
-    _ = dc._render_template()
 
 
 def create_datacard_page(dataset: Dataset):
@@ -751,12 +753,16 @@ def create_datacard_page(dataset: Dataset):
 
 
 def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
-                                       of_basename: str = 'datasets'):
+                                       ofbase: str = 'datasets'):
     r"""Create overview page of datasets.
 
     Args:
         datasets: list of datasets
-        of_basename: str
+        ofbase: basename of the file written to disk
+
+    ofbase: written to disk in both csv and rst formats.
+    Final outfilenames consist of ofbase plus extension.
+
     """
 
     tuples = [
@@ -774,12 +780,10 @@ def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
         columns=['name', 'description', 'license', 'version', 'schemes'],
         index='name',
     )
-    csv_file = f'{of_basename}.csv'
+    csv_file = f'{ofbase}.csv'
     df.to_csv(csv_file)
 
-    # Create RST file showing CSV file
-    # and adding links to all data cards
-    rst_file = f'{of_basename}.rst'
+    rst_file = f'{ofbase}.rst'
 
     t_dir = os.path.join(os.path.dirname(__file__), 'templates')
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
@@ -862,10 +866,10 @@ def format_schemes(
 ):
     """Convert schemes object into string.
 
-    It lists the main annotaton schemes
+    It lists the main annotation schemes
     of the datasets,
     and collects additional information
-    on schemes calles `emotion` and `speaker`.
+    on schemes calls `emotion` and `speaker`.
 
     """
     # Filter schemes

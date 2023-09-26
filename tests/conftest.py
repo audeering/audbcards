@@ -15,7 +15,17 @@ pytest.REPOSITORY = None
 pytest.VERSION = '1.0.0'
 
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
-pytest.TEMPLATE_DIR = audeer.mkdir(os.path.join(pytest.ROOT, 'templates'))
+pytest.TEMPLATE_DIR = audeer.mkdir(
+    os.path.join(
+        pytest.ROOT,
+        'test_data',
+        'rendered_templates',
+    ))
+
+
+@pytest.fixture
+def cache(tmpdir, scope='function'):
+    return audeer.mkdir(audeer.path(tmpdir, 'cache'))
 
 
 @pytest.fixture
@@ -77,7 +87,9 @@ def publish_db(tmpdir, scope='session', autouse=True):
         labels='speaker',
         description='Speaker IDs.',
     )
-    index = audformat.filewise_index(['data/f0.wav', 'data/f1.wav'])
+    index = audformat.filewise_index([
+        'data/f0.wav', 'data/f1.wav'
+    ])
     db['files'] = audformat.Table(index)
     db['files']['speaker'] = audformat.Column(scheme_id='speaker')
     db['files']['speaker'].set([0, 1])
@@ -90,8 +102,8 @@ def publish_db(tmpdir, scope='session', autouse=True):
     )
     index = audformat.segmented_index(
         files=['data/f0.wav', 'data/f0.wav', 'data/f1.wav', 'data/f1.wav'],
-        starts=[0, 1, 0, 1],
-        ends=[1, 2, 1, 2],
+        starts=[0, 0.5, 0, 150],
+        ends=[0.5, 1, 150, 301],
     )
     db['segments'] = audformat.Table(index)
     db['segments']['emotion'] = audformat.Column(scheme_id='emotion')
@@ -100,11 +112,11 @@ def publish_db(tmpdir, scope='session', autouse=True):
     # Create audio files and store database
     np.random.seed(1)
     sampling_rate = 8000
-    duration = 2
-    for file in list(db['files'].index):
+    durations = [1, 301]
+    for i, file in enumerate(list(db['files'].index)):
         path = audeer.path(db_path, file)
         audeer.mkdir(os.path.dirname(path))
-        signal = np.random.normal(0, .1, (1, duration * sampling_rate))
+        signal = np.random.normal(0, .1, (1, durations[i] * sampling_rate))
         audiofile.write(path, signal, sampling_rate, normalize=True)
     db.save(db_path)
 
@@ -134,7 +146,8 @@ def db(publish_db, scope='function'):
 @pytest.fixture
 def default_template(scope='function'):
 
-    fpath = os.path.join(pytest.TEMPLATE_DIR, 'db.rst')
+    fpath = os.path.join(pytest.TEMPLATE_DIR, 'default.rst')
+
     with open(fpath, 'r') as file:
         template_truth = file.read().rstrip()
 
