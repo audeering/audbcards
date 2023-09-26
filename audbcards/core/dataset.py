@@ -33,7 +33,6 @@ class Dataset:
             version: str,
             cache_root: str = './cache',
     ):
-        self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
@@ -172,8 +171,13 @@ class Dataset:
             return f'`{license} <{self.header.license_url}>`__'
 
     @property
+    def name(self) -> str:
+        r"""Name of dataset."""
+        return self.header.name
+
+    @property
     def name_link(self) -> str:
-        r"""Name of dataset as internal link to data card."""
+        r"""Name of dataset as internal RST link to data card."""
         return f'`{self.name} <./datasets/{self.name}.html>`__'
 
     def player(
