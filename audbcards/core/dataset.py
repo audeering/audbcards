@@ -572,8 +572,10 @@ class Datacard(object):
             print(f"... wrote {ofpath}")
 
 
-def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
-                                       ofbase: str = 'datasets'):
+def create_datasets_page(
+        datasets: typing.Sequence[Dataset],
+        ofbase: str = 'datasets',
+):
     r"""Create overview page of datasets.
 
     Args:
@@ -627,56 +629,6 @@ def create_datasets_page_from_template(datasets: typing.Sequence[Dataset],
     with open(rst_file, mode="w", encoding="utf-8") as fp:
         fp.write(content)
         print(f"... wrote {rst_file}")
-
-
-def create_datasets_page(datasets: typing.Sequence):
-    r"""Create overview page of datasets."""
-    # Create CSV file with overview of datasets
-    tuples = [
-        (
-            dataset.name_link,
-            dataset.short_description,
-            dataset.license_link,
-            dataset.version,
-            dataset.schemes,
-        )
-        for dataset in datasets
-    ]
-    df = pd.DataFrame.from_records(
-        tuples,
-        columns=['name', 'description', 'license', 'version', 'schemes'],
-        index='name',
-    )
-    csv_file = 'datasets.csv'
-    df.to_csv(csv_file)
-    # Create RST file showing CSV file
-    # and adding links to all data cards
-    rst_file = 'datasets.rst'
-    with open(rst_file, 'w') as fp:
-
-        fp.write('.. _datasets:\n')
-        fp.write('\n')
-        fp.write('Datasets\n')
-        fp.write('========\n')
-        fp.write('\n')
-        fp.write('Datasets available with audb_ as of |today|.\n')
-        fp.write('For each dataset, the latest version is shown.\n')
-        fp.write('\n')
-        fp.write('.. csv-table::\n')
-        fp.write('    :header-rows: 1\n')
-        fp.write('    :widths: 10, 20, 7, 4, 25\n')
-        fp.write(f'    :file: {csv_file}\n')
-        fp.write('\n')
-        fp.write('.. _audb: https://audeering.github.io/audb/\n')
-        fp.write('\n')
-        fp.write('\n')
-        fp.write('.. toctree::\n')
-        fp.write('    :maxdepth: 1\n')
-        fp.write('    :hidden:\n')
-        fp.write('\n')
-        # Add links to data cards
-        for dataset in datasets:
-            fp.write(f'    datasets/{dataset.name}\n')
 
 
 def format_schemes(
