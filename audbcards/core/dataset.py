@@ -183,7 +183,7 @@ class Dataset:
     @property
     def player(self) -> str:
         r"""Create an audio player showing the waveform.
-        
+
         As audio file :attr:`audbcards.Dataset.example`
         is used.
 
@@ -565,7 +565,7 @@ class Datacard(object):
         """
 
         if ofpath is None:
-            ofpath = f'datasets/{self._dataset.name}_from_template.rst'
+            ofpath = f'datasets/{self._dataset.name}.rst'
 
         with open(ofpath, mode="w", encoding="utf-8") as fp:
             fp.write(self.content)
