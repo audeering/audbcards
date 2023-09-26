@@ -3,7 +3,7 @@ import pytest
 import difflib
 import numpy as np
 
-from audbcards.core.dataset import create_datasets_page_from_template
+from audbcards.core.dataset import create_datasets_page
 
 
 def test_datacard_from_template_lines_similar(db, default_template):
@@ -35,4 +35,4 @@ def test_datacard_from_template_lines_similar(db, default_template):
 def test_create_datasets_page(db):
 
     datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
-    create_datasets_page_from_template(datasets, ofbase="datasets_page")
+    create_datasets_page(datasets, ofbase="datasets_page")

@@ -136,7 +136,7 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.version_link == expected_version_link
 
     # Test player
-    player_str = dataset.player()
+    player_str = dataset.player
     # Generate expected player
     # Check if file has been copied under the build folder
     dst_dir = f'{BUILD}/datasets/{db.name}'

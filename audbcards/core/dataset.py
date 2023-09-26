@@ -311,7 +311,7 @@ class Dataset:
                      if isinstance(v, property))
 
         props['name'] = self.name
-        props['player'] = self.player()
+        props['player'] = self.player
 
         return props
 
