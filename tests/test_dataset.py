@@ -136,36 +136,29 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.version_link == expected_version_link
 
     # Test player
-    # Init player using dataset object
-    plot_waveform = True
-    player_str = dataset.player(dataset.example, waveform=plot_waveform)
+    player_str = dataset.player()
     # Generate expected player
-    expected_player_str = ''
     # Check if file has been copied under the build folder
     dst_dir = f'{BUILD}/datasets/{db.name}'
     assert os.path.exists(os.path.join(dst_dir, expected_example))
     # Add plot of waveform
-    if plot_waveform:
-        signal, sampling_rate = audiofile.read(
-            os.path.join(dst_dir, expected_example),
-            always_2d=True,
-        )
-        plt.figure(figsize=[3, .5])
-        ax = plt.subplot(111)
-        audplot.waveform(signal[0, :], ax=ax)
-        audbcards.core.dataset.set_plot_margins()
-        plt.savefig(f'{os.path.join(tmpdir, db.name)}.png')
-        plt.close()
-        # Check if generated images are exactly the same (pixel-wise)
-        assert open(f'{db.name}.png', 'rb').read(
-        ) == open(f'{os.path.join(tmpdir, db.name)}.png', 'rb').read()
-        # Append image to the expected player_str
-        expected_player_str += (
-            f'.. image:: ../{db.name}.png\n'
-            '\n'
-        )
+    signal, sampling_rate = audiofile.read(
+        os.path.join(dst_dir, expected_example),
+        always_2d=True,
+    )
+    plt.figure(figsize=[3, .5])
+    ax = plt.subplot(111)
+    audplot.waveform(signal[0, :], ax=ax)
+    audbcards.core.dataset.set_plot_margins()
+    plt.savefig(f'{os.path.join(tmpdir, db.name)}.png')
+    plt.close()
+    # Check if generated images are exactly the same (pixel-wise)
+    assert open(f'{db.name}.png', 'rb').read(
+    ) == open(f'{os.path.join(tmpdir, db.name)}.png', 'rb').read()
     # Append audio to the expected player_str
-    expected_player_str += (
+    expected_player_str = (
+        f'.. image:: ../{db.name}.png\n'
+        '\n'
         '.. raw:: html\n'
         '\n'
         f'    <p><audio controls src="{db.name}/{expected_example}">'

@@ -180,15 +180,16 @@ class Dataset:
         r"""Name of dataset as internal RST link to data card."""
         return f'`{self.name} <./datasets/{self.name}.html>`__'
 
-    def player(
-            self,
-            file,
-            *,
-            waveform=True,
-    ) -> str:
-        r"""Create an audio player showing the waveform."""
-        player_str = ''
+    @property
+    def player(self) -> str:
+        r"""Create an audio player showing the waveform.
+        
+        As audio file :attr:`audbcards.Dataset.example`
+        is used.
+
+        """
         # Move file to build folder
+        file = self.example
         src_dir = (
             f'{self.cache_root}/'
             f'{audb.flavor_path(self.name, self.version)}'
@@ -199,24 +200,22 @@ class Dataset:
             os.path.join(src_dir, file),
             os.path.join(dst_dir, file),
         )
-        if waveform:
-            # Add plot of waveform
-            signal, sampling_rate = audiofile.read(
-                os.path.join(src_dir, file),
-                always_2d=True,
-            )
-            plt.figure(figsize=[3, .5])
-            ax = plt.subplot(111)
-            audplot.waveform(signal[0, :], ax=ax)
-            set_plot_margins()
-            plt.savefig(f'{self.name}.png')
-            plt.close()
 
-            player_str += (
-                f'.. image:: ../{self.name}.png\n'
-                '\n'
-            )
-        player_str += (
+        # Add plot of waveform
+        signal, sampling_rate = audiofile.read(
+            os.path.join(src_dir, file),
+            always_2d=True,
+        )
+        plt.figure(figsize=[3, .5])
+        ax = plt.subplot(111)
+        audplot.waveform(signal[0, :], ax=ax)
+        set_plot_margins()
+        plt.savefig(f'{self.name}.png')
+        plt.close()
+
+        player_str = (
+            f'.. image:: ../{self.name}.png\n'
+            '\n'
             '.. raw:: html\n'
             '\n'
             f'    <p><audio controls src="{self.name}/{file}"></audio></p>'
@@ -312,7 +311,7 @@ class Dataset:
                      if isinstance(v, property))
 
         props['name'] = self.name
-        props['player'] = self.player(self.example)
+        props['player'] = self.player()
 
         return props
 
