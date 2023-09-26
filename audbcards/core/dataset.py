@@ -310,9 +310,6 @@ class Dataset:
                      for k, v in class_items
                      if isinstance(v, property))
 
-        props['name'] = self.name
-        props['player'] = self.player
-
         return props
 
     @property
