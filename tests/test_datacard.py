@@ -7,7 +7,16 @@ from audbcards.core.dataset import create_datasets_page
 
 
 def test_datacard_from_template_lines_similar(db, default_template):
-    """Create datacard using jinja2 via Dataset and Datacard."""
+    """Create datacard using jinja2 via Dataset and Datacard.
+
+    The assertions for exact identity are currently too strict.
+    Therefore this uses text similarities as obtained from
+    the difflib builtins. These are based on
+
+    - average (or rather median and mean) similarities per line
+    - percentage of lines differing between original and rendered
+
+    """
 
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
     dc = audbcards.Datacard(dataset)
