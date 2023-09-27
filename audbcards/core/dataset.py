@@ -509,12 +509,6 @@ class Datacard(object):
 
         self._dataset = dataset
 
-    @property
-    def props(self) -> dict:
-        """slot to hold superclass properties for rendering."""
-        props = self._dataset.properties()
-        return props
-
     @functools.cached_property
     def content(self):
         """Property Accessor for rendered jinja2 content."""
