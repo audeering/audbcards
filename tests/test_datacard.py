@@ -6,7 +6,7 @@ import numpy as np
 from audbcards.core.dataset import create_datasets_page
 
 
-def test_datacard_from_template_lines_similar(db, default_template):
+def test_datacard_lines_similar(db, default_template):
     """Create datacard using jinja2 via Dataset and Datacard.
 
     The assertions for exact identity are currently too strict.
