@@ -532,7 +532,7 @@ class Datacard(object):
             tw=self._trim_trailing_whitespace,
         )
         template = environment.get_template("datacard.j2")
-        content = template.render(self.props)
+        content = template.render(self._dataset.properties())
         return content
 
     @staticmethod
