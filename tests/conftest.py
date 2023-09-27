@@ -20,7 +20,8 @@ pytest.TEMPLATE_DIR = audeer.mkdir(
         pytest.ROOT,
         'test_data',
         'rendered_templates',
-    ))
+    )
+)
 
 
 @pytest.fixture
