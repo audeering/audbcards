@@ -301,7 +301,6 @@ class Dataset:
         url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
         return f'`{self.version} <{url}>`__'
 
-    """Additions to class """
     def properties(self):
         """Get list of properties of the object."""
 
