@@ -23,6 +23,7 @@ def test_datacard_lines_similar(db, default_template):
     content = dc._render_template()
     content = content.rstrip()
 
+    # Remove lines that depent on author/local machine
     for pattern in [
             re.compile('^published.*$', flags=(re.MULTILINE)),
             re.compile('^repository.*$', flags=(re.MULTILINE)),
