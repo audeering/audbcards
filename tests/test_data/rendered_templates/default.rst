@@ -17,8 +17,8 @@ sampling rate 8000
 bit depth     16
 duration      0 days 00:00:04
 files         2
-repository    `data-local </tmp/pytest-of-cgeng/pytest-20/test_template_render0/repo/webapp/#/artifacts/browse/tree/General/data-local/db>`__
-published     2023-04-05 by cgeng
+repository    `data-local <.../data-local/db>`__
+published     2023-04-05 by author
 ============= ======================
 
 Description
@@ -29,13 +29,13 @@ Example database.
 Example
 ^^^^^^^
 
-:file:`data/f1.wav`
+:file:`data/f0.wav`
 
 .. image:: ../db.png
 
 .. raw:: html
 
-    <p><audio controls src="db/data/f1.wav"></audio></p>
+    <p><audio controls src="db/data/f0.wav"></audio></p>
 
 Tables
 ^^^^^^

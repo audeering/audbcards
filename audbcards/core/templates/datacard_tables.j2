@@ -7,5 +7,5 @@ Tables
    :widths: 20, 10, 70
 
 {% for data in tables|zip(types)|zip(columns) %}
-    "{{ data[0][0] }}", "{{ data[0][1] }}",  "{{ data[1] }}"
+    "{{ data[0][0] }}", "{{ data[0][1] }}", "{{ data[1] }}"
 {% endfor %}
