@@ -1,4 +1,3 @@
-import configparser
 import datetime
 import os
 import random
@@ -9,6 +8,7 @@ import jinja2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import toml
 
 import audb
 import audeer
@@ -247,9 +247,11 @@ class Dataset:
             ts = os.stat(url).st_ctime
             date_created = datetime.datetime.utcfromtimestamp(ts)
             date_created = date_created.strftime("%Y-%m-%d")
-            cf = configparser.ConfigParser()
-            cf.read('setup.cfg')
-            authors = cf['metadata']['Author']
+            config = toml.load(audeer.path('pyproject.toml'))
+            authors = ', '.join(
+                author['name']
+                for author in config['project']['authors']
+            )
             creators = authors.split(', ')
             creator = random.choice(creators)
             publication = f'{date_created} by {creator}'
