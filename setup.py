@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 package_data = {'audbcards': ['core/templates/*']}
 
 setup(

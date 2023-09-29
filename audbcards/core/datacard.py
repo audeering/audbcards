@@ -7,7 +7,15 @@ from audbcards.core.dataset import Dataset
 
 
 class Datacard(object):
+    r"""Datacard.
 
+    Datacard object to write a RST file
+    for a given dataset.
+
+    Args:
+        dataset: dataset object
+
+    """
     def __init__(self, dataset: Dataset):
 
         self._dataset = dataset
@@ -15,7 +23,6 @@ class Datacard(object):
     @functools.cached_property
     def content(self):
         """Property Accessor for rendered jinja2 content."""
-
         return self._render_template()
 
     def _render_template(self):
@@ -43,7 +50,6 @@ class Datacard(object):
         Returns:
             trimmed single scheme table row
         """
-
         if x[-1] == '':
             x.pop()
 
@@ -59,7 +65,6 @@ class Datacard(object):
 
         if ofpath is specified, the directory must exist.
         """
-
         if ofpath is None:
             ofpath = f'datasets/{self._dataset.name}.rst'
 

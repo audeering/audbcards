@@ -1,18 +1,18 @@
 import os
 import posixpath
 
-import pytest
-
-import audeer
-import audiofile
-import audb
-import audformat
-import audbcards
-import audplot
-
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import pytest
+
+import audb
+import audeer
+import audformat
+import audiofile
+import audplot
+
+import audbcards
 
 
 BUILD = audeer.path('..', 'build', 'html')
