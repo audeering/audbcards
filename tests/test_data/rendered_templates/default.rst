@@ -10,12 +10,12 @@ version       `1.0.0 <https://github.com/audeering/db/blob/main/CHANGELOG.md>`__
 license       `CC0-1.0 <https://creativecommons.org/publicdomain/zero/1.0/>`__
 source        https://github.com/audeering/audbcards
 usage         unrestricted
-languages     eng
+languages     eng, deu
 format        wav
 channel       1
 sampling rate 8000
 bit depth     16
-duration      0 days 00:00:04
+duration      0 days 00:05:02
 files         2
 repository    `data-local <.../data-local/db>`__
 published     2023-04-05 by author

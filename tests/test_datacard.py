@@ -6,7 +6,7 @@ import audbcards
 from audbcards.core.dataset import create_datasets_page
 
 
-def test_datacard_lines_similar(db, default_template):
+def test_datacard_lines_similar(db, default_template, cache):
     """Create datacard using jinja2 via Dataset and Datacard.
 
     The assertions for exact identity are currently too strict.
@@ -18,7 +18,7 @@ def test_datacard_lines_similar(db, default_template):
 
     """
 
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION)
+    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     dc = audbcards.Datacard(dataset)
     content = dc._render_template()
     content = content.rstrip()

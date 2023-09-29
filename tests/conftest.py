@@ -42,7 +42,7 @@ def publish_db(tmpdir, scope='session', autouse=True):
     the database was published to.
 
     """
-    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    cache = audeer.mkdir(audeer.path(tmpdir, 'audb-cache'))
     audb.config.CACHE_ROOT = cache
     audb.config.SHARED_CACHE = cache
 
