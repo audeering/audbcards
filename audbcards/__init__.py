@@ -1,5 +1,5 @@
-from audbcards.core.dataset import Dataset
 from audbcards.core.datacard import Datacard
+from audbcards.core.dataset import Dataset
 
 
 __all__ = []

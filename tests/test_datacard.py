@@ -17,13 +17,12 @@ def test_datacard_lines_similar(db, default_template, cache):
     - percentage of lines differing between original and rendered
 
     """
-
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     dc = audbcards.Datacard(dataset)
     content = dc._render_template()
     content = content.rstrip()
 
-    # Remove lines that depent on author/local machine
+    # Remove lines that depend on author/local machine
     for pattern in [
             re.compile('^published.*$', flags=(re.MULTILINE)),
             re.compile('^repository.*$', flags=(re.MULTILINE)),

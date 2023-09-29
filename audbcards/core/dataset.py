@@ -1,4 +1,3 @@
-import configparser
 import datetime
 import os
 import random
@@ -6,10 +5,10 @@ import shutil
 import typing
 
 import jinja2
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import toml
 
 import audb
 import audeer
@@ -30,7 +29,17 @@ BUILD = audeer.path('..', 'build', 'html')
 
 # Functions to create data cards -------------------------------------------
 class Dataset:
+    r"""Dataset.
 
+    Dataset object that represents a dataset
+    that can be loaded with :func:`audb.load()`.
+
+    Args:
+        name: name of dataset
+        version: version of dataset
+        cache_root: cache folder
+
+    """
     def __init__(
             self,
             name: str,
@@ -238,9 +247,11 @@ class Dataset:
             ts = os.stat(url).st_ctime
             date_created = datetime.datetime.utcfromtimestamp(ts)
             date_created = date_created.strftime("%Y-%m-%d")
-            cf = configparser.ConfigParser()
-            cf.read('setup.cfg')
-            authors = cf['metadata']['Author']
+            config = toml.load(audeer.path('pyproject.toml'))
+            authors = ', '.join(
+                author['name']
+                for author in config['project']['authors']
+            )
             creators = authors.split(', ')
             creator = random.choice(creators)
             publication = f'{date_created} by {creator}'
@@ -307,7 +318,6 @@ class Dataset:
 
     def properties(self):
         """Get list of properties of the object."""
-
         class_items = self.__class__.__dict__.items()
         props = dict((k, getattr(self, k))
                      for k, v in class_items
@@ -342,13 +352,14 @@ class Dataset:
 
     @property
     def tables(self) -> typing.List[str]:
-        """List od Tables in db."""
+        """Tables of the dataset."""
         db = self.header
         tables = list(db)
         return tables
 
     @property
     def columns(self) -> typing.List[str]:
+        """Columns of the dataset."""
         db = self.header
         columns = [list(db[table_id].columns) for table_id in self.tables]
         columns = [x for x in map(", ".join, columns)]
@@ -356,6 +367,7 @@ class Dataset:
 
     @property
     def types(self) -> typing.List[str]:
+        """Table types of the dataset."""
         types = []
         db = self.header
         for table_id in self.tables:
@@ -445,7 +457,7 @@ class Dataset:
 
     @property
     def scheme_info(self) -> dict:
-
+        """Information on schemes."""
         db = self.header
         scheme_info = {}
 
@@ -492,7 +504,12 @@ class Dataset:
 
     @property
     def dataset_schemes(self) -> list:
+        """Dataset schemes with more information.
 
+        Eache scheme is returned as a list
+        containing its name, type, min, max, labels, mappings.
+
+        """
         db = self.header
         dataset_schemes = []
         for scheme_id in db.schemes:
@@ -521,7 +538,6 @@ def create_datasets_page(
     Final outfilenames consist of ofbase plus extension.
 
     """
-
     tuples = [
         (
             dataset.name_link,
