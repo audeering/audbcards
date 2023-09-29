@@ -1,0 +1,11 @@
+
+Schemes
+^^^^^^^
+
+.. csv-table::
+{{ scheme_info['header_line'] }}
+
+{% for row in  dataset_schemes %}
+  {% set row_trimmed = row|tw %}
+  "{{ row_trimmed|join('", "') }}"
+{% endfor %}

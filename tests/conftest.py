@@ -14,6 +14,15 @@ pytest.NAME = 'db'
 pytest.REPOSITORY = None
 pytest.VERSION = '1.0.0'
 
+pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
+pytest.TEMPLATE_DIR = audeer.mkdir(
+    os.path.join(
+        pytest.ROOT,
+        'test_data',
+        'rendered_templates',
+    )
+)
+
 
 @pytest.fixture
 def cache(tmpdir, scope='function'):
@@ -33,7 +42,7 @@ def publish_db(tmpdir, scope='session', autouse=True):
     the database was published to.
 
     """
-    cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    cache = audeer.mkdir(audeer.path(tmpdir, 'audb-cache'))
     audb.config.CACHE_ROOT = cache
     audb.config.SHARED_CACHE = cache
 
@@ -44,7 +53,7 @@ def publish_db(tmpdir, scope='session', autouse=True):
         source='https://github.com/audeering/audbcards',
         usage='unrestricted',
         expires=None,
-        languages='eng',
+        languages=['eng', 'de'],
         description='Example database.',
         author='H Wierstorf, C Geng, B E Abrougui',
         organization='audEERING',
@@ -133,3 +142,14 @@ def db(publish_db, scope='function'):
         version=pytest.VERSION,
         verbose=False,
     )
+
+
+@pytest.fixture
+def default_template(scope='function'):
+
+    fpath = os.path.join(pytest.TEMPLATE_DIR, 'default.rst')
+
+    with open(fpath, 'r') as file:
+        template_truth = file.read().rstrip()
+
+    return template_truth

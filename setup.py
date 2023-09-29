@@ -1,7 +1,6 @@
 from setuptools import setup
 
-
-package_data = {'audb': ['core/etc/*']}
+package_data = {'audbcards': ['core/templates/*']}
 
 setup(
     use_scm_version=True,

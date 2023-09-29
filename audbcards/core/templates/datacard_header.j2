@@ -1,0 +1,26 @@
+.. _{{ name }}:
+
+{{ name }}
+{% for n in range(name|length) %}-{% endfor %}
+
+
+{% if author is defined %}
+Created by {{ author }}
+{% endif %}
+
+============= ======================
+version       {{ version_link }}
+license       {{ license_link }}
+source        {{ source }}
+usage         {{ usage }}
+{% if languages is defined %}languages     {{ languages|join(', ') }}{% endif %}
+
+format        {{ formats }}
+channel       {{ channels  }}
+sampling rate {{ sampling_rates }}
+bit depth     {{ bit_depths }}
+duration      {{ duration }}
+files         {{ files }}
+repository    {{ repository_link }}
+published     {{ publication }}
+============= ======================

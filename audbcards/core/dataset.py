@@ -1,6 +1,12 @@
+import configparser
+import datetime
+import functools
 import os
+import random
 import shutil
 import typing
+
+import jinja2
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,7 +18,6 @@ import audfactory
 import audformat
 import audiofile
 import audplot
-
 
 # Configuration -----------------------------------------------------------
 
@@ -28,7 +33,6 @@ class Dataset:
             version: str,
             cache_root: str = './cache',
     ):
-        self.name = name
         self.version = version
         self.repository = audb.repository(name, version)
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
@@ -167,19 +171,25 @@ class Dataset:
             return f'`{license} <{self.header.license_url}>`__'
 
     @property
+    def name(self) -> str:
+        r"""Name of dataset."""
+        return self.header.name
+
+    @property
     def name_link(self) -> str:
-        r"""Name of dataset as internal link to data card."""
+        r"""Name of dataset as internal RST link to data card."""
         return f'`{self.name} <./datasets/{self.name}.html>`__'
 
-    def player(
-            self,
-            file,
-            *,
-            waveform=True,
-    ) -> str:
-        r"""Create an audio player showing the waveform."""
-        player_str = ''
+    @property
+    def player(self) -> str:
+        r"""Create an audio player showing the waveform.
+
+        As audio file :attr:`audbcards.Dataset.example`
+        is used.
+
+        """
         # Move file to build folder
+        file = self.example
         src_dir = (
             f'{self.cache_root}/'
             f'{audb.flavor_path(self.name, self.version)}'
@@ -190,24 +200,22 @@ class Dataset:
             os.path.join(src_dir, file),
             os.path.join(dst_dir, file),
         )
-        if waveform:
-            # Add plot of waveform
-            signal, sampling_rate = audiofile.read(
-                os.path.join(src_dir, file),
-                always_2d=True,
-            )
-            plt.figure(figsize=[3, .5])
-            ax = plt.subplot(111)
-            audplot.waveform(signal[0, :], ax=ax)
-            set_plot_margins()
-            plt.savefig(f'{self.name}.png')
-            plt.close()
 
-            player_str += (
-                f'.. image:: ../{self.name}.png\n'
-                '\n'
-            )
-        player_str += (
+        # Add plot of waveform
+        signal, sampling_rate = audiofile.read(
+            os.path.join(src_dir, file),
+            always_2d=True,
+        )
+        plt.figure(figsize=[3, .5])
+        ax = plt.subplot(111)
+        audplot.waveform(signal[0, :], ax=ax)
+        set_plot_margins()
+        plt.savefig(f'{self.name}.png')
+        plt.close()
+
+        player_str = (
+            f'.. image:: ../{self.name}.png\n'
+            '\n'
             '.. raw:: html\n'
             '\n'
             f'    <p><audio controls src="{self.name}/{file}"></audio></p>'
@@ -221,9 +229,23 @@ class Dataset:
             f'{self.repository.host}/{self.repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
         )
-        path = audfactory.path(url)
-        stat = path.stat()
-        return f'{stat.ctime:%Y-%m-%d} by {stat.created_by}'
+
+        if self.repository.backend == 'file-system':
+            ts = os.stat(url).st_ctime
+            date_created = datetime.datetime.utcfromtimestamp(ts)
+            date_created = date_created.strftime("%Y-%m-%d")
+            cf = configparser.ConfigParser()
+            cf.read('setup.cfg')
+            authors = cf['metadata']['Author']
+            creators = authors.split(', ')
+            creator = random.choice(creators)
+            publication = f'{date_created} by {creator}'
+        else:
+            path = audfactory.path(url)
+            stat = path.stat()
+            publication = f'{stat.ctime:%Y-%m-%d} by {stat.created_by}'
+
+        return publication
 
     @property
     def repository_link(self) -> str:
@@ -279,101 +301,150 @@ class Dataset:
         url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
         return f'`{self.version} <{url}>`__'
 
+    def properties(self):
+        """Get list of properties of the object."""
 
-def create_datacard_page(dataset: Dataset):
-    r"""Create a dedicated sub-page for the data card.
+        class_items = self.__class__.__dict__.items()
+        props = dict((k, getattr(self, k))
+                     for k, v in class_items
+                     if isinstance(v, property))
 
-    This creates the RST file ``docs/datasets/{dataset}.rst``
-    containing the data card for the given dataset.
+        return props
 
-    If an audio example is provided for the dataset
-    it is copied to the build destination
-    under ``build/html/datasets/{dataset}``.
+    @property
+    def source(self) -> str:
+        r"""Source of the database."""
+        return self.header.source
 
-    """
-    db = dataset.header
+    @property
+    def description(self) -> str:
+        r"""Source of the database."""
+        return self.header.description
 
-    rst_file = f'datasets/{dataset.name}.rst'
-    with open(rst_file, 'w') as fp:
+    @property
+    def usage(self) -> str:
+        r"""Usage of the database."""
+        return self.header.usage
 
-        # Link to page
-        fp.write(f'.. _{dataset.name}:\n')
-        fp.write('\n')
+    @property
+    def languages(self) -> typing.List[str]:
+        r"""Languages of the database."""
+        return self.header.languages
 
-        # Heading
-        fp.write(f'{dataset.name}\n')
-        fp.write('-' * len(dataset.name))
-        fp.write('\n\n')
+    @property
+    def author(self) -> typing.List[str]:
+        r"""Authors of the database."""
+        return self.header.author
 
-        # Author
-        if db.author is not None:
-            fp.write(f'Created by {db.author}\n')
-            fp.write('\n\n')
-
-        # Overview table
-        fp.write('============= ======================\n')
-        fp.write(f'version       {dataset.version_link}\n')
-        fp.write(f'license       {dataset.license_link}\n')
-        fp.write(f'source        {db.source}\n')
-        fp.write(f'usage         {db.usage}\n')
-        if db.languages is not None:
-            fp.write(f'languages     {", ".join(db.languages)}\n')
-        fp.write(f'format        {dataset.formats}\n')
-        fp.write(f'channel       {dataset.channels}\n')
-        fp.write(f'sampling rate {dataset.sampling_rates}\n')
-        fp.write(f'bit depth     {dataset.bit_depths}\n')
-        fp.write(f'duration      {dataset.duration}\n')
-        fp.write(f'files         {dataset.files}\n')
-        fp.write(f'repository    {dataset.repository_link}\n')
-        fp.write(f'published     {dataset.publication}\n')
-        fp.write('============= ======================\n')
-        fp.write('\n\n')
-
-        # Description
-        if (
-                db.description is not None
-                and len(db.description) > 0
-        ):
-            description = db.description.replace('|', r'\|')
-            fp.write('Description\n')
-            fp.write('^^^^^^^^^^^\n')
-            fp.write('\n')
-            fp.write(description)
-            fp.write('\n\n')
-
-        # Audio example
-        file = dataset.example
-        if len(file) > 0:
-            fp.write('Example\n')
-            fp.write('^^^^^^^\n')
-            fp.write('\n')
-            fp.write(f':file:`{file}`\n')
-            fp.write('\n')
-            fp.write(f'{dataset.player(file)}\n')
-            fp.write('\n')
-
-        # Tables
+    @property
+    def tables(self) -> typing.List[str]:
+        """List od Tables in db."""
+        db = self.header
         tables = list(db)
+        return tables
+
+    @property
+    def columns(self) -> typing.List[str]:
+        db = self.header
+        columns = [list(db[table_id].columns) for table_id in self.tables]
+        columns = [x for x in map(", ".join, columns)]
+        return columns
+
+    @property
+    def types(self) -> typing.List[str]:
         types = []
-        for table_id in tables:
+        db = self.header
+        for table_id in self.tables:
             table = db[table_id]
             if isinstance(table, audformat.MiscTable):
                 types.append('misc')
             else:
                 types.append(table.type)
-        columns = [list(db[table_id].columns) for table_id in tables]
-        fp.write('Tables\n')
-        fp.write('^^^^^^\n')
-        fp.write('\n')
-        fp.write('.. csv-table::\n')
-        fp.write('   :header: ID,Type,Columns\n')
-        fp.write('   :widths: 20, 10, 70\n')
-        fp.write('\n')
-        for table, type_, column in zip(tables, types, columns):
-            fp.write(f'    "{table}", "{type_}", "{", ".join(column)}"\n')
-        fp.write('\n\n')
 
-        # Schemes
+        return types
+
+    def _scheme_to_list(self, scheme_id):
+
+        db = self.header
+        scheme_info = self.scheme_info
+
+        scheme = db.schemes[scheme_id]
+
+        data_dict = {
+            'ID': scheme_id,
+            'Dtype': scheme.dtype,
+        }
+        data = [scheme_id, scheme.dtype]
+        #  minimum, maximum, labels, mappings = "", "", "", ""
+
+        minimum, maximum = None, None
+        labels = None
+
+        # can use 'Minimum' in scheme_info['columns'] later on
+        if scheme_info["has_minimums"]:
+            minimum = scheme.minimum or ''
+            data_dict['Min'] = minimum
+        if scheme_info["has_maximums"]:
+            maximum = scheme.maximum or ''
+            data_dict['Max'] = maximum
+        if scheme_info["has_labels"]:
+            if scheme.labels is None:
+                labels = []
+            else:
+                labels = sorted(scheme._labels_to_list())
+                labels = [str(label) for label in labels]
+                # Avoid `_` at end of label,
+                # as this has special meaning in RST (link)
+                labels = [
+                    label[:-1] + r'\_'
+                    if label.endswith('_')
+                    else label
+                    for label in labels
+                ]
+                labels = limit_presented_samples(
+                    labels,
+                    15,
+                    replacement_text='[...]',
+                )
+                labels = ", ".join(labels)
+            scheme_info['Labels'] = labels
+
+        data.append(minimum)
+        data.append(maximum)
+        data.append(labels)
+        data_dict['Labels'] = labels
+        if scheme_info["has_mappings"]:
+            if not isinstance(scheme.labels, (str, dict)):
+                mappings = ''
+            else:
+                labels = scheme._labels_to_dict()
+                # Mappings can contain a single mapping
+                # or a deeper nestings.
+                # In the first case we just present ✓,
+                # in the second case the keys of the nested dict.
+                # {'f': 'female', 'm': 'male'}
+                # or
+                # {'s1': {'gender': 'male', 'age': 21}}
+                mappings = list(labels.values())
+                if isinstance(mappings[0], dict):
+                    # e.g. {'s1': {'gender': 'male', 'age': 21}}
+                    mappings = sorted(list(mappings[0].keys()))
+                    mappings = f'{", ".join(mappings)}'
+                else:
+                    # e.g. {'f': 'female', 'm': 'male'}
+                    mappings = '✓'
+
+            data.append(mappings)
+            data_dict['Mappings'] = mappings
+
+        return data_dict
+
+    @property
+    def scheme_info(self) -> dict:
+
+        db = self.header
+        scheme_info = {}
+
         if len(db.schemes) > 0:
             has_minimums = any(
                 [db.schemes[s].minimum is not None for s in db.schemes]
@@ -390,79 +461,125 @@ def create_datacard_page(dataset: Dataset):
                     for s in db.schemes
                 ]
             )
-            header_line = '   :header: ID,Dtype'
-            if has_minimums:
-                header_line += ',Min'
-            if has_maximums:
-                header_line += ',Max'
-            if has_labels:
-                header_line += ',Labels'
-            if has_mappings:
-                header_line += ',Mappings'
-            header_line += '\n'
-            fp.write('Schemes\n')
-            fp.write('^^^^^^^\n')
-            fp.write('\n')
-            fp.write('.. csv-table::\n')
-            fp.write(header_line)
-            fp.write('\n')
-            for scheme_id in db.schemes:
-                fp.write(f'    "{scheme_id}", ')
-                scheme = db.schemes[scheme_id]
-                fp.write(f'"{scheme.dtype}"')
-                if has_minimums:
-                    minimum = scheme.minimum or ''
-                    fp.write(f', "{minimum}"')
-                if has_maximums:
-                    maximum = scheme.maximum or ''
-                    fp.write(f', "{maximum}"')
-                if has_labels:
-                    if scheme.labels is None:
-                        labels = []
-                    else:
-                        labels = sorted(scheme._labels_to_list())
-                        labels = [str(label) for label in labels]
-                        # Avoid `_` at end of label,
-                        # as this has special meaning in RST (link)
-                        labels = [
-                            label[:-1] + r'\_'
-                            if label.endswith('_')
-                            else label
-                            for label in labels
-                        ]
-                        labels = limit_presented_samples(
-                            labels,
-                            15,
-                            replacement_text='[...]',
-                        )
-                    fp.write(f', "{", ".join(labels)}"')
-                if has_mappings:
-                    if not isinstance(scheme.labels, (str, dict)):
-                        mappings = ''
-                    else:
-                        labels = scheme._labels_to_dict()
-                        # Mappings can contain a single mapping
-                        # or a deeper nestings.
-                        # In the first case we just present ✓,
-                        # in the second case the keys of the nested dict.
-                        # {'f': 'female', 'm': 'male'}
-                        # or
-                        # {'s1': {'gender': 'male', 'age': 21}}
-                        mappings = list(labels.values())
-                        if isinstance(mappings[0], dict):
-                            # e.g. {'s1': {'gender': 'male', 'age': 21}}
-                            mappings = sorted(list(mappings[0].keys()))
-                            mappings = f'{", ".join(mappings)}'
-                        else:
-                            # e.g. {'f': 'female', 'm': 'male'}
-                            mappings = '✓'
-                        fp.write(f', "{mappings}"')
-                fp.write('\n')
+
+        columns = ['ID', 'Dtype']
+        header_line = '   :header: ID,Dtype'
+        if has_minimums:
+            header_line += ',Min'
+            columns.append('Min')
+        if has_maximums:
+            header_line += ',Max'
+            columns.append('Max')
+        if has_labels:
+            header_line += ',Labels'
+            columns.append('Labels')
+        if has_mappings:
+            header_line += ',Mappings'
+            columns.append('Mappings')
+
+        scheme_info['header_line'] = header_line
+        scheme_info['has_minimums'] = has_minimums
+        scheme_info['has_maximums'] = has_maximums
+        scheme_info['has_labels'] = has_labels
+        scheme_info['has_mappings'] = has_mappings
+
+        scheme_info['columns'] = columns
+        return scheme_info
+
+    @property
+    def dataset_schemes(self) -> list:
+
+        db = self.header
+        dataset_schemes = []
+        for scheme_id in db.schemes:
+            dataset_scheme = self._scheme_to_list(scheme_id)
+            dataset_schemes.append(dataset_scheme)
+
+        cols = self.scheme_info['columns']
+        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
+        filter = data.applymap(lambda d: d == [])
+        data.mask(filter, other='', inplace=True)
+        scheme_data = np.array(data).tolist()
+        return scheme_data
 
 
-def create_datasets_page(datasets: typing.Sequence):
-    r"""Create overview page of datasets."""
-    # Create CSV file with overview of datasets
+class Datacard(object):
+
+    def __init__(self, dataset: Dataset):
+
+        self._dataset = dataset
+
+    @functools.cached_property
+    def content(self):
+        """Property Accessor for rendered jinja2 content."""
+
+        return self._render_template()
+
+    def _render_template(self):
+
+        t_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
+                                         trim_blocks=True)
+        # Provide Jinja filter access to Python build-ins/functions
+        environment.filters.update(
+            zip=zip,
+            tw=self._trim_trailing_whitespace,
+        )
+        template = environment.get_template("datacard.j2")
+        content = template.render(self._dataset.properties())
+        return content
+
+    @staticmethod
+    def _trim_trailing_whitespace(x: list):
+        """J2 filter to get rid of trailing empty table entries within a row.
+
+        Trims last entry if present.
+
+        Args:
+            x: untrimmed single scheme table row
+        Returns:
+            trimmed single scheme table row
+        """
+
+        if x[-1] == '':
+            x.pop()
+
+        return x
+
+    def save(self, ofpath: str = None):
+        """Save content of rendered template to rst.
+
+        Args:
+            ofpath: filepath to save rendered template to
+        Returns:
+            None
+
+        if ofpath is specified, the directory must exist.
+        """
+
+        if ofpath is None:
+            ofpath = f'datasets/{self._dataset.name}.rst'
+
+        with open(ofpath, mode="w", encoding="utf-8") as fp:
+            fp.write(self.content)
+            print(f"... wrote {ofpath}")
+
+
+def create_datasets_page(
+        datasets: typing.Sequence[Dataset],
+        ofbase: str = 'datasets',
+):
+    r"""Create overview page of datasets.
+
+    Args:
+        datasets: list of datasets
+        ofbase: basename of the file written to disk
+
+    ofbase: written to disk in both csv and rst formats.
+    Final outfilenames consist of ofbase plus extension.
+
+    """
+
     tuples = [
         (
             dataset.name_link,
@@ -478,36 +595,33 @@ def create_datasets_page(datasets: typing.Sequence):
         columns=['name', 'description', 'license', 'version', 'schemes'],
         index='name',
     )
-    csv_file = 'datasets.csv'
+    csv_file = f'{ofbase}.csv'
     df.to_csv(csv_file)
-    # Create RST file showing CSV file
-    # and adding links to all data cards
-    rst_file = 'datasets.rst'
-    with open(rst_file, 'w') as fp:
 
-        fp.write('.. _datasets:\n')
-        fp.write('\n')
-        fp.write('Datasets\n')
-        fp.write('========\n')
-        fp.write('\n')
-        fp.write('Datasets available with audb_ as of |today|.\n')
-        fp.write('For each dataset, the latest version is shown.\n')
-        fp.write('\n')
-        fp.write('.. csv-table::\n')
-        fp.write('    :header-rows: 1\n')
-        fp.write('    :widths: 10, 20, 7, 4, 25\n')
-        fp.write(f'    :file: {csv_file}\n')
-        fp.write('\n')
-        fp.write('.. _audb: https://audeering.github.io/audb/\n')
-        fp.write('\n')
-        fp.write('\n')
-        fp.write('.. toctree::\n')
-        fp.write('    :maxdepth: 1\n')
-        fp.write('    :hidden:\n')
-        fp.write('\n')
-        # Add links to data cards
-        for dataset in datasets:
-            fp.write(f'    datasets/{dataset.name}\n')
+    rst_file = f'{ofbase}.rst'
+
+    t_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
+                                     trim_blocks=True)
+
+    data = [
+        (
+            dataset.name,
+            dataset.version,
+        )
+        for dataset in datasets
+    ]
+
+    data = {
+        'data': data,
+    }
+
+    template = environment.get_template("datasets.j2")
+    content = template.render(data)
+
+    with open(rst_file, mode="w", encoding="utf-8") as fp:
+        fp.write(content)
+        print(f"... wrote {rst_file}")
 
 
 def format_schemes(
