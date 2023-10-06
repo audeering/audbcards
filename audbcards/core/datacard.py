@@ -53,15 +53,6 @@ class Datacard(object):
         # Add audio player for example file
         dataset['player'] = self.player(dataset['example'])
 
-        # NOTE: the following would be needed
-        # when we introduce to specify the columns
-        # in the datasets template.
-        # # Display mapping for speaker and emotion schemes,
-        # # e.g. 'speaker: [age, gender, language]'
-        # dataset['formated_schemes'] = format_schemes(
-        #     self._dataset.header.schemes
-        # )
-
         content = template.render(dataset)
 
         return content
