@@ -29,7 +29,7 @@ def test_dataset(cache, tmpdir, db):
     # __init__
     assert dataset.name == pytest.NAME
     assert dataset.version == pytest.VERSION
-    assert dataset.repository == pytest.REPOSITORY
+    assert dataset._repository == pytest.REPOSITORY
     expected_header = audb.info.header(
         pytest.NAME,
         version=pytest.VERSION,
@@ -129,6 +129,11 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.license_link == expected_license_link
 
     # publication: skipped for now
+
+    # repository
+    expected_repository = pytest.REPOSITORY.name
+    assert dataset.repository == expected_repository
+
     # repository_link : skipped for now
 
     # sampling_rates

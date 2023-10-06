@@ -47,7 +47,7 @@ class Dataset:
             cache_root: str = './cache',
     ):
         self.version = version
-        self.repository = audb.repository(name, version)
+        self._repository = audb.repository(name, version)
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
 
         self.header = audb.info.header(
@@ -297,11 +297,11 @@ class Dataset:
         # by audbackend.Backend.date()
         # when audbackend 1.0.0 is released
         url = (
-            f'{self.repository.host}/{self.repository.name}/{self.name}/'
+            f'{self._repository.host}/{self._repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
         )
 
-        if self.repository.backend == 'file-system':
+        if self._repository.backend == 'file-system':
             ts = os.stat(url).st_ctime
             date = datetime.datetime.utcfromtimestamp(ts)
             date = date.strftime("%Y-%m-%d")
@@ -319,11 +319,11 @@ class Dataset:
         # by audbackend.Backend.owner()
         # when audbackend 1.0.0 is released
         url = (
-            f'{self.repository.host}/{self.repository.name}/{self.name}/'
+            f'{self._repository.host}/{self._repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
         )
 
-        if self.repository.backend == 'file-system':
+        if self._repository.backend == 'file-system':
             # NOTE: the following will
             config = toml.load(audeer.path('pyproject.toml'))
             authors = ', '.join(
@@ -349,15 +349,21 @@ class Dataset:
         return props
 
     @property
+    def repository(self) -> str:
+        r"""Repository containing the dataset."""
+        return f'{self._repository.name}'
+
+    @property
     def repository_link(self) -> str:
-        r"""Repository name with link to dataset in Artifactory web UI."""
-        url = (
-            f'{self.repository.host}/'
+        r"""Link to repository in Artifactory web UI."""
+        # NOTE: this needs to be changed
+        # as we want to support different backends
+        return (
+            f'{self._repository.host}/'
             f'webapp/#/artifacts/browse/tree/General/'
-            f'{self.repository.name}/'
+            f'{self._repository.name}/'
             f'{self.name}'
         )
-        return f'`{self.repository.name} <{url}>`__'
 
     @property
     def sampling_rates(self) -> str:
