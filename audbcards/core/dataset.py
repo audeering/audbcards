@@ -291,8 +291,11 @@ class Dataset:
         return player_str
 
     @property
-    def publication(self) -> str:
-        r"""Date and author uploading dataset to repository."""
+    def publication_date(self) -> str:
+        r"""Date dataset was uploaded to repository."""
+        # NOTE: the following code can be replaced
+        # by audbackend.Backend.date()
+        # when audbackend 1.0.0 is released
         url = (
             f'{self.repository.host}/{self.repository.name}/{self.name}/'
             f'db/{self.version}/db-{self.version}.zip'
@@ -300,22 +303,41 @@ class Dataset:
 
         if self.repository.backend == 'file-system':
             ts = os.stat(url).st_ctime
-            date_created = datetime.datetime.utcfromtimestamp(ts)
-            date_created = date_created.strftime("%Y-%m-%d")
+            date = datetime.datetime.utcfromtimestamp(ts)
+            date = date.strftime("%Y-%m-%d")
+        else:
+            path = audfactory.path(url)
+            stat = path.stat()
+            date = f'{stat.ctime:%Y-%m-%d}'
+
+        return date
+
+    @property
+    def publication_owner(self) -> str:
+        r"""User who uploaded dataset to repository."""
+        # NOTE: the following code can be replaced
+        # by audbackend.Backend.owner()
+        # when audbackend 1.0.0 is released
+        url = (
+            f'{self.repository.host}/{self.repository.name}/{self.name}/'
+            f'db/{self.version}/db-{self.version}.zip'
+        )
+
+        if self.repository.backend == 'file-system':
+            # NOTE: the following will
             config = toml.load(audeer.path('pyproject.toml'))
             authors = ', '.join(
                 author['name']
                 for author in config['project']['authors']
             )
-            creators = authors.split(', ')
-            creator = random.choice(creators)
-            publication = f'{date_created} by {creator}'
+            owners = authors.split(', ')
+            owner = random.choice(owners)
         else:
             path = audfactory.path(url)
             stat = path.stat()
-            publication = f'{stat.ctime:%Y-%m-%d} by {stat.created_by}'
+            owner = f'{stat.created_by}'
 
-        return publication
+        return owner
 
     def properties(self):
         """Get list of properties of the object."""
