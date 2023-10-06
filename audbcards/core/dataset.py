@@ -108,14 +108,6 @@ class Dataset:
         )
 
     @property
-    def columns(self) -> typing.List[str]:
-        """Columns of the dataset."""
-        db = self.header
-        columns = [list(db[table_id].columns) for table_id in self.tables]
-        columns = [x for x in map(", ".join, columns)]
-        return columns
-
-    @property
     def description(self) -> str:
         r"""Source of the database."""
         return self.header.description
