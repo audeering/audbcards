@@ -7,6 +7,7 @@ import pytest
 
 import audb
 import audeer
+import audformat
 import audiofile
 
 import audbcards
@@ -169,12 +170,15 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.tables == expected_tables
 
     # tables_table
-    expected_tables_table = [
-        ['ID', 'Type', 'Columns'],
-        ['files', 'filewise', 'speaker'],
-        ['segments', 'segmented', 'emotion'],
-        ['speaker', 'misc', 'age, gender'],
-    ]
+    expected_tables_table = [['ID', 'Type', 'Columns']]
+    for table_id in list(db):
+        table = db[table_id]
+        if isinstance(table, audformat.MiscTable):
+            table_type = 'misc'
+        else:
+            table_type = table.type
+        columns = ', '.join(list(table.columns))
+        expected_tables_table.append([table_id, table_type, columns])
     assert dataset.tables_table == expected_tables_table
 
     # version
