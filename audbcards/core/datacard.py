@@ -1,9 +1,17 @@
 import functools
 import os
+import shutil
 
 import jinja2
+import matplotlib.pyplot as plt
+
+import audb
+import audeer
+import audiofile
+import audplot
 
 from audbcards.core.dataset import Dataset
+from audbcards.core.utils import set_plot_margins
 
 
 class Datacard(object):
@@ -36,7 +44,13 @@ class Datacard(object):
             tw=self._trim_trailing_whitespace,
         )
         template = environment.get_template("datacard.j2")
-        content = template.render(self._dataset.properties())
+
+        # Add content not included in Dataset class
+        dataset = self._dataset.properties()
+        dataset['player'] = self.player(dataset['example'])
+
+        content = template.render(dataset)
+
         return content
 
     @staticmethod
@@ -54,6 +68,55 @@ class Datacard(object):
             x.pop()
 
         return x
+
+    def player(self, file: str) -> str:
+        r"""Create an audio player showing the waveform.
+
+        Args:
+            file: input audio file to be used in the player.
+                :attr:`audbcards.Dataset.example`
+                is a good fit
+
+        """
+        # Move file to build folder
+        src_dir = (
+            f'{self._dataset.cache_root}/'
+            f'{audb.flavor_path(self._dataset.name, self._dataset.version)}'
+        )
+        # NOTE: once we added a sphinx datacard extension
+        # to this repository,
+        # we can directly use `app.builder.outdir`
+        # to get the build dir.
+        # https://github.com/audeering/audbcards/issues/2
+        build_dir = audeer.path('..', 'build', 'html')
+        dst_dir = f'{build_dir}/datasets/{self._dataset.name}'
+        audeer.mkdir(os.path.join(dst_dir, os.path.dirname(file)))
+        shutil.copy(
+            os.path.join(src_dir, file),
+            os.path.join(dst_dir, file),
+        )
+
+        # Add plot of waveform
+        signal, sampling_rate = audiofile.read(
+            os.path.join(src_dir, file),
+            always_2d=True,
+        )
+        plt.figure(figsize=[3, .5])
+        ax = plt.subplot(111)
+        audplot.waveform(signal[0, :], ax=ax)
+        set_plot_margins()
+        plt.savefig(f'{self._dataset.name}.png')
+        plt.close()
+
+        player_src = f'{self._dataset.name}/{file}'
+        player_str = (
+            f'.. image:: ../{self._dataset.name}.png\n'
+            '\n'
+            '.. raw:: html\n'
+            '\n'
+            f'    <p><audio controls src="{player_src}"></audio></p>'
+        )
+        return player_str
 
     def save(self, ofpath: str = None):
         """Save content of rendered template to rst.

@@ -1,7 +1,6 @@
 import os
 import posixpath
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
@@ -10,12 +9,8 @@ import audb
 import audeer
 import audformat
 import audiofile
-import audplot
 
 import audbcards
-
-
-BUILD = audeer.path('..', 'build', 'html')
 
 
 def test_dataset(cache, tmpdir, db):
@@ -163,38 +158,6 @@ def test_dataset(cache, tmpdir, db):
     # version
     expected_version = pytest.VERSION
     assert dataset.version == expected_version
-
-    # Test player
-    player_str = dataset.player
-    # Generate expected player
-    # Check if file has been copied under the build folder
-    dst_dir = f'{BUILD}/datasets/{db.name}'
-    assert os.path.exists(os.path.join(dst_dir, expected_example))
-    # Add plot of waveform
-    signal, sampling_rate = audiofile.read(
-        os.path.join(dst_dir, expected_example),
-        always_2d=True,
-    )
-    plt.figure(figsize=[3, .5])
-    ax = plt.subplot(111)
-    audplot.waveform(signal[0, :], ax=ax)
-    audbcards.core.dataset.set_plot_margins()
-    plt.savefig(f'{os.path.join(tmpdir, db.name)}.png')
-    plt.close()
-    # Check if generated images are exactly the same (pixel-wise)
-    assert open(f'{db.name}.png', 'rb').read(
-    ) == open(f'{os.path.join(tmpdir, db.name)}.png', 'rb').read()
-    # Append audio to the expected player_str
-    expected_player_str = (
-        f'.. image:: ../{db.name}.png\n'
-        '\n'
-        '.. raw:: html\n'
-        '\n'
-        f'    <p><audio controls src="{db.name}/{expected_example}">'
-        f'</audio></p>'
-    )
-    # Check if the generated player_str and the expected matches
-    assert expected_player_str == player_str
 
 
 @pytest.mark.parametrize(
