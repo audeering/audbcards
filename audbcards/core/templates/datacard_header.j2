@@ -17,8 +17,9 @@ license       {{ license }}
 {% endif %}
 source        {{ source }}
 usage         {{ usage }}
-{% if languages is defined %}languages     {{ languages|join(', ') }}{% endif %}
-
+{% if languages is defined %}
+languages     {{ languages|join(', ') }}
+{% endif %}
 format        {{ formats|join(', ') }}
 channel       {{ channels|join(', ') }}
 sampling rate {{ sampling_rates }}
