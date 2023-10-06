@@ -86,6 +86,11 @@ class Dataset:
         )
 
     @property
+    def author(self) -> typing.List[str]:
+        r"""Authors of the database."""
+        return self.header.author
+
+    @property
     def bit_depths(self) -> str:
         r"""Bit depths of media files in dataset."""
         return ', '.join(
@@ -110,6 +115,40 @@ class Dataset:
                 ]
             )
         )
+
+    @property
+    def columns(self) -> typing.List[str]:
+        """Columns of the dataset."""
+        db = self.header
+        columns = [list(db[table_id].columns) for table_id in self.tables]
+        columns = [x for x in map(", ".join, columns)]
+        return columns
+
+    @property
+    def dataset_schemes(self) -> list:
+        """Dataset schemes with more information.
+
+        Eache scheme is returned as a list
+        containing its name, type, min, max, labels, mappings.
+
+        """
+        db = self.header
+        dataset_schemes = []
+        for scheme_id in db.schemes:
+            dataset_scheme = self._scheme_to_list(scheme_id)
+            dataset_schemes.append(dataset_scheme)
+
+        cols = self.scheme_info['columns']
+        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
+        filter = data.applymap(lambda d: d == [])
+        data.mask(filter, other='', inplace=True)
+        scheme_data = np.array(data).tolist()
+        return scheme_data
+
+    @property
+    def description(self) -> str:
+        r"""Source of the database."""
+        return self.header.description
 
     @property
     def duration(self) -> str:
@@ -170,6 +209,11 @@ class Dataset:
                 ]
             )
         )
+
+    @property
+    def languages(self) -> typing.List[str]:
+        r"""Languages of the database."""
+        return self.header.languages
 
     @property
     def license_link(self) -> str:
@@ -262,6 +306,15 @@ class Dataset:
 
         return publication
 
+    def properties(self):
+        """Get list of properties of the object."""
+        class_items = self.__class__.__dict__.items()
+        props = dict((k, getattr(self, k))
+                     for k, v in class_items
+                     if isinstance(v, property))
+
+        return props
+
     @property
     def repository_link(self) -> str:
         r"""Repository name with link to dataset in Artifactory web UI."""
@@ -287,6 +340,53 @@ class Dataset:
         )
 
     @property
+    def scheme_info(self) -> dict:
+        """Information on schemes."""
+        db = self.header
+        scheme_info = {}
+
+        if len(db.schemes) > 0:
+            has_minimums = any(
+                [db.schemes[s].minimum is not None for s in db.schemes]
+            )
+            has_maximums = any(
+                [db.schemes[s].maximum is not None for s in db.schemes]
+            )
+            has_labels = any(
+                [db.schemes[s].labels is not None for s in db.schemes]
+            )
+            has_mappings = any(
+                [
+                    isinstance(db.schemes[s].labels, (str, dict))
+                    for s in db.schemes
+                ]
+            )
+
+        columns = ['ID', 'Dtype']
+        header_line = '   :header: ID,Dtype'
+        if has_minimums:
+            header_line += ',Min'
+            columns.append('Min')
+        if has_maximums:
+            header_line += ',Max'
+            columns.append('Max')
+        if has_labels:
+            header_line += ',Labels'
+            columns.append('Labels')
+        if has_mappings:
+            header_line += ',Mappings'
+            columns.append('Mappings')
+
+        scheme_info['header_line'] = header_line
+        scheme_info['has_minimums'] = has_minimums
+        scheme_info['has_maximums'] = has_maximums
+        scheme_info['has_labels'] = has_labels
+        scheme_info['has_mappings'] = has_mappings
+
+        scheme_info['columns'] = columns
+        return scheme_info
+
+    @property
     def schemes(self) -> str:
         r"""List schemes of dataset.
 
@@ -309,46 +409,9 @@ class Dataset:
         return description
 
     @property
-    def version_link(self) -> str:
-        r"""Version of dataset as link to changelog on Github."""
-        github = 'https://github.com/audeering'
-        branch = 'main'
-        url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
-        return f'`{self.version} <{url}>`__'
-
-    def properties(self):
-        """Get list of properties of the object."""
-        class_items = self.__class__.__dict__.items()
-        props = dict((k, getattr(self, k))
-                     for k, v in class_items
-                     if isinstance(v, property))
-
-        return props
-
-    @property
     def source(self) -> str:
         r"""Source of the database."""
         return self.header.source
-
-    @property
-    def description(self) -> str:
-        r"""Source of the database."""
-        return self.header.description
-
-    @property
-    def usage(self) -> str:
-        r"""Usage of the database."""
-        return self.header.usage
-
-    @property
-    def languages(self) -> typing.List[str]:
-        r"""Languages of the database."""
-        return self.header.languages
-
-    @property
-    def author(self) -> typing.List[str]:
-        r"""Authors of the database."""
-        return self.header.author
 
     @property
     def tables(self) -> typing.List[str]:
@@ -356,14 +419,6 @@ class Dataset:
         db = self.header
         tables = list(db)
         return tables
-
-    @property
-    def columns(self) -> typing.List[str]:
-        """Columns of the dataset."""
-        db = self.header
-        columns = [list(db[table_id].columns) for table_id in self.tables]
-        columns = [x for x in map(", ".join, columns)]
-        return columns
 
     @property
     def types(self) -> typing.List[str]:
@@ -378,6 +433,19 @@ class Dataset:
                 types.append(table.type)
 
         return types
+
+    @property
+    def usage(self) -> str:
+        r"""Usage of the database."""
+        return self.header.usage
+
+    @property
+    def version_link(self) -> str:
+        r"""Version of dataset as link to changelog on Github."""
+        github = 'https://github.com/audeering'
+        branch = 'main'
+        url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
+        return f'`{self.version} <{url}>`__'
 
     def _scheme_to_list(self, scheme_id):
 
@@ -454,74 +522,6 @@ class Dataset:
             data_dict['Mappings'] = mappings
 
         return data_dict
-
-    @property
-    def scheme_info(self) -> dict:
-        """Information on schemes."""
-        db = self.header
-        scheme_info = {}
-
-        if len(db.schemes) > 0:
-            has_minimums = any(
-                [db.schemes[s].minimum is not None for s in db.schemes]
-            )
-            has_maximums = any(
-                [db.schemes[s].maximum is not None for s in db.schemes]
-            )
-            has_labels = any(
-                [db.schemes[s].labels is not None for s in db.schemes]
-            )
-            has_mappings = any(
-                [
-                    isinstance(db.schemes[s].labels, (str, dict))
-                    for s in db.schemes
-                ]
-            )
-
-        columns = ['ID', 'Dtype']
-        header_line = '   :header: ID,Dtype'
-        if has_minimums:
-            header_line += ',Min'
-            columns.append('Min')
-        if has_maximums:
-            header_line += ',Max'
-            columns.append('Max')
-        if has_labels:
-            header_line += ',Labels'
-            columns.append('Labels')
-        if has_mappings:
-            header_line += ',Mappings'
-            columns.append('Mappings')
-
-        scheme_info['header_line'] = header_line
-        scheme_info['has_minimums'] = has_minimums
-        scheme_info['has_maximums'] = has_maximums
-        scheme_info['has_labels'] = has_labels
-        scheme_info['has_mappings'] = has_mappings
-
-        scheme_info['columns'] = columns
-        return scheme_info
-
-    @property
-    def dataset_schemes(self) -> list:
-        """Dataset schemes with more information.
-
-        Eache scheme is returned as a list
-        containing its name, type, min, max, labels, mappings.
-
-        """
-        db = self.header
-        dataset_schemes = []
-        for scheme_id in db.schemes:
-            dataset_scheme = self._scheme_to_list(scheme_id)
-            dataset_schemes.append(dataset_scheme)
-
-        cols = self.scheme_info['columns']
-        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
-        filter = data.applymap(lambda d: d == [])
-        data.mask(filter, other='', inplace=True)
-        scheme_data = np.array(data).tolist()
-        return scheme_data
 
 
 def create_datasets_page(
