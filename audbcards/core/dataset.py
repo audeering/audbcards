@@ -89,15 +89,17 @@ class Dataset:
         return self.header.author
 
     @property
-    def bit_depths(self) -> str:
+    def bit_depths(self) -> typing.List[int]:
         r"""Bit depths of media files in dataset."""
-        return ', '.join(
-            set(
-                [
-                    str(self.deps.bit_depth(file))
-                    for file in self.deps.media
-                    if self.deps.bit_depth(file)
-                ]
+        return sorted(
+            list(
+                set(
+                    [
+                        self.deps.bit_depth(file)
+                        for file in self.deps.media
+                        if self.deps.bit_depth(file)
+                    ]
+                )
             )
         )
 

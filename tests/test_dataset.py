@@ -51,10 +51,17 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.archives == expected_archives
 
     # bit depths
-    expected_bit_depths = ', '.join(set([
-        str(audiofile.bit_depth(file)) for file in db.files
-        if audiofile.bit_depth(file)
-    ]))
+    expected_bit_depths = sorted(
+        list(
+            set(
+                [
+                    audiofile.bit_depth(file)
+                    for file in db.files
+                    if audiofile.bit_depth(file)
+                ]
+            )
+        )
+    )
     assert dataset.bit_depths == expected_bit_depths
 
     # channels

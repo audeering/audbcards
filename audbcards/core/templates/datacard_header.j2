@@ -18,7 +18,7 @@ usage         {{ usage }}
 format        {{ formats }}
 channel       {{ channels  }}
 sampling rate {{ sampling_rates }}
-bit depth     {{ bit_depths }}
+bit depth     {{ bit_depths|join(', ') }}
 duration      {{ duration }}
 files         {{ files }}
 repository    {{ repository_link }}
