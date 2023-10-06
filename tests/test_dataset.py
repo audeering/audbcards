@@ -78,7 +78,7 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.channels == expected_channels
 
     # duration
-    expected_duration = str(db.files_duration(db.files).sum())
+    expected_duration = db.files_duration(db.files).sum()
     assert dataset.duration == expected_duration
 
     # example

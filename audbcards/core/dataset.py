@@ -153,14 +153,12 @@ class Dataset:
         return self.header.description
 
     @property
-    def duration(self) -> str:
+    def duration(self) -> pd.Timedelta:
         r"""Total duration of media files in dataset."""
         durations = [self.deps.duration(file) for file in self.deps.media]
-        return str(
-            pd.to_timedelta(
-                sum([d for d in durations if d is not None]),
-                unit='s',
-            )
+        return pd.to_timedelta(
+            sum([d for d in durations if d is not None]),
+            unit='s',
         )
 
     @property
