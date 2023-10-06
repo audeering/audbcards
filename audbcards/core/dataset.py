@@ -366,15 +366,17 @@ class Dataset:
         )
 
     @property
-    def sampling_rates(self) -> str:
+    def sampling_rates(self) -> typing.List[int]:
         r"""Sampling rates of media files in dataset."""
-        return ', '.join(
-            set(
-                [
-                    str(self.deps.sampling_rate(file))
-                    for file in self.deps.media
-                    if self.deps.sampling_rate(file)
-                ]
+        return sorted(
+            list(
+                set(
+                    [
+                        self.deps.sampling_rate(file)
+                        for file in self.deps.media
+                        if self.deps.sampling_rate(file)
+                    ]
+                )
             )
         )
 

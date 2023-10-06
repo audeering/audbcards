@@ -137,9 +137,16 @@ def test_dataset(cache, tmpdir, db):
     # repository_link : skipped for now
 
     # sampling_rates
-    expected_sampling_rates = ', '.join(set([
-        str(audiofile.sampling_rate(file)) for file in db.files
-    ]))
+    expected_sampling_rates = sorted(
+        list(
+            set(
+                [
+                    audiofile.sampling_rate(file)
+                    for file in db.files
+                ]
+            )
+        )
+    )
     assert dataset.sampling_rates == expected_sampling_rates
 
     # schemes

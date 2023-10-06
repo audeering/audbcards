@@ -22,7 +22,7 @@ languages     {{ languages|join(', ') }}
 {% endif %}
 format        {{ formats|join(', ') }}
 channel       {{ channels|join(', ') }}
-sampling rate {{ sampling_rates }}
+sampling rate {{ sampling_rates|join(', ') }}
 bit depth     {{ bit_depths|join(', ') }}
 duration      {{ duration }}
 files         {{ files }}
