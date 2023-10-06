@@ -352,7 +352,7 @@ class Dataset:
     @property
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
-        table_list = [['ID', 'Type', 'Column']]
+        table_list = [['ID', 'Type', 'Columns']]
         db = self.header
         for table_id in self.tables:
             table = db[table_id]

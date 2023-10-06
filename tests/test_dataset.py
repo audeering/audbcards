@@ -147,12 +147,35 @@ def test_dataset(cache, tmpdir, db):
     expected_schemes = list(db.schemes)
     assert dataset.schemes == expected_schemes
 
+    # schemes_table
+    expected_schemes_table = [
+        ['ID', 'Dtype', 'Min', 'Labels', 'Mappings'],
+        ['age', 'int', 0, '', ''],
+        ['emotion', 'str', '', 'angry, happy, neutral', ''],
+        ['gender', 'str', '', 'female, male', ''],
+        ['speaker', 'int', '', '0, 1', 'age, gender'],
+    ]
+    assert dataset.schemes_table == expected_schemes_table
+
     # short_description
     max_desc_length = 150
     expected_description = db.description if (
         len(db.description) < max_desc_length
     ) else f'{db.description[:max_desc_length - 3]}...'
     assert dataset.short_description == expected_description
+
+    # tables
+    expected_tables = list(db)
+    assert dataset.tables == expected_tables
+
+    # tables_table
+    expected_tables_table = [
+        ['ID', 'Type', 'Columns'],
+        ['files', 'filewise', 'speaker'],
+        ['segments', 'segmented', 'emotion'],
+        ['speaker', 'misc', 'age, gender'],
+    ]
+    assert dataset.tables_table == expected_tables_table
 
     # version
     expected_version = pytest.VERSION

@@ -44,7 +44,7 @@ Tables
     :header-rows: 1
     :widths: 20, 10, 70
 
-    "ID", "Type", "Column"
+    "ID", "Type", "Columns"
     "files", "filewise", "speaker"
     "segments", "segmented", "emotion"
     "speaker", "misc", "age, gender"
