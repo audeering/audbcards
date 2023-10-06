@@ -77,12 +77,10 @@ class Dataset:
             )
 
     @property
-    def archives(self) -> str:
+    def archives(self) -> int:
         r"""Number of archives of media files in dataset."""
-        return str(
-            len(
-                set([self.deps.archive(file) for file in self.deps.media])
-            )
+        return len(
+            set([self.deps.archive(file) for file in self.deps.media])
         )
 
     @property

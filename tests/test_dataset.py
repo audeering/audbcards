@@ -45,8 +45,8 @@ def test_dataset(cache, tmpdir, db):
     pd.testing.assert_frame_equal(dataset.deps(), expected_df)
 
     # archives
-    expected_archives = str(
-        len(expected_df.loc[expected_deps.media].archive.unique())
+    expected_archives = len(
+        expected_df.loc[expected_deps.media].archive.unique()
     )
     assert dataset.archives == expected_archives
 
