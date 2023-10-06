@@ -374,20 +374,6 @@ class Dataset:
         return table_list
 
     @property
-    def types(self) -> typing.List[str]:
-        """Table types of the dataset."""
-        types = []
-        db = self.header
-        for table_id in self.tables:
-            table = db[table_id]
-            if isinstance(table, audformat.MiscTable):
-                types.append('misc')
-            else:
-                types.append(table.type)
-
-        return types
-
-    @property
     def usage(self) -> str:
         r"""Usage of the database."""
         return self.header.usage
