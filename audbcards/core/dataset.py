@@ -104,15 +104,17 @@ class Dataset:
         )
 
     @property
-    def channels(self) -> str:
+    def channels(self) -> typing.List[int]:
         r"""Channels of media files in dataset."""
-        return ', '.join(
-            set(
-                [
-                    str(self.deps.channels(file))
-                    for file in self.deps.media
-                    if self.deps.channels(file)
-                ]
+        return sorted(
+            list(
+                set(
+                    [
+                        self.deps.channels(file)
+                        for file in self.deps.media
+                        if self.deps.channels(file)
+                    ]
+                )
             )
         )
 
