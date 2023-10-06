@@ -426,10 +426,14 @@ class Dataset:
         labels = None
 
         if 'Min' in scheme_info:
-            minimum = scheme.minimum or ''
+            minimum = scheme.minimum
+            if minimum is None:
+                minimum = ''
             data_dict['Min'] = minimum
         if 'Max' in scheme_info:
-            maximum = scheme.maximum or ''
+            maximum = scheme.maximum
+            if maximum is None:
+                maximum = ''
             data_dict['Max'] = maximum
         if 'Labels' in scheme_info:
             if scheme.labels is None:

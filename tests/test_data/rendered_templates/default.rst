@@ -56,7 +56,7 @@ Schemes
     :header-rows: 1
 
     "ID", "Dtype", "Min", "Labels", "Mappings"
-    "age", "int", "", ""
+    "age", "int", "0", ""
     "emotion", "str", "", "angry, happy, neutral"
     "gender", "str", "", "female, male"
     "speaker", "int", "", "0, 1", "age, gender"
