@@ -4,7 +4,6 @@ import pytest
 import audb
 import audbackend
 import audeer
-import audformat
 import audiofile
 
 import audbcards
