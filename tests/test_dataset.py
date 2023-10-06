@@ -128,10 +128,6 @@ def test_dataset(cache, tmpdir, db):
         expected_license_link = db.license_url
     assert dataset.license_link == expected_license_link
 
-    # name_link
-    expected_name_link = f'`{db.name} <./datasets/{db.name}.html>`__'
-    assert dataset.name_link == expected_name_link
-
     # publication: skipped for now
     # repository_link : skipped for now
 

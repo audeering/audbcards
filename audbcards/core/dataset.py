@@ -249,11 +249,6 @@ class Dataset:
         return self.header.name
 
     @property
-    def name_link(self) -> str:
-        r"""Name of dataset as internal RST link to data card."""
-        return f'`{self.name} <./datasets/{self.name}.html>`__'
-
-    @property
     def player(self) -> str:
         r"""Create an audio player showing the waveform.
 
@@ -556,7 +551,7 @@ def create_datasets_page(
     """
     tuples = [
         (
-            dataset.name_link,
+            f'`{dataset.name} <./datasets/{dataset.name}.html>`__',
             dataset.short_description,
             dataset.license_link,
             dataset.version,
