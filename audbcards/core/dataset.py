@@ -218,16 +218,30 @@ class Dataset:
         return self.header.languages
 
     @property
-    def license_link(self) -> str:
-        r"""License of dataset as a link if possible."""
-        license = self.header.license or 'Unknown'
+    def license(self) -> str:
+        r"""License of dataset.
+
+        If no license is given,
+        ``'Unknown'`` is returned.
+
+        """
+        return self.header.license or 'Unknown'
+
+    @property
+    def license_link(self) -> typing.Optional[str]:
+        r"""Link to license of dataset.
+
+        If no link is available
+        ``None`` is returned.
+
+        """
         if (
                 self.header.license_url is None
                 or len(self.header.license_url) == 0
         ):
-            return license
+            return None
         else:
-            return f'`{license} <{self.header.license_url}>`__'
+            return self.header.license_url
 
     @property
     def name(self) -> str:

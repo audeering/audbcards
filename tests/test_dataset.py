@@ -114,15 +114,18 @@ def test_dataset(cache, tmpdir, db):
     )
     assert dataset.formats == expected_formats
 
+    # license
+    expected_license = db.license or 'Unknown'
+    assert dataset.license == expected_license
+
     # license link
-    license = db.license or 'Unknown'
     if (
             db.license_url is None
             or len(db.license_url) == 0
     ):
-        expected_license_link = license
+        expected_license_link = None
     else:
-        expected_license_link = f'`{license} <{db.license_url}>`__'
+        expected_license_link = db.license_url
     assert dataset.license_link == expected_license_link
 
     # name_link

@@ -10,7 +10,11 @@ Created by {{ author }}
 
 ============= ======================
 version       {{ version_link }}
-license       {{ license_link }}
+{% if license_link is not none %}
+license       `{{ license }} <{{ license_link }}>`__
+{% else %}
+license       {{ license }}
+{% endif %}
 source        {{ source }}
 usage         {{ usage }}
 {% if languages is defined %}languages     {{ languages|join(', ') }}{% endif %}
