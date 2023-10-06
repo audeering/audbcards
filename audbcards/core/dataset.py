@@ -358,6 +358,22 @@ class Dataset:
         return tables
 
     @property
+    def tables_table(self) -> typing.List[str]:
+        """Tables of the dataset."""
+        table_list = [['ID', 'Type', 'Column']]
+        db = self.header
+        for table_id in self.tables:
+            table = db[table_id]
+            if isinstance(table, audformat.MiscTable):
+                table_type = 'misc'
+            else:
+                table_type = table.type
+            columns = ', '.join(list(table.columns))
+            table_list.append([table_id, table_type, columns])
+
+        return table_list
+
+    @property
     def types(self) -> typing.List[str]:
         """Table types of the dataset."""
         types = []

@@ -41,9 +41,10 @@ Tables
 ^^^^^^
 
 .. csv-table::
-   :header: ID,Type,Columns
-   :widths: 20, 10, 70
+    :header-rows: 1
+    :widths: 20, 10, 70
 
+    "ID", "Type", "Column"
     "files", "filewise", "speaker"
     "segments", "segmented", "emotion"
     "speaker", "misc", "age, gender"

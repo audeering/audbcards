@@ -3,9 +3,9 @@ Tables
 ^^^^^^
 
 .. csv-table::
-   :header: ID,Type,Columns
-   :widths: 20, 10, 70
+    :header-rows: 1
+    :widths: 20, 10, 70
 
-{% for data in tables|zip(types)|zip(columns) %}
-    "{{ data[0][0] }}", "{{ data[0][1] }}", "{{ data[1] }}"
+{% for row in tables_table %}
+    "{{ row|join('", "') }}"
 {% endfor %}
