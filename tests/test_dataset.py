@@ -98,7 +98,7 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.example == expected_example
 
     # files
-    expected_files = str(len(db.files))
+    expected_files = len(db.files)
     assert dataset.files == expected_files
 
     # formats

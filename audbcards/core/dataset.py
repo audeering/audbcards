@@ -194,9 +194,9 @@ class Dataset:
         return media
 
     @property
-    def files(self) -> str:
+    def files(self) -> int:
         r"""Number of media files in dataset."""
-        return str(len(self.deps.media))
+        return len(self.deps.media)
 
     @property
     def formats(self) -> str:
