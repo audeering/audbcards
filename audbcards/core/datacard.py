@@ -45,9 +45,22 @@ class Datacard(object):
         )
         template = environment.get_template("datacard.j2")
 
-        # Add content not included in Dataset class
+        # === Add/change content of Dataset class
+
+        # Get dataset property names and content as dictionary
         dataset = self._dataset.properties()
+
+        # Add audio player for example file
         dataset['player'] = self.player(dataset['example'])
+
+        # NOTE: the following would be needed
+        # when we introduce to specify the columns
+        # in the datasets template.
+        # # Display mapping for speaker and emotion schemes,
+        # # e.g. 'speaker: [age, gender, language]'
+        # dataset['formated_schemes'] = format_schemes(
+        #     self._dataset.header.schemes
+        # )
 
         content = template.render(dataset)
 

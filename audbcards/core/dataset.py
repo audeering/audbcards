@@ -375,15 +375,9 @@ class Dataset:
         return scheme_info
 
     @property
-    def schemes(self) -> str:
-        r"""List schemes of dataset.
-
-        For the schemes ``'speaker'`` and ``'emotion'``
-        it incorporates mappings in brackets,
-        e.g. ``'speaker: [age, gender, language]'``.
-
-        """
-        return format_schemes(self.header.schemes)
+    def schemes(self) -> typing.List[str]:
+        r"""Schemes of dataset."""
+        return list(self.header.schemes)
 
     @property
     def short_description(self) -> str:
@@ -529,7 +523,7 @@ def create_datasets_page(
             dataset.short_description,
             dataset.license_link,
             dataset.version,
-            dataset.schemes,
+            format_schemes(dataset.header.schemes),
         )
         for dataset in datasets
     ]

@@ -3,19 +3,21 @@ import typing
 import matplotlib.pyplot as plt
 
 import audeer
+import audformat
 
 
 def format_schemes(
-        schemes,
-        excludes=['duration'],
-        max_schemes=15,
-):
+        schemes: typing.Dict[str, audformat.Scheme],
+        excludes: typing.Sequence[str] = ['duration'],
+        max_schemes: int = 15,
+) -> str:
     """Convert schemes object into string.
 
     It lists the main annotation schemes
     of the datasets,
     and collects additional information
-    on schemes calls `emotion` and `speaker`.
+    on schemes named ``'emotion'`` and ``'speaker'``,
+    e.g. ``'speaker: [age, gender, language]'``.
 
     """
     # Filter schemes
