@@ -15,7 +15,7 @@ source        {{ source }}
 usage         {{ usage }}
 {% if languages is defined %}languages     {{ languages|join(', ') }}{% endif %}
 
-format        {{ formats }}
+format        {{ formats|join(', ') }}
 channel       {{ channels|join(', ') }}
 sampling rate {{ sampling_rates }}
 bit depth     {{ bit_depths|join(', ') }}

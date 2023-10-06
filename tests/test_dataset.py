@@ -102,9 +102,16 @@ def test_dataset(cache, tmpdir, db):
     assert dataset.files == expected_files
 
     # formats
-    expected_formats = ', '.join(set([
-        audeer.file_extension(file) for file in db.files
-    ]))
+    expected_formats = sorted(
+        list(
+            set(
+                [
+                    audeer.file_extension(file)
+                    for file in db.files
+                ]
+            )
+        )
+    )
     assert dataset.formats == expected_formats
 
     # license link

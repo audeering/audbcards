@@ -199,14 +199,16 @@ class Dataset:
         return len(self.deps.media)
 
     @property
-    def formats(self) -> str:
+    def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
-        return ', '.join(
-            set(
-                [
-                    self.deps.format(file)
-                    for file in self.deps.media
-                ]
+        return sorted(
+            list(
+                set(
+                    [
+                        self.deps.format(file)
+                        for file in self.deps.media
+                    ]
+                )
             )
         )
 
