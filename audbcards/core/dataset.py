@@ -46,7 +46,7 @@ class Dataset:
             version: str,
             cache_root: str = './cache',
     ):
-        self.version = version
+        self._version = version
         self._repository = audb.repository(name, version)
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
 
@@ -185,7 +185,7 @@ class Dataset:
             audb.load_media(
                 self.name,
                 media,
-                version=self.version,
+                version=self._version,
                 cache_root=self.cache_root,
                 verbose=False,
             )
@@ -260,7 +260,7 @@ class Dataset:
         file = self.example
         src_dir = (
             f'{self.cache_root}/'
-            f'{audb.flavor_path(self.name, self.version)}'
+            f'{audb.flavor_path(self.name, self._version)}'
         )
         dst_dir = f'{BUILD}/datasets/{self.name}'
         audeer.mkdir(os.path.join(dst_dir, os.path.dirname(file)))
@@ -298,7 +298,7 @@ class Dataset:
         # when audbackend 1.0.0 is released
         url = (
             f'{self._repository.host}/{self._repository.name}/{self.name}/'
-            f'db/{self.version}/db-{self.version}.zip'
+            f'db/{self._version}/db-{self._version}.zip'
         )
 
         if self._repository.backend == 'file-system':
@@ -320,7 +320,7 @@ class Dataset:
         # when audbackend 1.0.0 is released
         url = (
             f'{self._repository.host}/{self._repository.name}/{self.name}/'
-            f'db/{self.version}/db-{self.version}.zip'
+            f'db/{self._version}/db-{self._version}.zip'
         )
 
         if self._repository.backend == 'file-system':
@@ -479,6 +479,11 @@ class Dataset:
     def usage(self) -> str:
         r"""Usage of the database."""
         return self.header.usage
+
+    @property
+    def version(self) -> str:
+        r"""Version of dataset."""
+        return self._version
 
     @property
     def version_link(self) -> str:

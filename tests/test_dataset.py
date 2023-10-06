@@ -160,6 +160,10 @@ def test_dataset(cache, tmpdir, db):
     ) else f'{db.description[:max_desc_length - 3]}...'
     assert dataset.short_description == expected_description
 
+    # version
+    expected_version = pytest.VERSION
+    assert dataset.version == expected_version
+
     # version_link
     github = 'https://github.com/audeering'
     branch = 'main'
