@@ -116,27 +116,6 @@ class Dataset:
         return columns
 
     @property
-    def dataset_schemes(self) -> list:
-        """Dataset schemes with more information.
-
-        Eache scheme is returned as a list
-        containing its name, type, min, max, labels, mappings.
-
-        """
-        db = self.header
-        dataset_schemes = []
-        for scheme_id in db.schemes:
-            dataset_scheme = self._scheme_to_list(scheme_id)
-            dataset_schemes.append(dataset_scheme)
-
-        cols = self.scheme_info['columns']
-        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
-        filter = data.applymap(lambda d: d == [])
-        data.mask(filter, other='', inplace=True)
-        scheme_data = np.array(data).tolist()
-        return scheme_data
-
-    @property
     def description(self) -> str:
         r"""Source of the database."""
         return self.header.description
@@ -328,56 +307,32 @@ class Dataset:
         )
 
     @property
-    def scheme_info(self) -> dict:
-        """Information on schemes."""
-        db = self.header
-        scheme_info = {}
-
-        if len(db.schemes) > 0:
-            has_minimums = any(
-                [db.schemes[s].minimum is not None for s in db.schemes]
-            )
-            has_maximums = any(
-                [db.schemes[s].maximum is not None for s in db.schemes]
-            )
-            has_labels = any(
-                [db.schemes[s].labels is not None for s in db.schemes]
-            )
-            has_mappings = any(
-                [
-                    isinstance(db.schemes[s].labels, (str, dict))
-                    for s in db.schemes
-                ]
-            )
-
-        columns = ['ID', 'Dtype']
-        header_line = '   :header: ID,Dtype'
-        if has_minimums:
-            header_line += ',Min'
-            columns.append('Min')
-        if has_maximums:
-            header_line += ',Max'
-            columns.append('Max')
-        if has_labels:
-            header_line += ',Labels'
-            columns.append('Labels')
-        if has_mappings:
-            header_line += ',Mappings'
-            columns.append('Mappings')
-
-        scheme_info['header_line'] = header_line
-        scheme_info['has_minimums'] = has_minimums
-        scheme_info['has_maximums'] = has_maximums
-        scheme_info['has_labels'] = has_labels
-        scheme_info['has_mappings'] = has_mappings
-
-        scheme_info['columns'] = columns
-        return scheme_info
-
-    @property
     def schemes(self) -> typing.List[str]:
         r"""Schemes of dataset."""
         return list(self.header.schemes)
+
+    @property
+    def schemes_table(self) -> typing.List[typing.List[str]]:
+        """Schemes table with name, type, min, max, labels, mappings.
+
+        The table is represented as a dictionary
+        with column names as keys.
+
+        """
+        db = self.header
+        dataset_schemes = []
+        for scheme_id in db.schemes:
+            dataset_scheme = self._scheme_to_list(scheme_id)
+            dataset_schemes.append(dataset_scheme)
+
+        cols = self._scheme_table_columns
+        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
+        filter = data.applymap(lambda d: d == [])
+        data.mask(filter, other='', inplace=True)
+        scheme_data = data.values.tolist()
+        # Add column names
+        scheme_data.insert(0, list(data))
+        return scheme_data
 
     @property
     def short_description(self) -> str:
@@ -426,10 +381,43 @@ class Dataset:
         r"""Version of dataset."""
         return self._version
 
+    @property
+    def _scheme_table_columns(self) -> typing.List[str]:
+        """Column names for the scheme table.
+
+        Column names always include ``'ID'`` and ``'Dtype'``,
+        and if defined in any scheme
+        ``'Min'``,
+        ``'Max'``,
+        ``'Labels'``,
+        ``'Mappings'``.
+
+        """
+        schemes = self.header.schemes
+
+        columns = ['ID', 'Dtype']
+
+        if len(schemes) > 0:
+            if any([schemes[s].minimum is not None for s in schemes]):
+                columns.append('Min')
+            if any([schemes[s].maximum is not None for s in schemes]):
+                columns.append('Max')
+            if any([schemes[s].labels is not None for s in schemes]):
+                columns.append('Labels')
+            if any(
+                    [
+                        isinstance(schemes[s].labels, (str, dict))
+                        for s in schemes
+                    ]
+            ):
+                columns.append('Mappings')
+
+        return columns
+
     def _scheme_to_list(self, scheme_id):
 
         db = self.header
-        scheme_info = self.scheme_info
+        scheme_info = self._scheme_table_columns
 
         scheme = db.schemes[scheme_id]
 
@@ -443,14 +431,13 @@ class Dataset:
         minimum, maximum = None, None
         labels = None
 
-        # can use 'Minimum' in scheme_info['columns'] later on
-        if scheme_info["has_minimums"]:
+        if 'Min' in scheme_info:
             minimum = scheme.minimum or ''
             data_dict['Min'] = minimum
-        if scheme_info["has_maximums"]:
+        if 'Max' in scheme_info:
             maximum = scheme.maximum or ''
             data_dict['Max'] = maximum
-        if scheme_info["has_labels"]:
+        if 'Labels' in scheme_info:
             if scheme.labels is None:
                 labels = []
             else:
@@ -470,13 +457,12 @@ class Dataset:
                     replacement_text='[...]',
                 )
                 labels = ", ".join(labels)
-            scheme_info['Labels'] = labels
+            data_dict['Labels'] = labels
 
         data.append(minimum)
         data.append(maximum)
         data.append(labels)
-        data_dict['Labels'] = labels
-        if scheme_info["has_mappings"]:
+        if 'Mappings' in scheme_info:
             if not isinstance(scheme.labels, (str, dict)):
                 mappings = ''
             else:

@@ -52,8 +52,9 @@ Schemes
 ^^^^^^^
 
 .. csv-table::
-   :header: ID,Dtype,Min,Labels,Mappings
+    :header-rows: 1
 
+    "ID", "Dtype", "Min", "Labels", "Mappings"
     "age", "int", "", ""
     "emotion", "str", "", "angry, happy, neutral"
     "gender", "str", "", "female, male"
