@@ -485,14 +485,6 @@ class Dataset:
         r"""Version of dataset."""
         return self._version
 
-    @property
-    def version_link(self) -> str:
-        r"""Version of dataset as link to changelog on Github."""
-        github = 'https://github.com/audeering'
-        branch = 'main'
-        url = f'{github}/{self.name}/blob/{branch}/CHANGELOG.md'
-        return f'`{self.version} <{url}>`__'
-
     def _scheme_to_list(self, scheme_id):
 
         db = self.header

@@ -164,13 +164,6 @@ def test_dataset(cache, tmpdir, db):
     expected_version = pytest.VERSION
     assert dataset.version == expected_version
 
-    # version_link
-    github = 'https://github.com/audeering'
-    branch = 'main'
-    url = f'{github}/{db.name}/blob/{branch}/CHANGELOG.md'
-    expected_version_link = f'`{pytest.VERSION} <{url}>`__'
-    assert dataset.version_link == expected_version_link
-
     # Test player
     player_str = dataset.player
     # Generate expected player
