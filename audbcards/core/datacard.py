@@ -4,6 +4,7 @@ import shutil
 
 import jinja2
 import matplotlib.pyplot as plt
+import numpy as np
 
 import audb
 import audeer
@@ -51,6 +52,7 @@ class Datacard(object):
         dataset = self._dataset.properties()
 
         # Add audio player for example file
+        dataset['example'] = self.example
         dataset['player'] = self.player(dataset['example'])
 
         content = template.render(dataset)
@@ -73,12 +75,55 @@ class Datacard(object):
 
         return x
 
+    @property
+    def example(self) -> str:
+        r"""Select example media file.
+
+        This select a media file
+        based on the median duration
+        of all files
+        between 0.5 s and 300 s
+        and downloads it to the cache.
+
+        """
+        # Pick a meaningful duration for the example audio file
+        min_dur = 0.5
+        max_dur = 300  # 5 min
+        durations = [
+            self._dataset.deps.duration(file)
+            for file in self._dataset.deps.media
+        ]
+        selected_duration = np.median(
+            [d for d in durations if d >= min_dur and d <= max_dur]
+        )
+        # Get index for duration closest to selected duration
+        # see https://stackoverflow.com/a/9706105
+        # durations.index(selected_duration)
+        # is an alternative but fails due to rounding errors
+        index = min(
+            range(len(durations)),
+            key=lambda n: abs(durations[n] - selected_duration),
+        )
+        # Download of example data might fail
+        try:
+            media = self._dataset.deps.media[index]
+            audb.load_media(
+                self._dataset.name,
+                media,
+                version=self._dataset.version,
+                cache_root=self._dataset.cache_root,
+                verbose=False,
+            )
+        except:  # noqa: E722
+            media = ''
+        return media
+
     def player(self, file: str) -> str:
         r"""Create an audio player showing the waveform.
 
         Args:
             file: input audio file to be used in the player.
-                :attr:`audbcards.Dataset.example`
+                :attr:`audbcards.Datacard.example`
                 is a good fit
 
         """

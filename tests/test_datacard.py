@@ -1,7 +1,9 @@
 import os
+import posixpath
 import re
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 
 import audeer
@@ -14,6 +16,27 @@ from audbcards.core.utils import set_plot_margins
 
 
 BUILD = audeer.path('..', 'build', 'html')
+
+
+def test_datacard_example(db, cache):
+
+    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    datacard = audbcards.Datacard(dataset)
+
+    # Relative path to audio file from database
+    # as written in the dependencies table,
+    # for example data/file.wav
+    durations = [d.total_seconds() for d in db.files_duration(db.files)]
+    median_duration = np.median([d for d in durations if 0.5 < d < 300])
+    expected_example_index = min(
+        range(len(durations)),
+        key=lambda n: abs(durations[n] - median_duration)
+    )
+    expected_example = audeer.path(
+        db.files[expected_example_index]
+    ).replace(os.sep, posixpath.sep)
+    expected_example = '/'.join(expected_example.split('/')[-2:])
+    assert datacard.example == expected_example
 
 
 def test_datacard_lines_similar(db, default_template, cache):
@@ -48,15 +71,15 @@ def test_datacard_player(db, cache):
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
-    player_str = datacard.player(dataset.example)
+    player_str = datacard.player(datacard.example)
 
     # Check if file has been copied under the build folder
     dst_dir = f'{BUILD}/datasets/{db.name}'
-    assert os.path.exists(os.path.join(dst_dir, dataset.example))
+    assert os.path.exists(os.path.join(dst_dir, datacard.example))
 
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
-        os.path.join(dst_dir, dataset.example),
+        os.path.join(dst_dir, datacard.example),
         always_2d=True,
     )
     plt.figure(figsize=[3, .5])
@@ -77,7 +100,7 @@ def test_datacard_player(db, cache):
         '\n'
         '.. raw:: html\n'
         '\n'
-        f'    <p><audio controls src="{db.name}/{dataset.example}">'
+        f'    <p><audio controls src="{db.name}/{datacard.example}">'
         f'</audio></p>'
     )
     # Check if the generated player_str and the expected matches

@@ -1,7 +1,3 @@
-import os
-import posixpath
-
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -75,22 +71,6 @@ def test_dataset(cache, tmpdir, db):
     # duration
     expected_duration = db.files_duration(db.files).sum()
     assert dataset.duration == expected_duration
-
-    # example
-    # Relative path to audio file from database
-    # as written in the dependencies table,
-    # for example data/file.wav
-    durations = [d.total_seconds() for d in db.files_duration(db.files)]
-    median_duration = np.median([d for d in durations if 0.5 < d < 300])
-    expected_example_index = min(
-        range(len(durations)),
-        key=lambda n: abs(durations[n] - median_duration)
-    )
-    expected_example = audeer.path(
-        db.files[expected_example_index]
-    ).replace(os.sep, posixpath.sep)
-    expected_example = '/'.join(expected_example.split('/')[-2:])
-    assert dataset.example == expected_example
 
     # files
     expected_files = len(db.files)

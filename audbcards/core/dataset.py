@@ -4,7 +4,6 @@ import random
 import typing
 
 import jinja2
-import numpy as np
 import pandas as pd
 import toml
 
@@ -120,38 +119,6 @@ class Dataset:
             sum([d for d in durations if d is not None]),
             unit='s',
         )
-
-    @property
-    def example(self) -> str:
-        r"""Relative path to example media file in dataset."""
-        # Pick a meaningful duration for the example audio file
-        min_dur = 0.5
-        max_dur = 300  # 5 min
-        durations = [self.deps.duration(file) for file in self.deps.media]
-        selected_duration = np.median(
-            [d for d in durations if d >= min_dur and d <= max_dur]
-        )
-        # Get index for duration closest to selected duration
-        # see https://stackoverflow.com/a/9706105
-        # durations.index(selected_duration)
-        # is an alternative but fails due to rounding errors
-        index = min(
-            range(len(durations)),
-            key=lambda n: abs(durations[n] - selected_duration),
-        )
-        # Download of example data might fail
-        try:
-            media = self.deps.media[index]
-            audb.load_media(
-                self.name,
-                media,
-                version=self._version,
-                cache_root=self.cache_root,
-                verbose=False,
-            )
-        except:  # noqa: E722
-            media = ''
-        return media
 
     @property
     def files(self) -> int:
