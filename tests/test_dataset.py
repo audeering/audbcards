@@ -19,6 +19,7 @@ BUILD = audeer.path('..', 'build', 'html')
 
 
 def test_dataset(cache, tmpdir, db):
+
     dataset_cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
     dataset = audbcards.Dataset(
         pytest.NAME,
@@ -120,6 +121,10 @@ def test_dataset(cache, tmpdir, db):
     # schemes
     expected_schemes = audbcards.core.dataset.format_schemes(db.schemes)
     assert dataset.schemes == expected_schemes
+
+    # segments
+    expected_segments = str(len(db.segments))
+    assert dataset.segments == expected_segments
 
     # short_description
     max_desc_length = 150

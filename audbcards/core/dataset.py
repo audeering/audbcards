@@ -398,6 +398,12 @@ class Dataset:
         return format_schemes(self.header.schemes)
 
     @property
+    def segments(self) -> str:
+        r"""Number of segments in dataset."""
+        db = self.header
+        return str(len(db.segments))
+
+    @property
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
