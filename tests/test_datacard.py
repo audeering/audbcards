@@ -108,6 +108,6 @@ def test_datacard_player(db, cache):
 
 
 def test_create_datasets_page(db):
-
+    r"""Test the creation of an RST file with an datasets overview table."""
     datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
     create_datasets_page(datasets, ofbase="datasets_page")
