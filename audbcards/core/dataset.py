@@ -356,6 +356,9 @@ class Dataset:
         """
         schemes = self.header.schemes
 
+        if len(schemes) == 0:
+            return []
+
         columns = ['ID', 'Dtype']
 
         if len(schemes) > 0:
