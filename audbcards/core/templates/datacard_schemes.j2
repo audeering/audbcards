@@ -1,4 +1,5 @@
 
+{% if schemes_table is defined and schemes_table|length > 1 %}
 Schemes
 ^^^^^^^
 
@@ -9,3 +10,4 @@ Schemes
   {% set row_trimmed = row|tw %}
   "{{ row_trimmed|join('", "') }}"
 {% endfor %}
+{% endif %}
