@@ -13,6 +13,31 @@ from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
 
 
+def datasetcache(func):
+    r"""Decorator to manage dataset instance cache."""
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        """Inner Function containing logic."""
+        cache_root =  audeer.mkdir(audeer.safe_path(kwargs.get('cache_root')))
+        dbname, version = args
+        cache_filename = audeer.path(
+            cache_root,
+            'dataset',
+            dbname,
+            version,
+            'dataset.pkl',
+        )
+
+        print(f"using cache file {cache_filename}")
+        if os.path.exists(cache_filename):
+            return Dataset._load_pickled(cache_filename)
+
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
+
 class Dataset:
     r"""Dataset.
 
@@ -25,10 +50,12 @@ class Dataset:
         cache_root: cache folder
 
     """
+    @datasetcache
     def __init__(
             self,
             name: str,
             version: str,
+            *,
             cache_root: str = './cache',
     ):
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
@@ -67,6 +94,33 @@ class Dataset:
             audeer.rmdir(
                 audeer.path(self.cache_root, name, other_version)
             )
+
+        # save instance to cache
+        object_cache = audeer.path(
+            self.cache_root,
+            'dataset',
+            name,
+            version,
+            'dataset.pkl',
+        )
+        self._save_pickled(object_cache)
+
+    @staticmethod
+    def _load_pickled(path: str):
+        r"""Load pickled object instance."""
+        if not os.path.exists(path):
+            raise FileNotFoundError()
+
+        with open(path, "rb") as f:
+            return pickle.load(f)
+
+    def _save_pickled(self, path: str):
+        """Save object instance to path as pickle."""
+        audeer.mkdir(os.path.dirname(path))
+
+        with open(path, "wb") as f:
+            pickle.dump(self, f, protocol=4)
+
 
     @property
     def archives(self) -> int:
