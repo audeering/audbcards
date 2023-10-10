@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import audeer
+import audformat
 import audiofile
 import audplot
 
@@ -111,3 +112,11 @@ def test_create_datasets_page(db):
 
     datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
     create_datasets_page(datasets, ofbase="datasets_page")
+
+
+def test_dataset_with_no_schemes(cache, tmpdir, db):
+    """When no schemes exist, schemes_table becomes [[]]."""
+    version = db.meta["audb"]["version"]
+    dataset = audbcards.core.dataset.Dataset(db.name, version)
+    dataset.header.schemes = audformat.core.common.HeaderDict()
+    assert dataset.schemes_table == [[]]
