@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import audeer
+import audformat
 import audiofile
 import audplot
 
