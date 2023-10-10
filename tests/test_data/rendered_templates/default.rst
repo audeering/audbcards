@@ -6,7 +6,7 @@ db
 Created by H Wierstorf, C Geng, B E Abrougui
 
 ============= ======================
-version       `1.0.0 <https://github.com/audeering/db/blob/main/CHANGELOG.md>`__
+version       1.0.0
 license       `CC0-1.0 <https://creativecommons.org/publicdomain/zero/1.0/>`__
 source        https://github.com/audeering/audbcards
 usage         unrestricted
@@ -41,9 +41,10 @@ Tables
 ^^^^^^
 
 .. csv-table::
-   :header: ID,Type,Columns
-   :widths: 20, 10, 70
+    :header-rows: 1
+    :widths: 20, 10, 70
 
+    "ID", "Type", "Columns"
     "files", "filewise", "speaker"
     "segments", "segmented", "emotion"
     "speaker", "misc", "age, gender"
@@ -52,9 +53,10 @@ Schemes
 ^^^^^^^
 
 .. csv-table::
-   :header: ID,Dtype,Min,Labels,Mappings
+    :header-rows: 1
 
-    "age", "int", "", ""
+    "ID", "Dtype", "Min", "Labels", "Mappings"
+    "age", "int", "0", ""
     "emotion", "str", "", "angry, happy, neutral"
     "gender", "str", "", "female, male"
     "speaker", "int", "", "0, 1", "age, gender"

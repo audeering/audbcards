@@ -3,9 +3,9 @@ Schemes
 ^^^^^^^
 
 .. csv-table::
-{{ scheme_info['header_line'] }}
+    :header-rows: 1
 
-{% for row in  dataset_schemes %}
+{% for row in schemes_table %}
   {% set row_trimmed = row|tw %}
   "{{ row_trimmed|join('", "') }}"
 {% endfor %}

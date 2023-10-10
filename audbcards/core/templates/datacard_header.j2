@@ -9,18 +9,23 @@ Created by {{ author }}
 {% endif %}
 
 ============= ======================
-version       {{ version_link }}
-license       {{ license_link }}
+version       {{ version }}
+{% if license_link is not none %}
+license       `{{ license }} <{{ license_link }}>`__
+{% else %}
+license       {{ license }}
+{% endif %}
 source        {{ source }}
 usage         {{ usage }}
-{% if languages is defined %}languages     {{ languages|join(', ') }}{% endif %}
-
-format        {{ formats }}
-channel       {{ channels  }}
-sampling rate {{ sampling_rates }}
-bit depth     {{ bit_depths }}
+{% if languages is defined %}
+languages     {{ languages|join(', ') }}
+{% endif %}
+format        {{ formats|join(', ') }}
+channel       {{ channels|join(', ') }}
+sampling rate {{ sampling_rates|join(', ') }}
+bit depth     {{ bit_depths|join(', ') }}
 duration      {{ duration }}
 files         {{ files }}
-repository    {{ repository_link }}
-published     {{ publication }}
+repository    `{{ repository }} <{{ repository_link }}>`__
+published     {{ publication_date }} by {{ publication_owner }}
 ============= ======================
