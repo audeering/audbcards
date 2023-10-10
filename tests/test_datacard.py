@@ -67,7 +67,14 @@ def test_datacard_lines_similar(db, default_template, cache):
 
 
 def test_datacard_player(db, cache):
+    r"""Test the Datacard.player.
 
+    It checks if the desired waveplot PNG file is created,
+    the example audio file is copied to the build folder,
+    and the expected RST string
+    to include the player is returned.
+
+    """
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
