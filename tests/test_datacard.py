@@ -19,7 +19,12 @@ BUILD = audeer.path('..', 'build', 'html')
 
 
 def test_datacard_example(db, cache):
+    r"""Test Datacard.example.
 
+    It checks that the desired audio file
+    is selected as example.
+
+    """
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
