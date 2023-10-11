@@ -1,7 +1,7 @@
-.. _db:
+.. _medium_db:
 
-db
---
+medium_db
+---------
 
 Created by H Wierstorf, C Geng, B E Abrougui
 
@@ -31,11 +31,11 @@ Example
 
 :file:`data/f0.wav`
 
-.. image:: ../db.png
+.. image:: ../medium_db.png
 
 .. raw:: html
 
-    <p><audio controls src="db/data/f0.wav"></audio></p>
+    <p><audio controls src="medium_db/data/f0.wav"></audio></p>
 
 Tables
 ^^^^^^

@@ -192,17 +192,6 @@ def medium_db(
     return audb.load(name, version=pytest.VERSION, verbose=False)
 
 
-@pytest.fixture
-def default_template(scope='function'):
-
-    fpath = os.path.join(pytest.TEMPLATE_DIR, 'default.rst')
-
-    with open(fpath, 'r') as file:
-        template_truth = file.read().rstrip()
-
-    return template_truth
-
-
 def create_audio_files(
         db: audformat.Database,
         db_path: str,
