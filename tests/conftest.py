@@ -1,4 +1,5 @@
 import os
+import typing
 
 import numpy as np
 import pandas as pd
@@ -10,10 +11,7 @@ import audformat
 import audiofile
 
 
-pytest.NAME = 'db'
-pytest.REPOSITORY = None
 pytest.VERSION = '1.0.0'
-
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
 pytest.TEMPLATE_DIR = audeer.mkdir(
     os.path.join(
@@ -30,7 +28,83 @@ def cache(tmpdir, scope='function'):
 
 
 @pytest.fixture
-def publish_db(tmpdir, scope='session', autouse=True):
+def audb_cache(tmpdir, scope='session', autouse=True):
+    """Provide a local audb cache only visible inside the tests."""
+    cache = audeer.mkdir(audeer.path(tmpdir, 'audb-cache'))
+    audb.config.CACHE_ROOT = cache
+    audb.config.SHARED_CACHE = cache
+
+
+@pytest.fixture
+def repository(tmpdir, scope='session'):
+    """Provide audb repository only visible inside the tests."""
+    host = audeer.mkdir(audeer.path(tmpdir, 'repo'))
+    repository = audb.Repository(
+        name='data-local',
+        host=host,
+        backend='file-system',
+    )
+    audb.config.REPOSITORIES = [repository]
+    return repository
+
+
+@pytest.fixture
+def minimal_db(
+        tmpdir,
+        repository,
+        scope='session',
+        autouse=True,
+):
+    r"""Publish and load a minimal database.
+
+    The name of the database will be ``minimal-db``.
+
+    The database has no schemes
+    and a single filewise table.
+
+    Further it contains a single file
+    with a length of 0.01 s.
+
+
+    """
+    name = 'minimal_db'
+
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+
+    db = audformat.Database(
+        name=name,
+        source='https://github.com/audeering/audbcards',
+        usage='unrestricted',
+        expires=None,
+        languages=[],
+        description='Minimal database.',
+        author='H Wierstorf, C Geng, B E Abrougui',
+        license=audformat.define.License.CC0_1_0,
+    )
+
+    # Table 'files'
+    index = audformat.filewise_index(['f0.wav'])
+    db['files'] = audformat.Table(index)
+    db['files']['speaker'] = audformat.Column()
+    db['files']['speaker'].set([0])
+
+    # Create audio files and store database
+    durations = [.1]  # s
+    create_audio_files(db, db_path, durations)
+    db.save(db_path)
+
+    # Publish and load database
+    audb.publish(db_path, pytest.VERSION, repository)
+    return audb.load(name, version=pytest.VERSION, verbose=False)
+
+
+@pytest.fixture
+def medium_db(
+        tmpdir,
+        repository,
+        scope='session',
+        autouse=True,
+):
     r"""Publish a test database.
 
     The database will use ``pytest.NAME`` as name
@@ -42,14 +116,12 @@ def publish_db(tmpdir, scope='session', autouse=True):
     the database was published to.
 
     """
-    cache = audeer.mkdir(audeer.path(tmpdir, 'audb-cache'))
-    audb.config.CACHE_ROOT = cache
-    audb.config.SHARED_CACHE = cache
+    name = 'medium_db'
 
-    db_path = audeer.mkdir(audeer.path(tmpdir, pytest.NAME))
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
 
     db = audformat.Database(
-        name=pytest.NAME,
+        name=name,
         source='https://github.com/audeering/audbcards',
         usage='unrestricted',
         expires=None,
@@ -111,37 +183,13 @@ def publish_db(tmpdir, scope='session', autouse=True):
     db['segments']['emotion'].set(['neutral', 'neutral', 'happy', 'angry'])
 
     # Create audio files and store database
-    np.random.seed(1)
-    sampling_rate = 8000
     durations = [1, 301]
-    for i, file in enumerate(list(db['files'].index)):
-        path = audeer.path(db_path, file)
-        audeer.mkdir(os.path.dirname(path))
-        signal = np.random.normal(0, .1, (1, durations[i] * sampling_rate))
-        audiofile.write(path, signal, sampling_rate, normalize=True)
+    create_audio_files(db, db_path, durations)
     db.save(db_path)
 
-    # Publish database
-    host = audeer.mkdir(audeer.path(tmpdir, 'repo'))
-    repository = audb.Repository(
-        name='data-local',
-        host=host,
-        backend='file-system',
-    )
-    audb.config.REPOSITORIES = [repository]
+    # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
-
-    # Make repository variable available in tests
-    pytest.REPOSITORY = repository
-
-
-@pytest.fixture
-def db(publish_db, scope='function'):
-    return audb.load(
-        pytest.NAME,
-        version=pytest.VERSION,
-        verbose=False,
-    )
+    return audb.load(name, version=pytest.VERSION, verbose=False)
 
 
 @pytest.fixture
@@ -153,3 +201,21 @@ def default_template(scope='function'):
         template_truth = file.read().rstrip()
 
     return template_truth
+
+
+def create_audio_files(
+        db: audformat.Database,
+        db_path: str,
+        durations: typing.Sequence[float],
+        *,
+        sampling_rate: int = 8000,
+        seed: int = 1,
+):
+    r"""Create audio files with given durations."""
+    np.random.seed(seed)
+    for n, file in enumerate(list(db['files'].index)):
+        path = audeer.path(db_path, file)
+        audeer.mkdir(os.path.dirname(path))
+        samples = int(durations[n] * sampling_rate)
+        signal = np.random.normal(0, .1, (1, samples))
+        audiofile.write(path, signal, sampling_rate, normalize=True)

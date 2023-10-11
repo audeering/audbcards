@@ -18,14 +18,21 @@ from audbcards.core.utils import set_plot_margins
 BUILD = audeer.path('..', 'build', 'html')
 
 
-def test_datacard_example(db, cache):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_datacard_example(db, cache, request):
     r"""Test Datacard.example.
 
     It checks that the desired audio file
     is selected as example.
 
     """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
     # Relative path to audio file from database
@@ -44,7 +51,13 @@ def test_datacard_example(db, cache):
     assert datacard.example == expected_example
 
 
-def test_datacard_lines_similar(db, default_template, cache):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_datacard_lines_similar(db, default_template, cache, request):
     """Create datacard using jinja2 via Dataset and Datacard.
 
     The assertions for exact identity are currently too strict.
@@ -55,7 +68,8 @@ def test_datacard_lines_similar(db, default_template, cache):
     - percentage of lines differing between original and rendered
 
     """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
     dc = audbcards.Datacard(dataset)
     content = dc._render_template()
     content = content.rstrip()
@@ -71,7 +85,13 @@ def test_datacard_lines_similar(db, default_template, cache):
     assert content == default_template
 
 
-def test_datacard_player(db, cache):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_datacard_player(db, cache, request):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
@@ -80,7 +100,8 @@ def test_datacard_player(db, cache):
     to include the player is returned.
 
     """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
     player_str = datacard.player(datacard.example)
