@@ -20,7 +20,12 @@ BUILD = audeer.path('..', 'build', 'html')
 
 
 def test_datacard_example(db, cache):
+    r"""Test Datacard.example.
 
+    It checks that the desired audio file
+    is selected as example.
+
+    """
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
@@ -68,7 +73,14 @@ def test_datacard_lines_similar(db, default_template, cache):
 
 
 def test_datacard_player(db, cache):
+    r"""Test the Datacard.player.
 
+    It checks if the desired waveplot PNG file is created,
+    the example audio file is copied to the build folder,
+    and the expected RST string
+    to include the player is returned.
+
+    """
     dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
@@ -109,7 +121,7 @@ def test_datacard_player(db, cache):
 
 
 def test_create_datasets_page(db):
-
+    r"""Test the creation of an RST file with an datasets overview table."""
     datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
     create_datasets_page(datasets, ofbase="datasets_page")
 
