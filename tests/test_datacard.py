@@ -21,6 +21,7 @@ BUILD = audeer.path('..', 'build', 'html')
 @pytest.mark.parametrize(
     'db',
     [
+        'minimal_db',
         'medium_db',
     ],
 )
@@ -28,8 +29,8 @@ def test_datacard(db, cache, request):
     """Test datacard creation from jinja2 templates."""
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
-    dc = audbcards.Datacard(dataset)
-    content = dc._render_template()
+    datacard = audbcards.Datacard(dataset)
+    content = datacard._render_template()
     content = content.rstrip()
     expected_content = load_rendered_template(db.name)
 

@@ -1,6 +1,7 @@
 import functools
 import os
 import shutil
+import typing
 
 import jinja2
 import matplotlib.pyplot as plt
@@ -48,14 +49,15 @@ class Datacard(object):
 
         # Add audio player for example file
         dataset['example'] = self.example
-        dataset['player'] = self.player(dataset['example'])
+        if dataset['example'] is not None:
+            dataset['player'] = self.player(dataset['example'])
 
         content = template.render(dataset)
 
         return content
 
     @property
-    def example(self) -> str:
+    def example(self) -> typing.Optional[str]:
         r"""Select example media file.
 
         This select a media file
@@ -75,6 +77,8 @@ class Datacard(object):
         selected_duration = np.median(
             [d for d in durations if d >= min_dur and d <= max_dur]
         )
+        if np.isnan(selected_duration):
+            return None
         # Get index for duration closest to selected duration
         # see https://stackoverflow.com/a/9706105
         # durations.index(selected_duration)
@@ -94,7 +98,7 @@ class Datacard(object):
                 verbose=False,
             )
         except:  # noqa: E722
-            media = ''
+            media = None
         return media
 
     def player(self, file: str) -> str:
