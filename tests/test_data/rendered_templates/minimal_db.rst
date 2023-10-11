@@ -17,7 +17,7 @@ sampling rate 8000
 bit depth     16
 duration      0 days 00:00:00.100000
 files         1
-repository    `data-local <.../data-local/db_minimal>`__
+repository    `data-local <.../data-local/minimal_db>`__
 published     2023-04-05 by author
 ============= ======================
 

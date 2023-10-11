@@ -17,7 +17,7 @@ sampling rate 8000
 bit depth     16
 duration      0 days 00:05:02
 files         2
-repository    `data-local <.../data-local/db>`__
+repository    `data-local <.../data-local/medium_db>`__
 published     2023-04-05 by author
 ============= ======================
 
