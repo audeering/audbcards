@@ -132,9 +132,16 @@ def test_datacard_player(db, cache, request):
     assert expected_player_str == player_str
 
 
-def test_create_datasets_page(db):
+@pytest.mark.parametrize(
+    'dbs',
+    [
+        ['minimal_db', 'medium_db'],
+    ],
+)
+def test_create_datasets_page(dbs, request):
     r"""Test the creation of an RST file with an datasets overview table."""
-    datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
+    dbs = [request.getfixturevalue(db) for db in dbs]
+    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
     create_datasets_page(datasets, ofbase="datasets_page")
 
 
