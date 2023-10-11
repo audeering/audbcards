@@ -24,12 +24,13 @@ pytest.TEMPLATE_DIR = audeer.mkdir(
 
 @pytest.fixture
 def cache(tmpdir, scope='function'):
+    """Local cache folder."""
     return audeer.mkdir(audeer.path(tmpdir, 'cache'))
 
 
 @pytest.fixture
 def audb_cache(tmpdir, scope='session', autouse=True):
-    """Provide a local audb cache only visible inside the tests."""
+    """Local audb cache folder."""
     cache = audeer.mkdir(audeer.path(tmpdir, 'audb-cache'))
     audb.config.CACHE_ROOT = cache
     audb.config.SHARED_CACHE = cache
@@ -37,7 +38,7 @@ def audb_cache(tmpdir, scope='session', autouse=True):
 
 @pytest.fixture
 def repository(tmpdir, scope='session'):
-    """Provide audb repository only visible inside the tests."""
+    """Local audb repository only visible inside the tests."""
     host = audeer.mkdir(audeer.path(tmpdir, 'repo'))
     repository = audb.Repository(
         name='data-local',
@@ -57,14 +58,13 @@ def minimal_db(
 ):
     r"""Publish and load a minimal database.
 
-    The name of the database will be ``minimal-db``.
+    The name of the database will be ``minimal_db``.
 
     The database has no schemes
     and a single filewise table.
 
     Further it contains a single file
     with a length of 0.01 s.
-
 
     """
     name = 'minimal_db'
@@ -105,15 +105,14 @@ def medium_db(
         scope='session',
         autouse=True,
 ):
-    r"""Publish a test database.
+    r"""Publish and load a medium test database.
 
-    The database will use ``pytest.NAME`` as name
-    and ``pytest.VERSION`` as version.
-    It will be published to a file-system repository
-    in a tmp folder.
-    ``audb.config.REPOSITORIES`` will be adjusted
-    to point to the repository
-    the database was published to.
+    The name of the database will be ``medium_db``.
+
+    The database contains
+    several schemes,
+    filewise, segmented, and misc tables,
+    and audio files that are suited as an example.
 
     """
     name = 'medium_db'
