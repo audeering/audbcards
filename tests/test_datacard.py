@@ -21,6 +21,7 @@ BUILD = audeer.path('..', 'build', 'html')
 @pytest.mark.parametrize(
     'db',
     [
+        'bare_db',
         'minimal_db',
         'medium_db',
     ],

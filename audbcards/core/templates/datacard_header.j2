@@ -3,8 +3,8 @@
 {{ name }}
 {% for n in range(name|length) %}-{% endfor %}
 
+{% if author is not none %}
 
-{% if author is defined %}
 Created by {{ author }}
 {% endif %}
 

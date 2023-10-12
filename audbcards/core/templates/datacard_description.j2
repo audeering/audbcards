@@ -1,6 +1,6 @@
 
 
-{% if description is defined and description|length > 0 %}
+{% if description is not none and description|length > 0 %}
 Description
 {% for n in range("Description"|length) %}^{% endfor %}
 

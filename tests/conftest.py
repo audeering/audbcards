@@ -50,6 +50,34 @@ def repository(tmpdir, scope='session'):
 
 
 @pytest.fixture
+def bare_db(
+        tmpdir,
+        repository,
+        scope='session',
+        autouse=True,
+):
+    r"""Publish and load a bare database.
+
+    The name of the database will be ``bare_db``.
+
+    The database has no schemes,
+    no table,
+    and no media files.
+
+    """
+    name = 'bare_db'
+
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+
+    db = audformat.Database(name=name)
+    db.save(db_path)
+
+    # Publish and load database
+    audb.publish(db_path, pytest.VERSION, repository)
+    return audb.load(name, version=pytest.VERSION, verbose=False)
+
+
+@pytest.fixture
 def minimal_db(
         tmpdir,
         repository,

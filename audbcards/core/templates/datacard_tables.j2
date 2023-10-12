@@ -1,4 +1,5 @@
 
+{% if tables_table is defined and tables_table|length > 1 %}
 Tables
 ^^^^^^
 
@@ -9,3 +10,4 @@ Tables
 {% for row in tables_table %}
     "{{ row|join('", "') }}"
 {% endfor %}
+{% endif %}
