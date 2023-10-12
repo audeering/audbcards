@@ -13,33 +13,6 @@ from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
 
 
-def datasetcache(func):
-    r"""Decorator to manage dataset instance cache."""
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        """Inner Function containing logic."""
-
-        cache_root =  audeer.mkdir(audeer.safe_path(kwargs.get('cache_root')))
-        dbname, version = args
-        cache_filename = audeer.path(
-            cache_root,
-            'audbcards',
-            'dataset',
-            dbname,
-            version,
-            'dataset.pkl',
-        )
-
-        print(f"using cache file {cache_filename}")
-        if os.path.exists(cache_filename):
-            return Dataset._load_pickled(cache_filename)
-
-        return func(self, *args, **kwargs)
-
-    return wrapper
-
-
-
 class Dataset:
     r"""Dataset.
 
@@ -59,7 +32,7 @@ class Dataset:
                 *,
                 cache_root: str = './cache',
                 ):
-
+        r"""Instantiate Dataset Object."""
         dataset_cache_filename = cls._dataset_cache_path(name,
                                                          version,
                                                          cache_root)
@@ -124,7 +97,6 @@ class Dataset:
                             version: str,
                             cache_root: str) -> str:
         r"""Generate the name of the cache file."""
-
         cache_dir = audeer.mkdir(audeer.path(
             cache_root,
             'audbcards',
