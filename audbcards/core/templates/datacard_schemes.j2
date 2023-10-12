@@ -6,6 +6,5 @@ Schemes
     :header-rows: 1
 
 {% for row in schemes_table %}
-  {% set row_trimmed = row|tw %}
-  "{{ row_trimmed|join('", "') }}"
+    "{{ row|join('", "') }}"
 {% endfor %}

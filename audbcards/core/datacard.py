@@ -39,11 +39,6 @@ class Datacard(object):
         t_dir = os.path.join(os.path.dirname(__file__), 'templates')
         environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
                                          trim_blocks=True)
-        # Provide Jinja filter access to Python build-ins/functions
-        environment.filters.update(
-            zip=zip,
-            tw=self._trim_trailing_whitespace,
-        )
         template = environment.get_template("datacard.j2")
 
         # === Add/change content of Dataset class
@@ -58,22 +53,6 @@ class Datacard(object):
         content = template.render(dataset)
 
         return content
-
-    @staticmethod
-    def _trim_trailing_whitespace(x: list):
-        """J2 filter to get rid of trailing empty table entries within a row.
-
-        Trims last entry if present.
-
-        Args:
-            x: untrimmed single scheme table row
-        Returns:
-            trimmed single scheme table row
-        """
-        if x[-1] == '':
-            x.pop()
-
-        return x
 
     @property
     def example(self) -> str:
