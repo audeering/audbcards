@@ -39,10 +39,6 @@ class Datacard(object):
         t_dir = os.path.join(os.path.dirname(__file__), 'templates')
         environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
                                          trim_blocks=True)
-        # Provide Jinja filter access to Python build-ins/functions
-        environment.filters.update(
-            zip=zip,
-        )
         template = environment.get_template("datacard.j2")
 
         # === Add/change content of Dataset class
