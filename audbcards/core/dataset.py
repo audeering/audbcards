@@ -18,6 +18,7 @@ def datasetcache(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         """Inner Function containing logic."""
+
         cache_root =  audeer.mkdir(audeer.safe_path(kwargs.get('cache_root')))
         dbname, version = args
         cache_filename = audeer.path(
@@ -51,13 +52,35 @@ class Dataset:
         cache_root: cache folder
 
     """
-    @datasetcache
+    @classmethod
+    def create (cls,
+                name: str,
+                version: str,
+                *,
+                cache_root: str = './cache',
+                ):
+
+        dataset_cache_filename = cls._dataset_cache_path(name,
+                                                         version,
+                                                         cache_root)
+
+
+        if os.path.exists(dataset_cache_filename):
+            print(f"loading from pickle: {dataset_cache_filename}")
+            obj = cls._load_pickled(dataset_cache_filename)
+            return obj
+
+        print("creating object ...")
+        obj = cls(name, version, cache_root)
+        print(f"saving cache file to {dataset_cache_filename}")
+        cls._save_pickled(obj, dataset_cache_filename)
+        return obj
+
     def __init__(
             self,
             name: str,
             version: str,
-            *,
-            cache_root: str = './cache',
+            cache_root: str,
     ):
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
@@ -96,15 +119,26 @@ class Dataset:
                 audeer.path(self.cache_root, name, other_version)
             )
 
-        # save instance to cache
-        object_cache = audeer.path(
-            self.cache_root,
+    @staticmethod
+    def _dataset_cache_path(name: str,
+                            version: str,
+                            cache_root: str) -> str:
+        r"""Generate the name of the cache file."""
+
+        cache_dir = audeer.mkdir(audeer.path(
+            cache_root,
+            'audbcards',
             'dataset',
             name,
-            version,
-            'dataset.pkl',
+            version)
         )
-        self._save_pickled(object_cache)
+
+        cache_filename = audeer.path(
+            cache_dir,
+            f'{name}-{version}.pkl',
+        )
+        return cache_filename
+
 
     @staticmethod
     def _load_pickled(path: str):
@@ -115,12 +149,13 @@ class Dataset:
         with open(path, "rb") as f:
             return pickle.load(f)
 
-    def _save_pickled(self, path: str):
+    @staticmethod
+    def _save_pickled(obj, path: str):
         """Save object instance to path as pickle."""
         audeer.mkdir(os.path.dirname(path))
 
         with open(path, "wb") as f:
-            pickle.dump(self, f, protocol=4)
+            pickle.dump(obj, f, protocol=4)
 
 
     @property
