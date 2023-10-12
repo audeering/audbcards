@@ -158,7 +158,7 @@ class Dataset:
 
     @staticmethod
     def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
-        r"""calculate ISO languages for a list of languages.
+        r"""Calculate ISO languages for a list of languages.
 
         Args:
             languages: list of languages as given in the header languages
