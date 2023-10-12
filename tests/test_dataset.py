@@ -179,3 +179,41 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     # version
     expected_version = pytest.VERSION
     assert dataset.version == expected_version
+
+
+@pytest.mark.parametrize(
+    "languages, iso_languages_expected",
+    [
+        (
+            ['greek', 'Greek', 'gr'], ['greek', 'Greek', 'gr']
+        ),
+        (
+            ['en', 'English', 'english', 'En'], ['eng']
+        ),
+        (
+            ['de', 'German', 'german', 'deu'], ['deu']
+        ),
+        (
+            ['Algerian Arabic', 'Egyptian Arabic', 'Libyan Arabic', 'Moroccan Arabic', 'North Levantine Arabic'], ['arz', 'ary', 'apc', 'ayl', 'arq']
+        ),
+        (
+            ['Algerian Arabic'], ['arq']
+        ),
+        (
+            ['Egyptian Arabic'], ['arz']
+        ),
+        (
+            ['Libyan Arabic'], ['ayl']
+        ),
+        (
+            ['North Levantine Arabic'], ['apc']
+        ),
+        (
+            ['Moroccan Arabic'], ['ary']
+        )
+    ]
+)
+def test_language_mappings(languages, iso_languages_expected):
+    """Test language mapping method."""
+    iso_languages_calculated = audbcards.Dataset._map_iso_languages(languages)
+    assert set(iso_languages_calculated) == set(iso_languages_expected)
