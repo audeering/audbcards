@@ -178,7 +178,7 @@ class Dataset:
 
             iso_languages.append(iso_language)
 
-        return list(set(iso_languages))
+        return sorted(list(set(iso_languages)))
 
     @property
     def license(self) -> str:
