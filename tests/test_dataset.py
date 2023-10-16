@@ -194,7 +194,16 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
             ['de', 'German', 'german', 'deu'], ['deu']
         ),
         (
-            ['Algerian Arabic', 'Egyptian Arabic', 'Libyan Arabic', 'Moroccan Arabic', 'North Levantine Arabic'], ['arz', 'ary', 'apc', 'ayl', 'arq']
+            ['Algerian Arabic',
+             'Egyptian Arabic',
+             'Libyan Arabic',
+             'Moroccan Arabic',
+             'North Levantine Arabic'],
+            ['arz',
+             'ary',
+             'apc',
+             'ayl',
+             'arq']
         ),
         (
             ['Algerian Arabic'], ['arq']
