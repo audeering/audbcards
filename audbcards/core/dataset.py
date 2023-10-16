@@ -160,13 +160,14 @@ class Dataset:
     def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
         r"""Calculate ISO languages for a list of languages.
 
+        Leaves languages intact if :func:`audformat.utils.map_language`
+        raises :exception:`ValueError`.
+        
         Args:
             languages: list of languages as given in the header languages
+            
         Returns:
             list of languages
-
-        Behavior: leaves languages intact if `audformat.utils.map_language`
-        raises ValueError
 
         """
         iso_languages = []
