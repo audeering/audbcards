@@ -216,4 +216,4 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 def test_language_mappings(languages, iso_languages_expected):
     """Test language mapping method."""
     iso_languages_calculated = audbcards.Dataset._map_iso_languages(languages)
-    assert set(iso_languages_calculated) == set(iso_languages_expected)
+    assert iso_languages_calculated == sorted(iso_languages_expected)
