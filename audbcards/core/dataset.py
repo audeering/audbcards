@@ -121,24 +121,6 @@ class Dataset:
         )
 
     @property
-    def example(self) -> str:
-        r"""Relative path to example media file in dataset."""
-        # Pick a meaningful duration for the example audio file
-        min_dur = 0.5
-        max_dur = 300  # 5 min
-        selected_duration = np.median(
-            [d for d in self.file_durations if d >= min_dur and d <= max_dur]
-        )
-        # Get index for duration closest to selected duration
-        # see https://stackoverflow.com/a/9706105
-        # durations.index(selected_duration)
-        # is an alternative but fails due to rounding errors
-        index = min(
-            range(len(self.file_durations)),
-            key=lambda n: abs(self.file_durations[n] - selected_duration),
-        )
-
-    @property
     def files(self) -> int:
         r"""Number of media files in dataset."""
         return len(self.deps.media)
