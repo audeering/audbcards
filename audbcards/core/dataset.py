@@ -162,10 +162,10 @@ class Dataset:
 
         Leaves languages intact if :func:`audformat.utils.map_language`
         raises :exception:`ValueError`.
-        
+
         Args:
             languages: list of languages as given in the header languages
-            
+
         Returns:
             list of languages
 
