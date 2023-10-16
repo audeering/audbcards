@@ -153,7 +153,7 @@ class Dataset:
 
     @property
     def iso_languages(self) -> typing.List[str]:
-        r"""Languages of the database."""
+        r"""Languages of the database as ISO 639-3 if possible."""
         return self._map_iso_languages(self.languages)
 
     @staticmethod
