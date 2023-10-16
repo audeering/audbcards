@@ -1,4 +1,5 @@
 
+{% if schemes_table is defined and schemes_table|length > 1 %}
 Schemes
 ^^^^^^^
 
@@ -8,3 +9,4 @@ Schemes
 {% for row in schemes_table %}
     "{{ row|join('", "') }}"
 {% endfor %}
+{% endif %}

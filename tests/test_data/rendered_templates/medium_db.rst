@@ -1,7 +1,7 @@
-.. _db:
+.. _medium_db:
 
-db
---
+medium_db
+---------
 
 Created by H Wierstorf, C Geng, B E Abrougui
 
@@ -17,25 +17,25 @@ sampling rate 8000
 bit depth     16
 duration      0 days 00:05:02
 files         2
-repository    `data-local <.../data-local/db>`__
+repository    `data-local <.../data-local/medium_db>`__
 published     2023-04-05 by author
 ============= ======================
 
 Description
 ^^^^^^^^^^^
 
-Example database.
+Medium database.
 
 Example
 ^^^^^^^
 
 :file:`data/f0.wav`
 
-.. image:: ../db.png
+.. image:: ../medium_db.png
 
 .. raw:: html
 
-    <p><audio controls src="db/data/f0.wav"></audio></p>
+    <p><audio controls src="medium_db/data/f0.wav"></audio></p>
 
 Tables
 ^^^^^^

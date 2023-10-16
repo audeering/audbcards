@@ -9,28 +9,37 @@ import audiofile
 import audbcards
 
 
-def test_dataset(cache, tmpdir, db):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_dataset(audb_cache, tmpdir, repository, db, request):
+    r"""Test audbcards.Dataset object and all its properties."""
+    db = request.getfixturevalue(db)
+
     dataset_cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
     dataset = audbcards.Dataset(
-        pytest.NAME,
+        db.name,
         pytest.VERSION,
         cache_root=dataset_cache,
     )
 
     # __init__
-    assert dataset.name == pytest.NAME
+    assert dataset.name == db.name
     assert dataset.version == pytest.VERSION
-    assert dataset._repository == pytest.REPOSITORY
+    assert dataset._repository == repository
     expected_header = audb.info.header(
-        pytest.NAME,
+        db.name,
         version=pytest.VERSION,
-        cache_root=cache,
+        cache_root=audb_cache,
     )
     assert str(dataset.header) == str(expected_header)
     expected_deps = audb.dependencies(
-        pytest.NAME,
+        db.name,
         version=pytest.VERSION,
-        cache_root=cache,
+        cache_root=audb_cache,
     )
     expected_df = expected_deps()
     pd.testing.assert_frame_equal(dataset.deps(), expected_df)
@@ -106,8 +115,7 @@ def test_dataset(cache, tmpdir, db):
     # publication: skipped for now
 
     # repository
-    expected_repository = pytest.REPOSITORY.name
-    assert dataset.repository == expected_repository
+    assert dataset.repository == repository.name
 
     # repository_link : skipped for now
 

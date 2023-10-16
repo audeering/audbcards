@@ -18,14 +18,49 @@ from audbcards.core.utils import set_plot_margins
 BUILD = audeer.path('..', 'build', 'html')
 
 
-def test_datacard_example(db, cache):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'bare_db',
+        'minimal_db',
+        'medium_db',
+    ],
+)
+def test_datacard(db, cache, request):
+    """Test datacard creation from jinja2 templates."""
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    datacard = audbcards.Datacard(dataset)
+    content = datacard._render_template()
+    content = content.rstrip()
+    expected_content = load_rendered_template(db.name)
+
+    # Remove lines that depend on author/local machine
+    for pattern in [
+            re.compile('^published.*$', flags=(re.MULTILINE)),
+            re.compile('^repository.*$', flags=(re.MULTILINE)),
+    ]:
+        content = re.sub(pattern, '', content)
+        expected_content = re.sub(pattern, '', expected_content)
+
+    assert content == expected_content
+
+
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_datacard_example(db, cache, request):
     r"""Test Datacard.example.
 
     It checks that the desired audio file
     is selected as example.
 
     """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
     # Relative path to audio file from database
@@ -44,34 +79,13 @@ def test_datacard_example(db, cache):
     assert datacard.example == expected_example
 
 
-def test_datacard_lines_similar(db, default_template, cache):
-    """Create datacard using jinja2 via Dataset and Datacard.
-
-    The assertions for exact identity are currently too strict.
-    Therefore this uses text similarities as obtained from
-    the difflib builtins. These are based on
-
-    - average (or rather median and mean) similarities per line
-    - percentage of lines differing between original and rendered
-
-    """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
-    dc = audbcards.Datacard(dataset)
-    content = dc._render_template()
-    content = content.rstrip()
-
-    # Remove lines that depend on author/local machine
-    for pattern in [
-            re.compile('^published.*$', flags=(re.MULTILINE)),
-            re.compile('^repository.*$', flags=(re.MULTILINE)),
-    ]:
-        content = re.sub(pattern, '', content)
-        default_template = re.sub(pattern, '', default_template)
-
-    assert content == default_template
-
-
-def test_datacard_player(db, cache):
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
+def test_datacard_player(db, cache, request):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
@@ -80,7 +94,8 @@ def test_datacard_player(db, cache):
     to include the player is returned.
 
     """
-    dataset = audbcards.Dataset(pytest.NAME, pytest.VERSION, cache)
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
     datacard = audbcards.Datacard(dataset)
 
     player_str = datacard.player(datacard.example)
@@ -119,7 +134,22 @@ def test_datacard_player(db, cache):
     assert expected_player_str == player_str
 
 
-def test_create_datasets_page(db):
+@pytest.mark.parametrize(
+    'dbs',
+    [
+        ['minimal_db', 'medium_db'],
+    ],
+)
+def test_create_datasets_page(dbs, request):
     r"""Test the creation of an RST file with an datasets overview table."""
-    datasets = [audbcards.Dataset(pytest.NAME, pytest.VERSION)] * 4
+    dbs = [request.getfixturevalue(db) for db in dbs]
+    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
     create_datasets_page(datasets, ofbase="datasets_page")
+
+
+def load_rendered_template(name: str) -> str:
+    r"""Load the expected rendered RST file."""
+    fpath = os.path.join(pytest.TEMPLATE_DIR, f'{name}.rst')
+    with open(fpath, 'r') as file:
+        rendered_rst = file.read().rstrip()
+    return rendered_rst
