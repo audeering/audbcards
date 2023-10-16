@@ -126,6 +126,13 @@ class Dataset:
         return len(self.deps.media)
 
     @property
+    def file_durations(self) -> typing.List:
+        r"""File durations in dataset in seconds."""
+        return [
+            self.deps.duration(file) for file in self.deps.media
+        ]
+
+    @property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
         return sorted(
