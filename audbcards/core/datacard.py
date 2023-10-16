@@ -70,10 +70,7 @@ class Datacard(object):
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
-        durations = [
-            self._dataset.deps.duration(file)
-            for file in self._dataset.deps.media
-        ]
+        durations = self._dataset.file_durations
         selected_duration = np.median(
             [d for d in durations if d >= min_dur and d <= max_dur]
         )
