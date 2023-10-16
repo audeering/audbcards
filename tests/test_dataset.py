@@ -85,6 +85,13 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     expected_files = len(db.files)
     assert dataset.files == expected_files
 
+    # file_durations
+    expected_file_durations = [
+        expected_deps.duration(file)
+        for file in expected_deps.media
+    ]
+    assert dataset.file_durations == expected_file_durations
+
     # formats
     expected_formats = sorted(
         list(
