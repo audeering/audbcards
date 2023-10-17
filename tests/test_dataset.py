@@ -222,7 +222,20 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         )
     ]
 )
-def test_language_mappings(languages, iso_languages_expected):
-    """Test language mapping method."""
+def test_iso_language_mappings(languages, iso_languages_expected):
+    """Test ISO 639-3 language mapping method."""
     iso_languages_calculated = audbcards.Dataset._map_iso_languages(languages)
     assert iso_languages_calculated == sorted(iso_languages_expected)
+
+
+@pytest.mark.parametrize(
+    'dbs',
+    [
+        ['minimal_db', 'medium_db'],
+    ],
+)
+def test_iso_language_property(dbs, request):
+    """Test ISO 639-3 language mapping property."""
+    dbs = [request.getfixturevalue(db) for db in dbs]
+    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
+    _ = [dataset.iso_languages for dataset in datasets]
