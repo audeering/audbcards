@@ -30,7 +30,7 @@ class Dataset:
                 name: str,
                 version: str,
                 *,
-                cache_root: str = './cache',
+                cache_root: str = '~/.cache/audbcards',
                 ):
         r"""Instantiate Dataset Object."""
         dataset_cache_filename = cls._dataset_cache_path(name,
@@ -60,12 +60,10 @@ class Dataset:
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
-            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
-            cache_root=self.cache_root,
             verbose=False,
         )
 
@@ -82,15 +80,29 @@ class Dataset:
         # Clean up cache
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
-        versions = audeer.list_dir_names(
-            audeer.path(self.cache_root, name),
-            basenames=True,
-        )
-        other_versions = [v for v in versions if v != version]
+        local_repos = [
+            x for x in audb.config.REPOSITORIES if x.backend == 'file-system'
+        ]
+        assert len(local_repos) == 1, "Expecting single local repo."
+        local_repo = local_repos[0]
+        versions = os.listdir(
+            audeer.path(
+                local_repo.host,
+                local_repo.name,
+                name,
+                'db',
+            ))
+
+        other_versions = [v for v in versions if v != self._version]
         for other_version in other_versions:
             audeer.rmdir(
-                audeer.path(self.cache_root, name, other_version)
-            )
+                audeer.path(
+                    local_repo.host,
+                    local_repo.name,
+                    name,
+                    'db',
+                    other_version,
+                ))
 
     @staticmethod
     def _dataset_cache_path(name: str,
