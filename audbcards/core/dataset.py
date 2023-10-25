@@ -39,13 +39,10 @@ class Dataset:
 
 
         if os.path.exists(dataset_cache_filename):
-            print(f"loading from pickle: {dataset_cache_filename}")
             obj = cls._load_pickled(dataset_cache_filename)
             return obj
 
-        print("creating object ...")
         obj = cls(name, version, cache_root)
-        print(f"saving cache file to {dataset_cache_filename}")
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
 
