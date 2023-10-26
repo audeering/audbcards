@@ -152,6 +152,36 @@ class Dataset:
         return self.header.languages
 
     @property
+    def iso_languages(self) -> typing.List[str]:
+        r"""Languages of the database as ISO 639-3 if possible."""
+        return self._map_iso_languages(self.languages)
+
+    @staticmethod
+    def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
+        r"""Calculate ISO languages for a list of languages.
+
+        Leaves languages intact if :func:`audformat.utils.map_language`
+        raises :exception:`ValueError`.
+
+        Args:
+            languages: list of languages as given in the header languages
+
+        Returns:
+            list of languages
+
+        """
+        iso_languages = []
+        for lang in languages:
+            try:
+                iso_language = audformat.utils.map_language(lang)
+            except ValueError:
+                iso_language = lang
+
+            iso_languages.append(iso_language)
+
+        return sorted(list(set(iso_languages)))
+
+    @property
     def license(self) -> str:
         r"""License of dataset.
 
