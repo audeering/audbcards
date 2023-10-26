@@ -39,9 +39,11 @@ def audb_cache(tmpdir, scope='session', autouse=True):
 @pytest.fixture
 def repository(tmpdir, scope='session'):
     """Local audb repository only visible inside the tests."""
+    name = 'data-local'
     host = audeer.mkdir(audeer.path(tmpdir, 'repo'))
+    audeer.mkdir(audeer.path(host, name))
     repository = audb.Repository(
-        name='data-local',
+        name=name,
         host=host,
         backend='file-system',
     )
