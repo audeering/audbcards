@@ -139,19 +139,19 @@ class Dataset:
             pickle.dump(obj, f, protocol=4)
 
 
-    @property
+    @functools.cached_property
     def archives(self) -> int:
         r"""Number of archives of media files in dataset."""
         return len(
             set([self.deps.archive(file) for file in self.deps.media])
         )
 
-    @property
+    @functools.cached_property
     def author(self) -> typing.List[str]:
         r"""Authors of the database."""
         return self.header.author
 
-    @property
+    @functools.cached_property
     def bit_depths(self) -> typing.List[int]:
         r"""Bit depths of media files in dataset."""
         return sorted(
@@ -166,7 +166,7 @@ class Dataset:
             )
         )
 
-    @property
+    @functools.cached_property
     def channels(self) -> typing.List[int]:
         r"""Channels of media files in dataset."""
         return sorted(
@@ -181,12 +181,12 @@ class Dataset:
             )
         )
 
-    @property
+    @functools.cached_property
     def description(self) -> str:
         r"""Source of the database."""
         return self.header.description
 
-    @property
+    @functools.cached_property
     def duration(self) -> pd.Timedelta:
         r"""Total duration of media files in dataset."""
         durations = [self.deps.duration(file) for file in self.deps.media]
@@ -195,19 +195,19 @@ class Dataset:
             unit='s',
         )
 
-    @property
+    @functools.cached_property
     def files(self) -> int:
         r"""Number of media files in dataset."""
         return len(self.deps.media)
 
-    @property
+    @functools.cached_property
     def file_durations(self) -> typing.List:
         r"""File durations in dataset in seconds."""
         return [
             self.deps.duration(file) for file in self.deps.media
         ]
 
-    @property
+    @functools.cached_property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
         return sorted(
@@ -221,7 +221,7 @@ class Dataset:
             )
         )
 
-    @property
+    @functools.cached_property
     def languages(self) -> typing.List[str]:
         r"""Languages of the database."""
         return self.header.languages
@@ -266,7 +266,7 @@ class Dataset:
         """
         return self.header.license or 'Unknown'
 
-    @property
+    @functools.cached_property
     def license_link(self) -> typing.Optional[str]:
         r"""Link to license of dataset.
 
@@ -282,18 +282,18 @@ class Dataset:
         else:
             return self.header.license_url
 
-    @property
+    @functools.cached_property
     def name(self) -> str:
         r"""Name of dataset."""
         return self.header.name
 
-    @property
+    @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
         path = self._backend.join('/', self.name, 'db.yaml')
         return self._backend.date(path, self._version)
 
-    @property
+    @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
         path = self._backend.join('/', self.name, 'db.yaml')
@@ -304,16 +304,15 @@ class Dataset:
         class_items = self.__class__.__dict__.items()
         props = dict((k, getattr(self, k))
                      for k, v in class_items
-                     if isinstance(v, property))
-
+                     if isinstance(v, functools.cached_property))
         return props
 
-    @property
+    @functools.cached_property
     def repository(self) -> str:
         r"""Repository containing the dataset."""
         return f'{self._repository.name}'
 
-    @property
+    @functools.cached_property
     def repository_link(self) -> str:
         r"""Link to repository in Artifactory web UI."""
         # NOTE: this needs to be changed
@@ -325,7 +324,7 @@ class Dataset:
             f'{self.name}'
         )
 
-    @property
+    @functools.cached_property
     def sampling_rates(self) -> typing.List[int]:
         r"""Sampling rates of media files in dataset."""
         return sorted(
@@ -340,12 +339,12 @@ class Dataset:
             )
         )
 
-    @property
+    @functools.cached_property
     def schemes(self) -> typing.List[str]:
         r"""Schemes of dataset."""
         return list(self.header.schemes)
 
-    @property
+    @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
         """Schemes table with name, type, min, max, labels, mappings.
 
@@ -368,7 +367,7 @@ class Dataset:
         scheme_data.insert(0, list(data))
         return scheme_data
 
-    @property
+    @functools.cached_property
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
@@ -379,19 +378,19 @@ class Dataset:
             description = f'{description[:length - 3]}...'
         return description
 
-    @property
+    @functools.cached_property
     def source(self) -> str:
         r"""Source of the database."""
         return self.header.source
 
-    @property
+    @functools.cached_property
     def tables(self) -> typing.List[str]:
         """Tables of the dataset."""
         db = self.header
         tables = list(db)
         return tables
 
-    @property
+    @functools.cached_property
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
         table_list = [['ID', 'Type', 'Columns']]
@@ -407,17 +406,17 @@ class Dataset:
 
         return table_list
 
-    @property
+    @functools.cached_property
     def usage(self) -> str:
         r"""Usage of the database."""
         return self.header.usage
 
-    @property
+    @functools.cached_property
     def version(self) -> str:
         r"""Version of dataset."""
         return self._version
 
-    @property
+    @functools.cached_property
     def _scheme_table_columns(self) -> typing.List[str]:
         """Column names for the scheme table.
 
