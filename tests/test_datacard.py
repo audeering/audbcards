@@ -27,7 +27,7 @@ from audbcards.core.utils import set_plot_margins
 def test_datacard(db, cache, request):
     """Test datacard creation from jinja2 templates."""
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
     datacard = audbcards.Datacard(dataset)
     content = datacard._render_template()
     content = content.rstrip()
@@ -58,7 +58,7 @@ def test_datacard_example_media(db, cache, request):
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
     datacard = audbcards.Datacard(dataset)
 
     # Relative path to audio file from database

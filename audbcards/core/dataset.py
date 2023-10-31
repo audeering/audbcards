@@ -13,7 +13,7 @@ from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
 
 
-class Dataset:
+class Dataset(object):
     r"""Dataset.
 
     Dataset object that represents a dataset
@@ -25,6 +25,35 @@ class Dataset:
         cache_root: cache folder
 
     """
+    def __new__(cls,
+                name: str,
+                version: str,
+                *,
+                cache_root: str = '~/.cache/audbcards',
+                ):
+        r"""Create Dataset Instance."""
+        instance = _Dataset.create(name, version, cache_root=cache_root)
+
+        return instance
+
+    @staticmethod
+    def _dataset_cache_path(*args):
+        cache_path = _Dataset._dataset_cache_path(*args)
+        return cache_path
+
+    @staticmethod
+    def _load_pickled(path: str):
+        ds = _Dataset._load_pickled(path)
+        return ds
+
+
+    @staticmethod
+    def _save_pickled(obj, path: str):
+        """Save object instance to path as pickle."""
+        return _Dataset._load_pickled(obj, path)
+
+class _Dataset:
+
     @classmethod
     def create (cls,
                 name: str,
@@ -45,6 +74,8 @@ class Dataset:
         obj = cls(name, version, cache_root)
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
+
+
 
     def __init__(
             self,
