@@ -539,6 +539,8 @@ class _Dataset:
         if 'Mappings' in scheme_info:
             if not isinstance(scheme.labels, (str, dict)):
                 mappings = ''
+            elif scheme._labels_to_dict() == {}:
+                mappings = ''
             else:
                 labels = scheme._labels_to_dict()
                 # Mappings can contain a single mapping
