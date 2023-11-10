@@ -72,6 +72,7 @@ class _Dataset:
             return obj
 
         obj = cls(name, version, cache_root)
+        _ = obj.properties()
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
 
