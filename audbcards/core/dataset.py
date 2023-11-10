@@ -50,7 +50,7 @@ class Dataset(object):
     @staticmethod
     def _save_pickled(obj, path: str):
         """Save object instance to path as pickle."""
-        return _Dataset._load_pickled(obj, path)
+        return _Dataset._save_pickled(obj, path)
 
 class _Dataset:
 
