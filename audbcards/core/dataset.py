@@ -463,23 +463,40 @@ class Dataset:
 
 def create_datasets_page(
         datasets: typing.Sequence[Dataset],
-        ofbase: str = 'datasets',
+        rst_file: str = './datasets.rst',
+        *,
+        datacards_path: str = './datasets',
 ):
     r"""Create overview page of datasets.
 
+    Writes the RST file ``rst_file`` to disk
+    accompanied by a CSV with the same basename.
+    The RST includes the CSV file
+    as a table listing all available datasets
+    containing the columns
+    name,
+    description,
+    license,
+    version,
+    schemes.
+    The name column does also contain a link
+    to the corresponding data card.
+
     Args:
         datasets: list of datasets
-        ofbase: basename of the file written to disk
-
-    ofbase: written to disk in both csv and rst formats.
-    Final outfilenames consist of ofbase plus extension.
+        rst_file: name of RST file written to disk.
+            Besides the RST file,
+            a CSV file with the same basename
+            is also stored
+        datacards_path: relative path to folder that stores
+            data cards for the given datasets
 
     """
     tuples = [
         (
-            f'`{dataset.name} <./datasets/{dataset.name}.html>`__',
+            f'`{dataset.name} <{datacards_path}/{dataset.name}.html>`__',
             dataset.short_description,
-            dataset.license_link,
+            f'`{dataset.license} <{dataset.license_link}>`__',
             dataset.version,
             format_schemes(dataset.header.schemes),
         )
@@ -490,14 +507,15 @@ def create_datasets_page(
         columns=['name', 'description', 'license', 'version', 'schemes'],
         index='name',
     )
-    csv_file = f'{ofbase}.csv'
+    csv_file = audeer.replace_file_extension(rst_file, 'csv')
     df.to_csv(csv_file)
 
-    rst_file = f'{ofbase}.rst'
-
-    t_dir = os.path.join(os.path.dirname(__file__), 'templates')
-    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
-                                     trim_blocks=True)
+    template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_dir),
+        trim_blocks=True,
+    )
+    template = environment.get_template("datasets.j2")
 
     data = [
         (
@@ -506,14 +524,7 @@ def create_datasets_page(
         )
         for dataset in datasets
     ]
-
-    data = {
-        'data': data,
-    }
-
-    template = environment.get_template("datasets.j2")
-    content = template.render(data)
+    content = template.render({'data': data})
 
     with open(rst_file, mode="w", encoding="utf-8") as fp:
         fp.write(content)
-        print(f"... wrote {rst_file}")

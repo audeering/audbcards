@@ -24,37 +24,33 @@ class Datacard(object):
 
     Args:
         dataset: dataset object
+        path: path to folder
+            that store datacard files
 
     """
-    def __init__(self, dataset: Dataset):
+    def __init__(
+            self,
+            dataset: Dataset,
+            *,
+            path: str = 'datasets',
+    ):
 
-        self._dataset = dataset
+        self.dataset = dataset
+        """Dataset object."""
+
+        self.path = path
+        """Folder to store datacard."""
+
+        self._sphinx_build_dir = None
+        """Sphinx build dir."""
+
+        self._sphinx_src_dir = None
+        """Sphinx source dir."""
 
     @functools.cached_property
     def content(self):
         """Property Accessor for rendered jinja2 content."""
         return self._render_template()
-
-    def _render_template(self):
-
-        t_dir = os.path.join(os.path.dirname(__file__), 'templates')
-        environment = jinja2.Environment(loader=jinja2.FileSystemLoader(t_dir),
-                                         trim_blocks=True)
-        template = environment.get_template("datacard.j2")
-
-        # === Add/change content of Dataset class
-
-        # Get dataset property names and content as dictionary
-        dataset = self._dataset.properties()
-
-        # Add audio player for example file
-        dataset['example'] = self.example
-        if dataset['example'] is not None:
-            dataset['player'] = self.player(dataset['example'])
-
-        content = template.render(dataset)
-
-        return content
 
     @property
     def example(self) -> typing.Optional[str]:
@@ -70,7 +66,7 @@ class Datacard(object):
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
-        durations = self._dataset.file_durations
+        durations = self.dataset.file_durations
         selected_duration = np.median(
             [d for d in durations if d >= min_dur and d <= max_dur]
         )
@@ -86,19 +82,22 @@ class Datacard(object):
         )
         # Download of example data might fail
         try:
-            media = self._dataset.deps.media[index]
+            media = self.dataset.deps.media[index]
             audb.load_media(
-                self._dataset.name,
+                self.dataset.name,
                 media,
-                version=self._dataset.version,
-                cache_root=self._dataset.cache_root,
+                version=self.dataset.version,
+                cache_root=self.dataset.cache_root,
                 verbose=False,
             )
         except:  # noqa: E722
             media = None
         return media
 
-    def player(self, file: str) -> str:
+    def player(
+            self,
+            file: str,
+    ) -> str:
         r"""Create an audio player showing the waveform.
 
         Args:
@@ -107,39 +106,46 @@ class Datacard(object):
                 is a good fit
 
         """
+        media_src_dir = (
+            f'{self.dataset.cache_root}/'
+            f'{audb.flavor_path(self.dataset.name, self.dataset.version)}'
+        )
         # Move file to build folder
-        src_dir = (
-            f'{self._dataset.cache_root}/'
-            f'{audb.flavor_path(self._dataset.name, self._dataset.version)}'
-        )
-        # NOTE: once we added a sphinx datacard extension
-        # to this repository,
-        # we can directly use `app.builder.outdir`
-        # to get the build dir.
-        # https://github.com/audeering/audbcards/issues/2
-        build_dir = audeer.path('..', 'build', 'html')
-        dst_dir = f'{build_dir}/datasets/{self._dataset.name}'
-        audeer.mkdir(os.path.join(dst_dir, os.path.dirname(file)))
-        shutil.copy(
-            os.path.join(src_dir, file),
-            os.path.join(dst_dir, file),
-        )
+        if self._sphinx_build_dir is not None:
+            media_dst_dir = audeer.path(
+                self._sphinx_build_dir,
+                self.path,
+                self.dataset.name,
+            )
+            audeer.mkdir(os.path.join(media_dst_dir, os.path.dirname(file)))
+            shutil.copy(
+                os.path.join(media_src_dir, file),
+                os.path.join(media_dst_dir, file),
+            )
 
         # Add plot of waveform
-        signal, sampling_rate = audiofile.read(
-            os.path.join(src_dir, file),
-            always_2d=True,
-        )
-        plt.figure(figsize=[3, .5])
-        ax = plt.subplot(111)
-        audplot.waveform(signal[0, :], ax=ax)
-        set_plot_margins()
-        plt.savefig(f'{self._dataset.name}.png')
-        plt.close()
+        if self._sphinx_src_dir is not None:
+            signal, sampling_rate = audiofile.read(
+                os.path.join(media_src_dir, file),
+                always_2d=True,
+            )
+            image_file = audeer.path(
+                self._sphinx_src_dir,
+                self.path,
+                self.dataset.name,
+                f'{self.dataset.name}.png',
+            )
+            audeer.mkdir(os.path.dirname(image_file))
+            plt.figure(figsize=[3, .5])
+            ax = plt.subplot(111)
+            audplot.waveform(signal[0, :], ax=ax)
+            set_plot_margins()
+            plt.savefig(image_file)
+            plt.close()
 
-        player_src = f'{self._dataset.name}/{file}'
+        player_src = f'./{self.dataset.name}/{file}'
         player_str = (
-            f'.. image:: ../{self._dataset.name}.png\n'
+            f'.. image:: ./{self.dataset.name}/{self.dataset.name}.png\n'
             '\n'
             '.. raw:: html\n'
             '\n'
@@ -147,19 +153,68 @@ class Datacard(object):
         )
         return player_str
 
-    def save(self, ofpath: str = None):
-        """Save content of rendered template to rst.
+    def save(self):
+        """Save content of rendered template to rst."""
+        if self._sphinx_src_dir is not None:
+            rst_file = audeer.path(
+                self._sphinx_src_dir,
+                self.path,
+                f'{self.dataset.name}.rst',
+            )
+            with open(rst_file, mode="w", encoding="utf-8") as fp:
+                fp.write(self.content)
+                print(f"... wrote {rst_file}")
+
+    def _expand_dataset(
+            self,
+            dataset: typing.Dict,
+    ) -> typing.Dict:
+        r"""Expand dataset dict by additional entries.
+
+        Additional properties are added
+        that are only part of the data card,
+        but not the dataset object,
+        e.g. :meth:`audbcards.Datacard.player`
 
         Args:
-            ofpath: filepath to save rendered template to
+            dataset: dataset object as dictionary representation
+
         Returns:
-            None
+            extended datasets dictionary
 
-        if ofpath is specified, the directory must exist.
         """
-        if ofpath is None:
-            ofpath = f'datasets/{self._dataset.name}.rst'
+        # Add audio player for example file
+        example = self.example
+        dataset['example'] = example
+        if example is not None:
+            player = self.player(example)
+            dataset['player'] = player
+        return dataset
 
-        with open(ofpath, mode="w", encoding="utf-8") as fp:
-            fp.write(self.content)
-            print(f"... wrote {ofpath}")
+    def _render_template(self):
+        r"""Render content of data card with Jinja2.
+
+        It uses the dictionary representation
+        :attr:`audbcards.Datacard._dataset_dict`
+        as bases for rendering.
+        The result might vary
+        depending if :meth:`audbcards.Datacard._expand_dataset`
+        was called before or not.
+
+        """
+        template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(template_dir),
+            trim_blocks=True,
+        )
+        template = environment.get_template("datacard.j2")
+
+        # Convert dataset object to dictionary
+        dataset = self.dataset.properties()
+
+        # Add additional datacard only properties
+        dataset = self._expand_dataset(dataset)
+
+        content = template.render(dataset)
+
+        return content
