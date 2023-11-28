@@ -290,7 +290,7 @@ class Dataset:
 
         cols = self._scheme_table_columns
         data = pd.DataFrame.from_dict(dataset_schemes)[cols]
-        filter = data.applymap(lambda d: d == [])
+        filter = data.map(lambda d: d == [])
         data.mask(filter, other='', inplace=True)
         scheme_data = data.values.tolist()
         # Add column names

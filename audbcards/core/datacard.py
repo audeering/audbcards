@@ -71,11 +71,14 @@ class Datacard(object):
         min_dur = 0.5
         max_dur = 300  # 5 min
         durations = self._dataset.file_durations
-        selected_duration = np.median(
-            [d for d in durations if d >= min_dur and d <= max_dur]
-        )
-        if np.isnan(selected_duration):
+        selected_durations = [
+            d for d in durations
+            if d >= min_dur and d <= max_dur
+        ]
+        if len(selected_durations) == 0:
             return None
+        selected_duration = np.median(selected_durations)
+
         # Get index for duration closest to selected duration
         # see https://stackoverflow.com/a/9706105
         # durations.index(selected_duration)
