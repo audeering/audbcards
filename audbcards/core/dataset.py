@@ -1,15 +1,12 @@
-import datetime
 import os
-import random
 import typing
 
 import jinja2
 import pandas as pd
-import toml
 
 import audb
+import audbackend
 import audeer
-import audfactory
 import audformat
 
 from audbcards.core.utils import format_schemes
@@ -34,10 +31,7 @@ class Dataset:
             version: str,
             cache_root: str = './cache',
     ):
-        self._version = version
-        self._repository = audb.repository(name, version)
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
-
         self.header = audb.info.header(
             name,
             version=version,
@@ -50,6 +44,16 @@ class Dataset:
             cache_root=self.cache_root,
             verbose=False,
         )
+
+        self._version = version
+        self._repository = audb.repository(name, version)
+        self._backend = audbackend.access(
+            name=self._repository.backend,
+            host=self._repository.host,
+            repository=self._repository.name,
+        )
+        if isinstance(self._backend, audbackend.Artifactory):
+            self._backend._use_legacy_file_structure()  # pragma: nocover
 
         # Clean up cache
         # by removing all other versions of the same dataset
@@ -215,51 +219,14 @@ class Dataset:
     @property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        # NOTE: the following code can be replaced
-        # by audbackend.Backend.date()
-        # when audbackend 1.0.0 is released
-        url = (
-            f'{self._repository.host}/{self._repository.name}/{self.name}/'
-            f'db/{self._version}/db-{self._version}.zip'
-        )
-
-        if self._repository.backend == 'file-system':
-            ts = os.stat(url).st_ctime
-            date = datetime.datetime.utcfromtimestamp(ts)
-            date = date.strftime("%Y-%m-%d")
-        else:
-            path = audfactory.path(url)
-            stat = path.stat()
-            date = f'{stat.ctime:%Y-%m-%d}'
-
-        return date
+        path = self._backend.join('/', self.name, 'db.yaml')
+        return self._backend.date(path, self._version)
 
     @property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        # NOTE: the following code can be replaced
-        # by audbackend.Backend.owner()
-        # when audbackend 1.0.0 is released
-        url = (
-            f'{self._repository.host}/{self._repository.name}/{self.name}/'
-            f'db/{self._version}/db-{self._version}.zip'
-        )
-
-        if self._repository.backend == 'file-system':
-            # NOTE: the following will
-            config = toml.load(audeer.path('pyproject.toml'))
-            authors = ', '.join(
-                author['name']
-                for author in config['project']['authors']
-            )
-            owners = authors.split(', ')
-            owner = random.choice(owners)
-        else:
-            path = audfactory.path(url)
-            stat = path.stat()
-            owner = f'{stat.created_by}'
-
-        return owner
+        path = self._backend.join('/', self.name, 'db.yaml')
+        return self._backend.owner(path, self._version)
 
     def properties(self):
         """Get list of properties of the object."""

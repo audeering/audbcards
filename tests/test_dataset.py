@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 import audb
+import audbackend
 import audeer
 import audformat
 import audiofile
@@ -24,6 +25,11 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         db.name,
         pytest.VERSION,
         cache_root=dataset_cache,
+    )
+    backend = audbackend.access(
+        name=repository.backend,
+        host=repository.host,
+        repository=repository.name,
     )
 
     # __init__
@@ -119,7 +125,19 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         expected_license_link = db.license_url
     assert dataset.license_link == expected_license_link
 
-    # publication: skipped for now
+    # publication_date:
+    expected_publication_date = backend.date(
+        backend.join('/', db.name, 'db.yaml'),
+        pytest.VERSION,
+    )
+    assert dataset.publication_date == expected_publication_date
+
+    # publication_owner
+    expected_publication_owner = backend.owner(
+        backend.join('/', db.name, 'db.yaml'),
+        pytest.VERSION,
+    )
+    assert dataset.publication_owner == expected_publication_owner
 
     # repository
     assert dataset.repository == repository.name
