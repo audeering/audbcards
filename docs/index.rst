@@ -1,7 +1,13 @@
 .. include:: ../README.rst
 
 .. toctree::
-    :caption: Datasets
+    :caption: Getting started
+    :hidden:
+
+    install
+
+.. toctree::
+    :caption: Example Data Cards
     :maxdepth: 2
     :hidden:
 
