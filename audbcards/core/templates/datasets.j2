@@ -1,15 +1,24 @@
-.. _datasets:
+.. _{{ name }}:
 
-Datasets
-========
+{{ header }}
+{% for n in range(header|length) %}={% endfor %}
 
-Datasets available with audb_ as of |today|.
+Datasets available with audb_ as of |today|
+in the
+{% if repositories|length > 1 %}
+repositories
+{% else %}
+repository
+{% endif %}
+{{ repositories|join(', ') }}.
 For each dataset, the latest version is shown.
 
+{% if data|length > 0 %}
 .. csv-table::
     :header-rows: 1
     :widths: 10, 20, 7, 4, 25
-    :file: datasets.csv
+    :file: {{ name }}.csv
+{% endif %}
 
 .. _audb: https://audeering.github.io/audb/
 
@@ -19,5 +28,5 @@ For each dataset, the latest version is shown.
     :hidden:
 
 {% for data in data %}
-    datasets/{{ data[0] }}
+    {{ path }}/{{ data[0] }}
 {% endfor %}

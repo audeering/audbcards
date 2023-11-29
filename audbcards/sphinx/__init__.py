@@ -16,9 +16,20 @@ __version__ = '0.1.0'
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
 def setup(app: sphinx.application.Sphinx):
     r"""Modelcard Sphinx extension."""
-    app.add_config_value('audbcards_output_path', 'datasets', False)
+    # Config values
+    app.add_config_value(
+        'audbcards_datasets',
+        [
+            # folder/name, header, repositories
+            ('datasets', 'Datasets', [audb.config.REPOSITORIES]),
+        ],
+        False,
+    )
+
+    # Connect functions to extension
     app.connect('builder-inited', builder_inited)
     app.connect('build-finished', builder_finished)
+
     return {
         'version': __version__,
         'parallel_read_safe': True,
@@ -40,41 +51,51 @@ def builder_inited(app: sphinx.application.Sphinx):
 
     """
     # Read config values
-    output_path = app.config.audbcards_output_path
+    sections = app.config.audbcards_datasets
 
-    # Clear existing data cards
-    datacard_path = audeer.path(app.srcdir, output_path)
-    audeer.rmdir(datacard_path)
-    audeer.mkdir(datacard_path)
+    # Gather and build data cards for each requested section
+    for (path, header, repositories) in sections:
 
-    print('Get list of available datasets... ', end='', flush=True)
-    df = audb.available(only_latest=True)
-    df = df.sort_index()
-    print('done')
+        # Clear existing data cards
+        datacard_path = audeer.path(app.srcdir, path)
+        audeer.rmdir(datacard_path)
+        audeer.mkdir(datacard_path)
 
-    # Iterate datasets and create data card pages
-    names = list(df.index)
-    versions = list(df['version'])
-    datasets = []
-    for (name, version) in zip(names, versions):
-        print(f'Parse {name}-{version}... ', end='', flush=True)
-        dataset = Dataset(name, version)
-        datacard = Datacard(
-            dataset,
-            path=output_path,
-            sphinx_build_dir=app.builder.outdir,
-            sphinx_src_dir=app.srcdir,
-        )
-        datacard.save()
-        datasets.append(dataset)
+        # Restrict available repositories
+        current_repos = audb.config.REPOSITORIES
+        audb.config.REPOSITORIES = audeer.to_list(repositories)
+
+        print('Get list of available datasets... ', end='', flush=True)
+        df = audb.available(only_latest=True)
+        df = df.sort_index()
         print('done')
 
-    # Create datasets overview page
-    create_datasets_page(
-        datasets,
-        audeer.path(app.srcdir, 'datasets.rst'),
-        datacards_path=output_path,
-    )
+        # Iterate datasets and create data card pages
+        names = list(df.index)
+        versions = list(df['version'])
+        datasets = []
+        for (name, version) in zip(names, versions):
+            print(f'Parse {name}-{version}... ', end='', flush=True)
+            dataset = Dataset(name, version)
+            datacard = Datacard(
+                dataset,
+                path=path,
+                sphinx_build_dir=app.builder.outdir,
+                sphinx_src_dir=app.srcdir,
+            )
+            datacard.save()
+            datasets.append(dataset)
+            print('done')
+
+        # Create datasets overview page
+        create_datasets_page(
+            datasets,
+            audeer.path(app.srcdir, f'{path}.rst'),
+            datacards_path=path,
+            header=header,
+        )
+
+        audb.config.REPOSITORIES = current_repos
 
 
 def builder_finished(
@@ -98,10 +119,11 @@ def builder_finished(
 
     """
     # Delete auto-generated data card output folder
-    output_path = app.config.audbcards_output_path
-    datacard_path = audeer.path(app.srcdir, output_path)
-    audeer.rmdir(datacard_path)
-    for ext in ['rst', 'csv']:
-        file = audeer.path(app.srcdir, f'datasets.{ext}')
-        if os.path.exists(file):
-            os.remove(file)
+    sections = app.config.audbcards_datasets
+    for (path, _, _) in sections:
+        datacard_path = audeer.path(app.srcdir, path)
+        audeer.rmdir(datacard_path)
+        for ext in ['rst', 'csv']:
+            file = audeer.path(app.srcdir, f'{path}.{ext}')
+            if os.path.exists(file):
+                os.remove(file)

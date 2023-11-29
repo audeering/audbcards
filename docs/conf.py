@@ -34,12 +34,25 @@ linkcheck_ignore = [
 intersphinx_mapping = {
     'audb': ('https://audeering.github.io/audb/', None),
 }
-# Restrict list to public datasets
-audb.config.REPOSITORIES = [
-    audb.Repository(
-        name='data-public',
-        host='https://audeering.jfrog.io/artifactory',
-        backend='artifactory',
+# Configure audbcards extension
+audbcards_datasets = [
+    (
+        'data-public',
+        'data-public',
+        audb.Repository(
+            name='data-public',
+            host='https://audeering.jfrog.io/artifactory',
+            backend='artifactory',
+        ),
+    ),
+    (
+        'data-private',
+        'data-private',
+        audb.Repository(
+            name='data-private',
+            host='https://audeering.jfrog.io/artifactory',
+            backend='artifactory',
+        ),
     ),
 ]
 
