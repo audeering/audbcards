@@ -26,15 +26,21 @@ class Datacard(object):
         dataset: dataset object
         path: path to folder
             that store datacard files
+        example: if ``True``,
+            include an audio example in the data card
+            showing the waveform of the audio
+            and an interactive player
         sphinx_build_dir: build dir of sphinx.
-            If not ``None``,
+            If not ``None``
+            and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
             or :meth:`audbcards.Datacard.save`
             will store an example audio file
             under
             ``<sphinx_build_dir>/<path>/<db-name>/<media-file-in-db>``
         sphinx_src_dir: source dir of sphinx.
-            If not ``None``,
+            If not ``None``
+            and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
             or :meth:`audbcards.Datacard.save`
             will store a wavplot of the example audio file
@@ -47,6 +53,7 @@ class Datacard(object):
             dataset: Dataset,
             *,
             path: str = 'datasets',
+            example: bool = True,
             sphinx_build_dir: str = None,
             sphinx_src_dir: str = None,
     ):
@@ -56,6 +63,9 @@ class Datacard(object):
 
         self.path = path
         """Folder to store datacard."""
+
+        self.example = example
+        """If an audio example should be included."""
 
         self.sphinx_build_dir = sphinx_build_dir
         """Sphinx build dir."""
@@ -69,7 +79,7 @@ class Datacard(object):
         return self._render_template()
 
     @property
-    def example(self) -> typing.Optional[str]:
+    def example_media(self) -> typing.Optional[str]:
         r"""Select example media file.
 
         This select a media file
@@ -118,7 +128,7 @@ class Datacard(object):
 
         Args:
             file: input audio file to be used in the player.
-                :attr:`audbcards.Datacard.example`
+                :attr:`audbcards.Datacard.example_media`
                 is a good fit
 
         """
@@ -199,12 +209,16 @@ class Datacard(object):
             extended datasets dictionary
 
         """
+        # Add path of datacard folder
+        dataset['path'] = self.path
         # Add audio player for example file
-        example = self.example
-        dataset['example'] = example
-        if example is not None:
-            player = self.player(example)
-            dataset['player'] = player
+        dataset['example'] = None
+        if self.example:
+            example = self.example_media
+            if example is not None:
+                player = self.player(example)
+                dataset['player'] = player
+                dataset['example'] = example
         return dataset
 
     def _render_template(self):

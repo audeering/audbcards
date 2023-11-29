@@ -20,8 +20,8 @@ def setup(app: sphinx.application.Sphinx):
     app.add_config_value(
         'audbcards_datasets',
         [
-            # folder/name, header, repositories
-            ('datasets', 'Datasets', [audb.config.REPOSITORIES]),
+            # folder/name, header, repositories, example
+            ('datasets', 'Datasets', [audb.config.REPOSITORIES], True),
         ],
         False,
     )
@@ -54,7 +54,7 @@ def builder_inited(app: sphinx.application.Sphinx):
     sections = app.config.audbcards_datasets
 
     # Gather and build data cards for each requested section
-    for (path, header, repositories) in sections:
+    for (path, header, repositories, example) in sections:
 
         # Clear existing data cards
         datacard_path = audeer.path(app.srcdir, path)
@@ -82,6 +82,7 @@ def builder_inited(app: sphinx.application.Sphinx):
                 path=path,
                 sphinx_build_dir=app.builder.outdir,
                 sphinx_src_dir=app.srcdir,
+                example=example,
             )
             datacard.save()
             datasets.append(dataset)
@@ -120,7 +121,7 @@ def builder_finished(
     """
     # Delete auto-generated data card output folder
     sections = app.config.audbcards_datasets
-    for (path, _, _) in sections:
+    for (path, _, _, _) in sections:
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
         for ext in ['rst', 'csv']:

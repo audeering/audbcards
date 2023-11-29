@@ -7,6 +7,7 @@
 
     data-public
     data-private
+    all-repos
 
 .. toctree::
     :caption: Development
