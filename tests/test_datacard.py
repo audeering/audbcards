@@ -15,9 +15,6 @@ from audbcards.core.dataset import create_datasets_page
 from audbcards.core.utils import set_plot_margins
 
 
-BUILD = audeer.path('..', 'build', 'html')
-
-
 @pytest.mark.parametrize(
     'db',
     [
@@ -85,7 +82,7 @@ def test_datacard_example(db, cache, request):
         'medium_db',
     ],
 )
-def test_datacard_player(db, cache, request):
+def test_datacard_player(tmpdir, db, cache, request):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
@@ -96,17 +93,40 @@ def test_datacard_player(db, cache, request):
     """
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
-    datacard = audbcards.Datacard(dataset)
 
+    datacard_path = audeer.mkdir(audeer.path(tmpdir, 'datasets'))
+    datacard = audbcards.Datacard(dataset, path=datacard_path)
+
+    # Execute player
+    # without specifying sphinx src and build dirs
     player_str = datacard.player(datacard.example)
+    build_dir = audeer.mkdir(audeer.path(tmpdir, 'build', 'html'))
+    src_dir = audeer.mkdir(audeer.path(tmpdir, 'docs'))
+    media_file = audeer.path(
+        build_dir,
+        datacard.path,
+        db.name,
+        datacard.example,
+    )
+    image_file = audeer.path(
+        src_dir,
+        datacard.path,
+        db.name,
+        f'{db.name}.png',
+    )
+    assert not os.path.exists(media_file)
+    assert not os.path.exists(image_file)
 
-    # Check if file has been copied under the build folder
-    dst_dir = f'{BUILD}/datasets/{db.name}'
-    assert os.path.exists(os.path.join(dst_dir, datacard.example))
+    # Set sphinx src and build dir and execute again
+    datacard._sphinx_build_dir = build_dir
+    datacard._sphinx_src_dir = src_dir
+    player_str = datacard.player(datacard.example)
+    assert os.path.exists(media_file)
+    assert os.path.exists(image_file)
 
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
-        os.path.join(dst_dir, datacard.example),
+        media_file,
         always_2d=True,
     )
     plt.figure(figsize=[3, .5])
@@ -118,7 +138,7 @@ def test_datacard_player(db, cache, request):
     plt.close()
     expected_waveform = open(outfile, 'rb').read()
     # Check if generated images are exactly the same (pixel-wise)
-    waveform = open(f'{db.name}.png', 'rb').read()
+    waveform = open(image_file, 'rb').read()
     assert waveform == expected_waveform
 
     # Append audio to the expected player_str
