@@ -123,11 +123,11 @@ def test_datacard_player(db, cache, request):
 
     # Append audio to the expected player_str
     expected_player_str = (
-        f'.. image:: ../{db.name}.png\n'
+        f'.. image:: ./{db.name}/{db.name}.png\n'
         '\n'
         '.. raw:: html\n'
         '\n'
-        f'    <p><audio controls src="{db.name}/{datacard.example}">'
+        f'    <p><audio controls src="./{db.name}/{datacard.example}">'
         f'</audio></p>'
     )
     # Check if the generated player_str and the expected matches
@@ -144,7 +144,7 @@ def test_create_datasets_page(dbs, request):
     r"""Test the creation of an RST file with an datasets overview table."""
     dbs = [request.getfixturevalue(db) for db in dbs]
     datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
-    create_datasets_page(datasets, ofbase="datasets_page")
+    create_datasets_page(datasets, rst_file="datasets_page.rst")
 
 
 def load_rendered_template(name: str) -> str:
