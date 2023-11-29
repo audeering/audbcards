@@ -5,6 +5,7 @@
     :hidden:
 
     install
+    sphinx-extension
 
 .. toctree::
     :caption: Example Data Cards
