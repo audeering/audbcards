@@ -57,9 +57,12 @@ def builder_inited(app: sphinx.application.Sphinx):
     for (name, version) in zip(names, versions):
         print(f'Parse {name}-{version}... ', end='', flush=True)
         dataset = Dataset(name, version)
-        datacard = Datacard(dataset, path=output_path)
-        datacard._sphinx_build_dir = app.builder.outdir
-        datacard._sphinx_src_dir = app.srcdir
+        datacard = Datacard(
+            dataset,
+            path=output_path,
+            sphinx_build_dir=app.builder.outdir,
+            sphinx_src_dir=app.srcdir,
+        )
         datacard.save()
         datasets.append(dataset)
         print('done')

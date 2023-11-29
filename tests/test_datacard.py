@@ -118,8 +118,8 @@ def test_datacard_player(tmpdir, db, cache, request):
     assert not os.path.exists(image_file)
 
     # Set sphinx src and build dir and execute again
-    datacard._sphinx_build_dir = build_dir
-    datacard._sphinx_src_dir = src_dir
+    datacard.sphinx_build_dir = build_dir
+    datacard.sphinx_src_dir = src_dir
     player_str = datacard.player(datacard.example)
     assert os.path.exists(media_file)
     assert os.path.exists(image_file)
