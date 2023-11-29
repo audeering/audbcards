@@ -31,11 +31,11 @@ Example
 
 :file:`data/f0.wav`
 
-.. image:: ../medium_db.png
+.. image:: ./medium_db/medium_db.png
 
 .. raw:: html
 
-    <p><audio controls src="medium_db/data/f0.wav"></audio></p>
+    <p><audio controls src="./medium_db/data/f0.wav"></audio></p>
 
 Tables
 ^^^^^^
