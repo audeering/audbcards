@@ -61,7 +61,7 @@ build-backend = 'setuptools.build_meta'
 
 # ----- codespell ---------------------------------------------------------
 [tool.codespell]
-builtin = 'clear,rare,informal,usage,names'
+builtin = 'clear,rare,informal,names'
 skip = './audbcards.egg-info,./build'
 
 
