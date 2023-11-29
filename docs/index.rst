@@ -5,7 +5,8 @@
     :maxdepth: 2
     :hidden:
 
-    datasets
+    data-public
+    data-private
 
 .. toctree::
     :caption: Development

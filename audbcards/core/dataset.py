@@ -466,6 +466,7 @@ def create_datasets_page(
         rst_file: str = './datasets.rst',
         *,
         datacards_path: str = './datasets',
+        header: str = 'Datasets',
 ):
     r"""Create overview page of datasets.
 
@@ -490,6 +491,7 @@ def create_datasets_page(
             is also stored
         datacards_path: relative path to folder that stores
             data cards for the given datasets
+        header: header of the created RST file
 
     """
     tuples = [
@@ -524,7 +526,18 @@ def create_datasets_page(
         )
         for dataset in datasets
     ]
-    content = template.render({'data': data})
+    repositories = [
+        f'`{repo.name} <{repo.host}>`__'
+        for repo in audb.config.REPOSITORIES
+    ]
+    content = {
+        'data': data,
+        'name': audeer.basename_wo_ext(rst_file),
+        'path': datacards_path,
+        'header': header,
+        'repositories': repositories,
+    }
+    content = template.render(content)
 
     with open(rst_file, mode="w", encoding="utf-8") as fp:
         fp.write(content)
