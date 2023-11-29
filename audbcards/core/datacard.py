@@ -26,6 +26,20 @@ class Datacard(object):
         dataset: dataset object
         path: path to folder
             that store datacard files
+        sphinx_build_dir: build dir of sphinx.
+            If not ``None``,
+            a call to :meth:`audbcards.Datacard.player`
+            or :meth:`audbcards.Datacard.save`
+            will store an example audio file
+            under
+            ``<sphinx_build_dir>/<path>/<db-name>/<media-file-in-db>``
+        sphinx_src_dir: source dir of sphinx.
+            If not ``None``,
+            a call to :meth:`audbcards.Datacard.player`
+            or :meth:`audbcards.Datacard.save`
+            will store a wavplot of the example audio file
+            under
+            ``<sphinx_src_dir>/<path>/<db-name>/<db-name>.png``
 
     """
     def __init__(
@@ -33,6 +47,8 @@ class Datacard(object):
             dataset: Dataset,
             *,
             path: str = 'datasets',
+            sphinx_build_dir: str = None,
+            sphinx_src_dir: str = None,
     ):
 
         self.dataset = dataset
@@ -41,10 +57,10 @@ class Datacard(object):
         self.path = path
         """Folder to store datacard."""
 
-        self._sphinx_build_dir = None
+        self.sphinx_build_dir = sphinx_build_dir
         """Sphinx build dir."""
 
-        self._sphinx_src_dir = None
+        self.sphinx_src_dir = sphinx_src_dir
         """Sphinx source dir."""
 
     @functools.cached_property
@@ -111,9 +127,9 @@ class Datacard(object):
             f'{audb.flavor_path(self.dataset.name, self.dataset.version)}'
         )
         # Move file to build folder
-        if self._sphinx_build_dir is not None:
+        if self.sphinx_build_dir is not None:
             media_dst_dir = audeer.path(
-                self._sphinx_build_dir,
+                self.sphinx_build_dir,
                 self.path,
                 self.dataset.name,
             )
@@ -124,13 +140,13 @@ class Datacard(object):
             )
 
         # Add plot of waveform
-        if self._sphinx_src_dir is not None:
+        if self.sphinx_src_dir is not None:
             signal, sampling_rate = audiofile.read(
                 os.path.join(media_src_dir, file),
                 always_2d=True,
             )
             image_file = audeer.path(
-                self._sphinx_src_dir,
+                self.sphinx_src_dir,
                 self.path,
                 self.dataset.name,
                 f'{self.dataset.name}.png',
@@ -155,9 +171,9 @@ class Datacard(object):
 
     def save(self):
         """Save content of rendered template to rst."""
-        if self._sphinx_src_dir is not None:
+        if self.sphinx_src_dir is not None:
             rst_file = audeer.path(
-                self._sphinx_src_dir,
+                self.sphinx_src_dir,
                 self.path,
                 f'{self.dataset.name}.rst',
             )
