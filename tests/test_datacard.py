@@ -160,10 +160,13 @@ def test_datacard_player(tmpdir, db, cache, request):
         ['minimal_db', 'medium_db'],
     ],
 )
-def test_create_datasets_page(tmpdir, dbs, request):
+def test_create_datasets_page(tmpdir, dbs, cache, request):
     r"""Test the creation of an RST file with an datasets overview table."""
     dbs = [request.getfixturevalue(db) for db in dbs]
-    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
+    datasets = [
+        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        for db in dbs
+    ]
     rst_file = audeer.path(tmpdir, 'datasets_page.rst')
     create_datasets_page(datasets, rst_file=rst_file)
     assert os.path.exists(rst_file)
