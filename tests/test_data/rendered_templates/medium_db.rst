@@ -1,4 +1,4 @@
-.. _medium_db:
+.. _datasets-medium_db:
 
 medium_db
 ---------
