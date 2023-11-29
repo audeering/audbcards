@@ -1,7 +1,7 @@
 Sphinx extension
 ================
 
-:mod:`audbcards` provides a sphinx extension,
+:mod:`audbcards` provides a `sphinx extension`_,
 to integrate data cards in a sphinx document.
 For listing all available datasets,
 you need to include the extension inside
@@ -140,3 +140,6 @@ e.g.
 Which will render as:
 
     :ref:`data-public-emodb` shows the data card for emodb.
+
+
+.. _sphinx extension: https://www.sphinx-doc.org/en/master/usage/extensions/index.html
