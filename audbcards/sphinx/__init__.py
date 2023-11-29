@@ -1,3 +1,5 @@
+import os
+
 import sphinx
 
 import audb
@@ -99,3 +101,7 @@ def builder_finished(
     output_path = app.config.audbcards_output_path
     datacard_path = audeer.path(app.srcdir, output_path)
     audeer.rmdir(datacard_path)
+    for ext in ['rst', 'csv']:
+        file = audeer.path(app.srcdir, f'datasets.{ext}')
+        if os.path.exists(file):
+            os.remove(file)
