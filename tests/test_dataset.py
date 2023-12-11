@@ -20,7 +20,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     r"""Test audbcards.Dataset object and all its properties."""
     db = request.getfixturevalue(db)
 
-    dataset_cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    dataset_cache = audeer.mkdir(tmpdir, 'cache')
     dataset = audbcards.Dataset(
         db.name,
         pytest.VERSION,

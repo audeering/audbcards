@@ -94,14 +94,14 @@ def test_datacard_player(tmpdir, db, cache, request):
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
 
-    datacard_path = audeer.mkdir(audeer.path(tmpdir, 'datasets'))
+    datacard_path = audeer.mkdir(tmpdir, 'datasets')
     datacard = audbcards.Datacard(dataset, path=datacard_path)
 
     # Execute player
     # without specifying sphinx src and build dirs
     player_str = datacard.player(datacard.example_media)
-    build_dir = audeer.mkdir(audeer.path(tmpdir, 'build', 'html'))
-    src_dir = audeer.mkdir(audeer.path(tmpdir, 'docs'))
+    build_dir = audeer.mkdir(tmpdir, 'build', 'html')
+    src_dir = audeer.mkdir(tmpdir, 'docs')
     media_file = audeer.path(
         build_dir,
         datacard.path,
