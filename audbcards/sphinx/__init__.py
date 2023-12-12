@@ -70,6 +70,8 @@ def builder_inited(app: sphinx.application.Sphinx):
         df = df.sort_index()
         print('done')
 
+        print(df)
+
         # Iterate datasets and create data card pages
         names = list(df.index)
         versions = list(df['version'])
