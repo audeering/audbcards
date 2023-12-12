@@ -31,13 +31,16 @@ class Dataset:
             version: str,
             cache_root: str = './cache',
     ):
+        print('-- mkdir')
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
+        print('-- header')
         self.header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
             cache_root=self.cache_root,
         )
+        print('-- dependencies')
         self.deps = audb.dependencies(
             name,
             version=version,
@@ -47,6 +50,7 @@ class Dataset:
 
         self._version = version
         self._repository = audb.repository(name, version)
+        print('-- access backend')
         self._backend = audbackend.access(
             name=self._repository.backend,
             host=self._repository.host,
@@ -58,6 +62,7 @@ class Dataset:
         # Clean up cache
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
+        print('-- clear cache')
         versions = audeer.list_dir_names(
             audeer.path(self.cache_root, name),
             basenames=True,
