@@ -46,16 +46,16 @@ audbcards_datasets = [
         ),
         True,
     ),
-    # (
-    #     'data-private',
-    #     'data-private',
-    #     audb.Repository(
-    #         name='data-private',
-    #         host='https://audeering.jfrog.io/artifactory',
-    #         backend='artifactory',
-    #     ),
-    #     True,
-    # ),
+    (
+        'data-private',
+        'data-private',
+        audb.Repository(
+            name='data-private',
+            host='https://audeering.jfrog.io/artifactory',
+            backend='artifactory',
+        ),
+        True,
+    ),
     # (
     #     'all-repos',
     #     'All repos',
