@@ -70,6 +70,8 @@ def builder_inited(app: sphinx.application.Sphinx):
         df = df.sort_index()
         print('done')
 
+        print(f'{repositories=}')
+        print(f'{path=}')
         print(df)
 
         # Iterate datasets and create data card pages
@@ -78,7 +80,9 @@ def builder_inited(app: sphinx.application.Sphinx):
         datasets = []
         for (name, version) in zip(names, versions):
             print(f'Parse {name}-{version}... ', end='', flush=True)
+            print('Dataset()')
             dataset = Dataset(name, version)
+            print('Datacard()')
             datacard = Datacard(
                 dataset,
                 path=path,
@@ -86,6 +90,7 @@ def builder_inited(app: sphinx.application.Sphinx):
                 sphinx_src_dir=app.srcdir,
                 example=example,
             )
+            print('Datacard.save()')
             datacard.save()
             datasets.append(dataset)
             print('done')
