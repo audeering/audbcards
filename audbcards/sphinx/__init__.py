@@ -56,6 +56,8 @@ def builder_inited(app: sphinx.application.Sphinx):
     # Gather and build data cards for each requested section
     for (path, header, repositories, example) in sections:
 
+        print()
+        print(f'# Parse {repositories}')
         # Clear existing data cards
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
@@ -65,14 +67,15 @@ def builder_inited(app: sphinx.application.Sphinx):
         current_repos = audb.config.REPOSITORIES
         audb.config.REPOSITORIES = audeer.to_list(repositories)
 
+        print(f'# {audb.config.REPOSITORIES=}')
         print('Get list of available datasets... ', end='', flush=True)
         df = audb.available(only_latest=True)
         df = df.sort_index()
         print('done')
 
-        print(f'{repositories=}')
-        print(f'{path=}')
-        print(df)
+        print(f'# {path=}')
+
+        print(f'# Found {len(df)} databases.')
 
         # Iterate datasets and create data card pages
         names = list(df.index)
