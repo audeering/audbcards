@@ -83,18 +83,24 @@ If you make changes to the documentation,
 you can re-create the HTML pages using Sphinx_.
 You can install it and a few other necessary packages with::
 
-   pip install -r docs/requirements.txt
+    pip install -r docs/requirements.txt
 
 To create the HTML pages, use::
 
-   python -m sphinx docs/ build/sphinx/html -b html
+    python -m sphinx docs/ build/sphinx/html -b html
+
+To ensure that anonymous access is used
+when communicating with Artifactory,
+you can call instead::
+
+    ARTIFACTORY_USERNAME=anonymous ARTIFACTORY_API_KEY="" python -m sphinx docs/ build/sphinx/html -b html
 
 The generated files will be available
 in the directory :file:`build/sphinx/html/`.
 
 It is also possible to automatically check if all links are still valid::
 
-   python -m sphinx docs/ build/sphinx/html -b linkcheck
+    python -m sphinx docs/ build/sphinx/html -b linkcheck
 
 .. _Sphinx: http://sphinx-doc.org
 
@@ -105,11 +111,11 @@ Running the Tests
 You'll need pytest_ for that.
 It can be installed with::
 
-   pip install -r tests/requirements.txt
+    pip install -r tests/requirements.txt
 
 To execute the tests, simply run::
 
-   python -m pytest
+    python -m pytest
 
 .. _pytest: https://pytest.org
 
