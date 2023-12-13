@@ -52,5 +52,5 @@ jobs:
         ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
       run: |
         python -m sphinx docs/ build/html/ -c tests/ -b html
-        cmp --silent -- docs/data-empty.rst tests/test_data/rendered_pages/data-empty.rst || exit 1
-        cmp --silent -- docs/all-repos.rst tests/test_data/rendered_pages/data-empty.rst || exit 1
+        cmp --silent -- docs/data-empty.rst tests/test_data/rendered_pages/data-empty.rst || echo "data-empty.rst different" && exit 1
+        cmp --silent -- docs/all-repos.rst tests/test_data/rendered_pages/data-empty.rst || echo "all-repos.rst different" && exit 1
