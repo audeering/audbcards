@@ -36,6 +36,7 @@ intersphinx_mapping = {
     'audb': ('https://audeering.github.io/audb/', None),
 }
 # Configure audbcards extension
+audbcards_cleanup = False
 audbcards_datasets = [
     (
         'data-public',

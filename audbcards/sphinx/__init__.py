@@ -25,6 +25,7 @@ def setup(app: sphinx.application.Sphinx):
         ],
         False,
     )
+    app.add_config_value('audbcards_cleanup', True, False)
 
     # Connect functions to extension
     app.connect('builder-inited', builder_inited)
@@ -120,11 +121,12 @@ def builder_finished(
 
     """
     # Delete auto-generated data card output folder
-    sections = app.config.audbcards_datasets
-    for (path, _, _, _) in sections:
-        datacard_path = audeer.path(app.srcdir, path)
-        audeer.rmdir(datacard_path)
-        for ext in ['rst', 'csv']:
-            file = audeer.path(app.srcdir, f'{path}.{ext}')
-            if os.path.exists(file):
-                os.remove(file)
+    if app.config.audbcards_cleanup:
+        sections = app.config.audbcards_datasets
+        for (path, _, _, _) in sections:
+            datacard_path = audeer.path(app.srcdir, path)
+            audeer.rmdir(datacard_path)
+            for ext in ['rst', 'csv']:
+                file = audeer.path(app.srcdir, f'{path}.{ext}')
+                if os.path.exists(file):
+                    os.remove(file)
