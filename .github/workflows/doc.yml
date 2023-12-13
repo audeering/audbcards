@@ -43,5 +43,11 @@ jobs:
     - name: Install docs requirements
       run: pip install -r docs/requirements.txt
 
-    - name: Test building documentation
+    - name: Test building user documentation
       run: python -m sphinx docs/ build/html/ -b html -W
+
+    - name: Test building documentation
+      env:
+        ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+        ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+      run: python -m sphinx docs/ build/html/ -c tests/ -b html -W
