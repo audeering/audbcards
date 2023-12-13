@@ -54,7 +54,9 @@ jobs:
         python -m sphinx docs/ build/html/ -c tests/ -b html
         echo "build docs"
         echo "Check created data-empty.rst"
-        cmp --silent -- docs/data-empty.rst tests/test_data/rendered_pages/data-empty.rst || echo "data-empty.rst different" && exit 1
+        cat docs/data-empty.rst
+        cat tests/test_data/rendered_pages/data-empty.rst
+        cmp --silent -- docs/data-empty.rst tests/test_data/rendered_pages/data-empty.rst || exit 1
         echo "Check created all-repos.rst"
         cmp --silent -- docs/all-repos.rst tests/test_data/rendered_pages/all-repos.rst || echo "all-repos.rst different" && exit 1
         echo "Passed comparison tests"
