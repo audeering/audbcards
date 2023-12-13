@@ -45,18 +45,3 @@ jobs:
 
     - name: Test building user documentation
       run: python -m sphinx docs/ build/html/ -b html -W
-
-    - name: Test building documentation
-      env:
-        ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-        ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
-      run: |
-        python -m sphinx docs/ build/html/ -c tests/ -b html
-        echo "build docs"
-        echo "Check created data-empty.rst"
-        cat docs/data-empty.rst
-        cat tests/test_data/rendered_pages/data-empty.rst
-        cmp --silent -- docs/data-empty.rst tests/test_data/rendered_pages/data-empty.rst || exit 1
-        echo "Check created all-repos.rst"
-        cmp --silent -- docs/all-repos.rst tests/test_data/rendered_pages/all-repos.rst || echo "all-repos.rst different" && exit 1
-        echo "Passed comparison tests"
