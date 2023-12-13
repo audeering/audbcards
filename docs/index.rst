@@ -13,8 +13,6 @@
     :hidden:
 
     data-public
-    data-empty
-    all-repos
 
 .. toctree::
     :caption: Development
