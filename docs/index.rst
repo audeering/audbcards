@@ -13,7 +13,7 @@
     :hidden:
 
     data-public
-    data-private
+    data-empty
     all-repos
 
 .. toctree::
