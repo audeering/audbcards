@@ -82,6 +82,52 @@ def test_datacard_example_media(db, cache, request):
         'medium_db',
     ],
 )
+def test_datacard_file_duration_distribution(tmpdir, db, cache, request):
+    r"""Test the Datacard.file_duration_distribution.
+
+    It checks if the desired distribution PNG file is created,
+    and the expected RST string
+    to include the distribution is returned.
+
+    """
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+
+    datacard_path = audeer.mkdir(tmpdir, 'datasets')
+    datacard = audbcards.Datacard(dataset, path=datacard_path)
+
+    # Without specifying sphinx src and build dirs,
+    # we do not expect a PNG file
+    distribution_str = datacard.file_duration_distribution
+    build_dir = audeer.mkdir(tmpdir, 'build', 'html')
+    src_dir = audeer.mkdir(tmpdir, 'docs')
+    image_file = audeer.path(
+        build_dir,
+        datacard.path,
+        db.name,
+        f'{db.name}-file-durations.png',
+    )
+    assert not os.path.exists(image_file)
+    expected_distribution_str = '1.0 s .. 301.0 s'
+    assert expected_distribution_str == distribution_str
+
+    # Set sphinx src and build dir and execute again
+    datacard.sphinx_build_dir = build_dir
+    datacard.sphinx_src_dir = src_dir
+    distribution_str = datacard.file_duration_distribution
+    assert os.path.exists(image_file)
+    expected_distribution_str = (
+        f'1.0 s |{db.name}-file-durations| 301.0 s'
+    )
+    assert expected_distribution_str == distribution_str
+
+
+@pytest.mark.parametrize(
+    'db',
+    [
+        'medium_db',
+    ],
+)
 def test_datacard_player(tmpdir, db, cache, request):
     r"""Test the Datacard.player.
 
