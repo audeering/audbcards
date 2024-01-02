@@ -128,7 +128,7 @@ class Datacard(object):
         return media
 
     @property
-    def files_durations(self) -> str:
+    def file_duration_distribution(self) -> str:
         r"""Min/max of files durations, and plotted distribution.
 
         This generates a single line
