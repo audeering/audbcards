@@ -148,8 +148,8 @@ class Datacard(object):
         unit = 's'
         durations = self.dataset.file_durations
         if len(durations) > 0:
-            min_ = np.min(self.dataset.file_durations)
-            max_ = np.max(self.dataset.file_durations)
+            min_ = np.min(durations)
+            max_ = np.max(durations)
         distribution_str = f'{min_:.1f} {unit} .. {max_:.1f} {unit}'
 
         # Save distribution plot
