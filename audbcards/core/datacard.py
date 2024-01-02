@@ -305,7 +305,7 @@ class Datacard(object):
             alpha=1,
             color='#d54239',
         )
-        # Remove al tiks, labels
+        # Remove all tiks, labels
         sns.despine(left=True, bottom=True)
         plt.tick_params(
             axis='both',
