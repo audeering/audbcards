@@ -6,6 +6,7 @@ import typing
 import jinja2
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 import audb
 import audeer
@@ -73,77 +74,13 @@ class Datacard(object):
         self.sphinx_src_dir = sphinx_src_dir
         """Sphinx source dir."""
 
+        self.rst_preamble = ''
+        """RST code added at top of data card."""
+
     @functools.cached_property
     def content(self):
         """Property Accessor for rendered jinja2 content."""
         return self._render_template()
-
-    def files_durations(
-            self,
-            values: typing.Sequence,
-            unit: str,
-            name: str,
-    ) -> str:
-        r"""String with min, max, and plotted distribution.
-
-        Args:
-            values: sequence of values
-            unit: unit of values
-            name: name for the distribution plot
-                without file extension
-
-        Returns:
-            string containing min, max and plot
-
-        """
-        min_ = np.min(values)
-        max_ = np.max(values)
-        plt.figure(figsize=[.5, .15])
-        # Remove all margins besides bottom
-        plt.subplot(111)
-        plt.subplots_adjust(
-            left=0,
-            bottom=0.25,
-            right=1,
-            top=1,
-            wspace=0,
-            hspace=0,
-        )
-        # Plot duration distribution
-        sns.kdeplot(
-            values,
-            fill=True,
-            cut=0,
-            clip=(min_, max_),
-            linewidth=0,
-            alpha=1,
-            color='#d54239',
-        )
-        # Remove al tiks, labels
-        sns.despine(left=True, bottom=True)
-        plt.tick_params(
-            axis='both',
-            which='both',
-            bottom=False,
-            left=False,
-            labelbottom=False,
-            labelleft=False,
-        )
-        plt.xlabel('')
-        plt.ylabel('')
-
-        # Add plot of waveform
-        if self.sphinx_src_dir is not None:
-            image_file = audeer.path(
-                self.sphinx_src_dir,
-                self.path,
-                self.dataset.name,
-                f'{self.dataset.name}.png',
-            )
-            plt.savefig(f'{name}.png', transparent=True)
-        plt.close()
-        self._rst = f'.. |{name}| image:: ../{name}.png\n'
-        return f'{min_:.1f} {unit} |{name}| {max_:.1f} {unit}'
 
     @property
     def example_media(self) -> typing.Optional[str]:
@@ -189,6 +126,45 @@ class Datacard(object):
         except:  # noqa: E722
             media = None
         return media
+
+    @property
+    def files_durations(self) -> str:
+        r"""Min/max of files durations, and plotted distribution.
+
+        This generates a single line
+        containing the min/max values
+        of files durations
+        and an inline p[lot of the corresponding distribution,
+        e.g.
+
+        1 s ..;:. 10 s
+
+        """
+        distribution_str = ''
+        self._plot_distribution(self.dataset.file_durations)
+        min_ = np.min(self.dataset.file_durations)
+        max_ = np.max(self.dataset.file_durations)
+        unit = 's'
+
+        # Save distribution plot
+        if self.sphinx_src_dir is not None:
+            name = 'files-durations'
+            image_file = audeer.path(
+                self.sphinx_src_dir,
+                self.path,
+                self.dataset.name,
+                f'{self.dataset.name}-{name}.png',
+            )
+            audeer.mkdir(os.path.dirname(image_file))
+            plt.savefig(image_file, transparent=True)
+            plt.close()
+            distribution_str = self._inline_image(
+                f'{min_:.1f} {unit}',
+                f'./{self.dataset.name}/{self.dataset.name}-{name}.png',
+                f'{max_:.1f} {unit}',
+            )
+
+        return distribution_str
 
     def player(
             self,
@@ -261,21 +237,42 @@ class Datacard(object):
                 fp.write(self.content)
                 print(f"... wrote {rst_file}")
 
+    def _inline_image(
+            self,
+            text1: str,
+            file: str,
+            text2: str,
+    ) -> str:
+        r"""RST string for rendering inline image between text.
+
+        Args:
+            text1: text to the left of the image
+            file: image file
+            text2: text to the right of the image
+
+        Returns:
+            RST code to generate the desired inline image
+
+        """
+        # In RST there is no easy way to insert inline images.
+        # We use the following workaround:
+        #
+        # .. |ref| image:: file
+        #
+        # text1 |ref| text2
+        #
+        ref = audeer.basename_wo_ext(file)
+        self.rst_preamble += f'.. |{ref}| image:: {file}\n'
+        return f'{text1} |{ref}| {text2}'
+
     def _plot_distribution(
             self,
             values: typing.Sequence,
-            unit: str,
-            filename: str,
-    ) -> str:
-        r"""String with min, max, and plotted inline distribution.
+    ):
+        r"""Plot inline distribution.
 
         Args:
             values: sequence of values
-            unit: unit of values
-            filename: name for the distribution plot
-
-        Returns:
-            string containing min, max and plot
 
         """
         min_ = np.min(values)
@@ -313,23 +310,6 @@ class Datacard(object):
         )
         plt.xlabel('')
         plt.ylabel('')
-        plt.savefig(f'{name}.png', transparent=True)
-        plt.close()
-        # In RST there is no easy way to insert inline images.
-        # We use the following workaround:
-        #
-        # .. |ref| image:: name.png
-        # 
-        # 1 s |ref| 10 s
-        #
-        ref = audeer.basename_wo_ext(name)
-        distribution_str = (
-            f'.. |{ref}| image:: '
-            f'./{self.dataset.name}/{self.dataset.name}-{name}.png\n'
-            '\n'
-            f'{min_:.1f} {unit} |{ref}| {max_:.1f} {unit}'
-        )
-        return distribution_str
 
     def _expand_dataset(
             self,
@@ -359,6 +339,7 @@ class Datacard(object):
                 player = self.player(example)
                 dataset['player'] = player
                 dataset['example'] = example
+        dataset['files_durations'] = self.files_durations
         return dataset
 
     def _render_template(self):
@@ -386,5 +367,9 @@ class Datacard(object):
         dataset = self._expand_dataset(dataset)
 
         content = template.render(dataset)
+
+        # Add RST preamble
+        if len(self.rst_preamble) > 0:
+            content = self.rst_preamble + '\n' + content
 
         return content

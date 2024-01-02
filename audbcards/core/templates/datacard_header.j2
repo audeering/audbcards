@@ -25,7 +25,7 @@ channel       {{ channels|join(', ') }}
 sampling rate {{ sampling_rates|join(', ') }}
 bit depth     {{ bit_depths|join(', ') }}
 duration      {{ duration }}
-files         {{ files }}
+files         {{ files }}, duration distribution: {{ files_durations }}
 repository    `{{ repository }} <{{ repository_link }}>`__
 published     {{ publication_date }} by {{ publication_owner }}
 ============= ======================
