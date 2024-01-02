@@ -26,17 +26,17 @@ classifiers = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Topic :: Scientific/Engineering',
 ]
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 dependencies = [
     'audb >=1.6.0',
     'audbackend >=1.0.1',
     'audplot >=1.4.6',
     'jinja2',
+    'pandas >=2.1.0',
     'toml',
 ]
 # Get version dynamically from git
