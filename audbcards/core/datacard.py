@@ -78,6 +78,73 @@ class Datacard(object):
         """Property Accessor for rendered jinja2 content."""
         return self._render_template()
 
+    def files_durations(
+            self,
+            values: typing.Sequence,
+            unit: str,
+            name: str,
+    ) -> str:
+        r"""String with min, max, and plotted distribution.
+
+        Args:
+            values: sequence of values
+            unit: unit of values
+            name: name for the distribution plot
+                without file extension
+
+        Returns:
+            string containing min, max and plot
+
+        """
+        min_ = np.min(values)
+        max_ = np.max(values)
+        plt.figure(figsize=[.5, .15])
+        # Remove all margins besides bottom
+        plt.subplot(111)
+        plt.subplots_adjust(
+            left=0,
+            bottom=0.25,
+            right=1,
+            top=1,
+            wspace=0,
+            hspace=0,
+        )
+        # Plot duration distribution
+        sns.kdeplot(
+            values,
+            fill=True,
+            cut=0,
+            clip=(min_, max_),
+            linewidth=0,
+            alpha=1,
+            color='#d54239',
+        )
+        # Remove al tiks, labels
+        sns.despine(left=True, bottom=True)
+        plt.tick_params(
+            axis='both',
+            which='both',
+            bottom=False,
+            left=False,
+            labelbottom=False,
+            labelleft=False,
+        )
+        plt.xlabel('')
+        plt.ylabel('')
+
+        # Add plot of waveform
+        if self.sphinx_src_dir is not None:
+            image_file = audeer.path(
+                self.sphinx_src_dir,
+                self.path,
+                self.dataset.name,
+                f'{self.dataset.name}.png',
+            )
+            plt.savefig(f'{name}.png', transparent=True)
+        plt.close()
+        self._rst = f'.. |{name}| image:: ../{name}.png\n'
+        return f'{min_:.1f} {unit} |{name}| {max_:.1f} {unit}'
+
     @property
     def example_media(self) -> typing.Optional[str]:
         r"""Select example media file.
@@ -193,6 +260,76 @@ class Datacard(object):
             with open(rst_file, mode="w", encoding="utf-8") as fp:
                 fp.write(self.content)
                 print(f"... wrote {rst_file}")
+
+    def _plot_distribution(
+            self,
+            values: typing.Sequence,
+            unit: str,
+            filename: str,
+    ) -> str:
+        r"""String with min, max, and plotted inline distribution.
+
+        Args:
+            values: sequence of values
+            unit: unit of values
+            filename: name for the distribution plot
+
+        Returns:
+            string containing min, max and plot
+
+        """
+        min_ = np.min(values)
+        max_ = np.max(values)
+        plt.figure(figsize=[.5, .15])
+        # Remove all margins besides bottom
+        plt.subplot(111)
+        plt.subplots_adjust(
+            left=0,
+            bottom=0.25,
+            right=1,
+            top=1,
+            wspace=0,
+            hspace=0,
+        )
+        # Plot duration distribution
+        sns.kdeplot(
+            values,
+            fill=True,
+            cut=0,
+            clip=(min_, max_),
+            linewidth=0,
+            alpha=1,
+            color='#d54239',
+        )
+        # Remove al tiks, labels
+        sns.despine(left=True, bottom=True)
+        plt.tick_params(
+            axis='both',
+            which='both',
+            bottom=False,
+            left=False,
+            labelbottom=False,
+            labelleft=False,
+        )
+        plt.xlabel('')
+        plt.ylabel('')
+        plt.savefig(f'{name}.png', transparent=True)
+        plt.close()
+        # In RST there is no easy way to insert inline images.
+        # We use the following workaround:
+        #
+        # .. |ref| image:: name.png
+        # 
+        # 1 s |ref| 10 s
+        #
+        ref = audeer.basename_wo_ext(name)
+        distribution_str = (
+            f'.. |{ref}| image:: '
+            f'./{self.dataset.name}/{self.dataset.name}-{name}.png\n'
+            '\n'
+            f'{min_:.1f} {unit} |{ref}| {max_:.1f} {unit}'
+        )
+        return distribution_str
 
     def _expand_dataset(
             self,
