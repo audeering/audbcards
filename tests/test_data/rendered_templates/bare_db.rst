@@ -1,4 +1,4 @@
-.. _bare_db:
+.. _datasets-bare_db:
 
 bare_db
 -------

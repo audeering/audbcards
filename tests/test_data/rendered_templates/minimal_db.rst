@@ -1,4 +1,4 @@
-.. _minimal_db:
+.. _datasets-minimal_db:
 
 minimal_db
 ----------

@@ -15,9 +15,6 @@ from audbcards.core.dataset import create_datasets_page
 from audbcards.core.utils import set_plot_margins
 
 
-BUILD = audeer.path('..', 'build', 'html')
-
-
 @pytest.mark.parametrize(
     'db',
     [
@@ -52,8 +49,8 @@ def test_datacard(db, cache, request):
         'medium_db',
     ],
 )
-def test_datacard_example(db, cache, request):
-    r"""Test Datacard.example.
+def test_datacard_example_media(db, cache, request):
+    r"""Test Datacard.example_media.
 
     It checks that the desired audio file
     is selected as example.
@@ -76,7 +73,7 @@ def test_datacard_example(db, cache, request):
         db.files[expected_example_index]
     ).replace(os.sep, posixpath.sep)
     expected_example = '/'.join(expected_example.split('/')[-2:])
-    assert datacard.example == expected_example
+    assert datacard.example_media == expected_example
 
 
 @pytest.mark.parametrize(
@@ -85,7 +82,7 @@ def test_datacard_example(db, cache, request):
         'medium_db',
     ],
 )
-def test_datacard_player(db, cache, request):
+def test_datacard_player(tmpdir, db, cache, request):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
@@ -96,17 +93,40 @@ def test_datacard_player(db, cache, request):
     """
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
-    datacard = audbcards.Datacard(dataset)
 
-    player_str = datacard.player(datacard.example)
+    datacard_path = audeer.mkdir(tmpdir, 'datasets')
+    datacard = audbcards.Datacard(dataset, path=datacard_path)
 
-    # Check if file has been copied under the build folder
-    dst_dir = f'{BUILD}/datasets/{db.name}'
-    assert os.path.exists(os.path.join(dst_dir, datacard.example))
+    # Execute player
+    # without specifying sphinx src and build dirs
+    player_str = datacard.player(datacard.example_media)
+    build_dir = audeer.mkdir(tmpdir, 'build', 'html')
+    src_dir = audeer.mkdir(tmpdir, 'docs')
+    media_file = audeer.path(
+        build_dir,
+        datacard.path,
+        db.name,
+        datacard.example_media,
+    )
+    image_file = audeer.path(
+        src_dir,
+        datacard.path,
+        db.name,
+        f'{db.name}.png',
+    )
+    assert not os.path.exists(media_file)
+    assert not os.path.exists(image_file)
+
+    # Set sphinx src and build dir and execute again
+    datacard.sphinx_build_dir = build_dir
+    datacard.sphinx_src_dir = src_dir
+    player_str = datacard.player(datacard.example_media)
+    assert os.path.exists(media_file)
+    assert os.path.exists(image_file)
 
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
-        os.path.join(dst_dir, datacard.example),
+        media_file,
         always_2d=True,
     )
     plt.figure(figsize=[3, .5])
@@ -118,16 +138,16 @@ def test_datacard_player(db, cache, request):
     plt.close()
     expected_waveform = open(outfile, 'rb').read()
     # Check if generated images are exactly the same (pixel-wise)
-    waveform = open(f'{db.name}.png', 'rb').read()
+    waveform = open(image_file, 'rb').read()
     assert waveform == expected_waveform
 
     # Append audio to the expected player_str
     expected_player_str = (
-        f'.. image:: ../{db.name}.png\n'
+        f'.. image:: ./{db.name}/{db.name}.png\n'
         '\n'
         '.. raw:: html\n'
         '\n'
-        f'    <p><audio controls src="{db.name}/{datacard.example}">'
+        f'    <p><audio controls src="./{db.name}/{datacard.example_media}">'
         f'</audio></p>'
     )
     # Check if the generated player_str and the expected matches
@@ -140,11 +160,17 @@ def test_datacard_player(db, cache, request):
         ['minimal_db', 'medium_db'],
     ],
 )
-def test_create_datasets_page(dbs, request):
+def test_create_datasets_page(tmpdir, dbs, cache, request):
     r"""Test the creation of an RST file with an datasets overview table."""
     dbs = [request.getfixturevalue(db) for db in dbs]
-    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
-    create_datasets_page(datasets, ofbase="datasets_page")
+    datasets = [
+        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        for db in dbs
+    ]
+    rst_file = audeer.path(tmpdir, 'datasets_page.rst')
+    create_datasets_page(datasets, rst_file=rst_file)
+    assert os.path.exists(rst_file)
+    assert os.path.exists(audeer.replace_file_extension(rst_file, 'csv'))
 
 
 def load_rendered_template(name: str) -> str:

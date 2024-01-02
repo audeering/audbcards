@@ -20,7 +20,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     r"""Test audbcards.Dataset object and all its properties."""
     db = request.getfixturevalue(db)
 
-    dataset_cache = audeer.mkdir(audeer.path(tmpdir, 'cache'))
+    dataset_cache = audeer.mkdir(tmpdir, 'cache')
     dataset = audbcards.Dataset(
         db.name,
         pytest.VERSION,
@@ -252,8 +252,11 @@ def test_iso_language_mappings(languages, iso_languages_expected):
         ['minimal_db', 'medium_db'],
     ],
 )
-def test_iso_language_property(dbs, request):
+def test_iso_language_property(dbs, cache, request):
     """Test ISO 639-3 language mapping property."""
     dbs = [request.getfixturevalue(db) for db in dbs]
-    datasets = [audbcards.Dataset(db.name, pytest.VERSION) for db in dbs]
+    datasets = [
+        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        for db in dbs
+    ]
     _ = [dataset.iso_languages for dataset in datasets]
