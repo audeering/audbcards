@@ -135,13 +135,10 @@ class Datacard(object):
         containing the min/max values
         of files durations
         and an inline plot of the corresponding distribution,
-        e.g. 1 s |distribution| 10 s
-
+        e.g. 1 s |distribution| 10 s.
         If used outside of ``sphinx``,
         it return a string with the minimum and maximum values,
-        e.g.
-
-            1 s .. 10 s
+        e.g. 1 s .. 10 s.
 
         .. |distribution| image:: docs/images/file-duration-distribution.png
 
