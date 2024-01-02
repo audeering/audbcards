@@ -134,20 +134,30 @@ class Datacard(object):
         This generates a single line
         containing the min/max values
         of files durations
-        and an inline p[lot of the corresponding distribution,
+        and an inline plot of the corresponding distribution,
         e.g.
 
         1 s ..;:. 10 s
 
+        If used outside of ``sphinx``,
+        it return a string with the minimum and maximum values,
+        e.g.
+
+            1 s .. 10 s
+
         """
-        distribution_str = ''
-        self._plot_distribution(self.dataset.file_durations)
-        min_ = np.min(self.dataset.file_durations)
-        max_ = np.max(self.dataset.file_durations)
+        min_ = 0
+        max_ = 0
         unit = 's'
+        durations = self.dataset.file_durations
+        if len(durations) > 0:
+            min_ = np.min(self.dataset.file_durations)
+            max_ = np.max(self.dataset.file_durations)
+        distribution_str = f'{min_:.1f} {unit} .. {max_:.1f} {unit}'
 
         # Save distribution plot
         if self.sphinx_src_dir is not None:
+            self._plot_distribution(durations)
             name = 'files-durations'
             image_file = audeer.path(
                 self.sphinx_src_dir,
@@ -339,7 +349,7 @@ class Datacard(object):
                 player = self.player(example)
                 dataset['player'] = player
                 dataset['example'] = example
-        dataset['files_durations'] = self.files_durations
+        dataset['file_duration_distribution'] = self.file_duration_distribution
         return dataset
 
     def _render_template(self):

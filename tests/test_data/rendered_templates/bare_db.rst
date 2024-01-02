@@ -14,7 +14,7 @@ channel
 sampling rate 
 bit depth     
 duration      0 days 00:00:00
-files         0
+files         0, duration distribution: 0.0 s .. 0.0 s
 repository    `data-local <.../data-local/bare_db>`__
 published     2023-04-05 by author
 ============= ======================
