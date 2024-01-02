@@ -158,7 +158,7 @@ class Datacard(object):
         # Save distribution plot
         if self.sphinx_src_dir is not None:
             self._plot_distribution(durations)
-            name = 'files-durations'
+            name = 'file-durations'
             image_file = audeer.path(
                 self.sphinx_src_dir,
                 self.path,
