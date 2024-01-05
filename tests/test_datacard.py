@@ -7,7 +7,6 @@ import numpy as np
 import pytest
 
 import audeer
-import audformat
 import audiofile
 import audplot
 
@@ -102,7 +101,7 @@ def test_datacard_file_duration_distribution(
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, 'datasets')
     datacard = audbcards.Datacard(dataset, path=datacard_path)
@@ -223,7 +222,7 @@ def test_create_datasets_page(tmpdir, dbs, cache, request):
     r"""Test the creation of an RST file with an datasets overview table."""
     dbs = [request.getfixturevalue(db) for db in dbs]
     datasets = [
-        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
         for db in dbs
     ]
     rst_file = audeer.path(tmpdir, 'datasets_page.rst')
