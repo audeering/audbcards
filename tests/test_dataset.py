@@ -1,4 +1,3 @@
-import os
 
 import pandas as pd
 import pytest
@@ -257,8 +256,10 @@ def test_iso_language_mappings(languages, iso_languages_expected):
 def test_iso_language_property(dbs, cache, request):
     """Test ISO 639-3 language mapping property."""
     dbs = [request.getfixturevalue(db) for db in dbs]
+
+
     datasets = [
-        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
         for db in dbs
     ]
     _ = [dataset.iso_languages for dataset in datasets]
