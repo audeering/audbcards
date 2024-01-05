@@ -1,8 +1,9 @@
 
+import functools
 import os
+import pickle
 import typing
 
-import functools
 import jinja2
 import pandas as pd
 
@@ -31,12 +32,16 @@ class Dataset(object):
                 name: str,
                 version: str,
                 *,
-                cache_root: str = '~/.cache/audbcards',
+                cache_root: str = '~/.cache',
                 ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(name, version, cache_root=cache_root)
 
         return instance
+
+    @staticmethod
+    def _map_iso_languages(*args):
+        return _Dataset._map_iso_languages(*args)
 
     @staticmethod
     def _dataset_cache_path(*args):
@@ -54,30 +59,6 @@ class Dataset(object):
         """Save object instance to path as pickle."""
         return _Dataset._save_pickled(obj, path)
 
-    @staticmethod
-    def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
-        r"""Calculate ISO languages for a list of languages.
-
-        Leaves languages intact if :func:`audformat.utils.map_language`
-        raises :exception:`ValueError`.
-
-        Args:
-            languages: list of languages as given in the header languages
-
-        Returns:
-            list of languages
-
-        """
-        iso_languages = []
-        for lang in languages:
-            try:
-                iso_language = audformat.utils.map_language(lang)
-            except ValueError:
-                iso_language = lang
-
-            iso_languages.append(iso_language)
-
-        return sorted(list(set(iso_languages)))
 
 
 class _Dataset:
@@ -87,7 +68,7 @@ class _Dataset:
                 name: str,
                 version: str,
                 *,
-                cache_root: str = '~/.cache/audbcards',
+                cache_root: str = '~/.cache/',
                 ):
         r"""Instantiate Dataset Object."""
         dataset_cache_filename = cls._dataset_cache_path(name,
@@ -110,17 +91,21 @@ class _Dataset:
             self,
             name: str,
             version: str,
-            cache_root: str,
+            cache_root: str = './cache',
     ):
+
+
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
+            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
+            cache_root=self.cache_root,
             verbose=False,
         )
 
@@ -137,29 +122,64 @@ class _Dataset:
         # Clean up cache
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
-        local_repos = [
-            x for x in audb.config.REPOSITORIES if x.backend == 'file-system'
-        ]
-        assert len(local_repos) == 1, "Expecting single local repo."
-        local_repo = local_repos[0]
-        versions = os.listdir(
-            audeer.path(
-                local_repo.host,
-                local_repo.name,
-                name,
-                'db',
-            ))
-
-        other_versions = [v for v in versions if v != self._version]
+        versions = audeer.list_dir_names(
+            audeer.path(self.cache_root, name),
+            basenames=True,
+        )
+        other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(
-                audeer.path(
-                    local_repo.host,
-                    local_repo.name,
-                    name,
-                    'db',
-                    other_version,
-                ))
+                audeer.path(self.cache_root, name, other_version)
+            )
+
+        # self.cache_root = audeer.mkdir(audeer.path(cache_root))
+        # self.header = audb.info.header(
+        #     name,
+        #     version=version,
+        #     load_tables=True,  # ensure misc tables are loaded
+        # )
+        # self.deps = audb.dependencies(
+        #     name,
+        #     version=version,
+        #     verbose=False,
+        # )
+
+        # self._version = version
+        # self._repository = audb.repository(name, version)
+        # self._backend = audbackend.access(
+        #     name=self._repository.backend,
+        #     host=self._repository.host,
+        #     repository=self._repository.name,
+        # )
+        # if isinstance(self._backend, audbackend.Artifactory):
+        #     self._backend._use_legacy_file_structure()  # pragma: nocover
+
+        # # Clean up cache
+        # # by removing all other versions of the same dataset
+        # # to reduce its storage size in CI runners
+        # local_repos = [
+        #     x for x in audb.config.REPOSITORIES if x.backend == 'file-system'
+        # ]
+        # assert len(local_repos) == 1, "Expecting single local repo."
+        # local_repo = local_repos[0]
+        # versions = os.listdir(
+        #     audeer.path(
+        #         local_repo.host,
+        #         local_repo.name,
+        #         name,
+        #         'db',
+        #     ))
+
+        # other_versions = [v for v in versions if v != self._version]
+        # for other_version in other_versions:
+        #     audeer.rmdir(
+        #         audeer.path(
+        #             local_repo.host,
+        #             local_repo.name,
+        #             name,
+        #             'db',
+        #             other_version,
+        #         ))
 
     @staticmethod
     def _dataset_cache_path(name: str,
@@ -565,6 +585,30 @@ class _Dataset:
 
         return data_dict
 
+    @staticmethod
+    def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
+        r"""Calculate ISO languages for a list of languages.
+
+        Leaves languages intact if :func:`audformat.utils.map_language`
+        raises :exception:`ValueError`.
+
+        Args:
+            languages: list of languages as given in the header languages
+
+        Returns:
+            list of languages
+
+        """
+        iso_languages = []
+        for lang in languages:
+            try:
+                iso_language = audformat.utils.map_language(lang)
+            except ValueError:
+                iso_language = lang
+
+            iso_languages.append(iso_language)
+
+        return sorted(list(set(iso_languages)))
 
 def create_datasets_page(
         datasets: typing.Sequence[Dataset],
