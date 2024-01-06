@@ -1,3 +1,4 @@
+import os
 
 import pandas as pd
 import pytest
@@ -12,16 +13,16 @@ import audbcards
 
 
 @pytest.mark.parametrize(
-    'db',
+    "db",
     [
-        'medium_db',
+        "medium_db",
     ],
 )
 def test_dataset(audb_cache, tmpdir, repository, db, request):
     r"""Test audbcards.Dataset object and all its properties."""
     db = request.getfixturevalue(db)
 
-    dataset_cache = audeer.mkdir(tmpdir, 'cache')
+    dataset_cache = audeer.mkdir(tmpdir, "cache")
     dataset = audbcards.Dataset(
         db.name,
         pytest.VERSION,
@@ -73,14 +74,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # channels
     expected_channels = sorted(
-        list(
-            set(
-                [
-                    audiofile.channels(file)
-                    for file in db.files
-                ]
-            )
-        )
+        list(set([audiofile.channels(file) for file in db.files]))
     )
     assert dataset.channels == expected_channels
 
@@ -94,33 +88,22 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # file_durations
     expected_file_durations = [
-        expected_deps.duration(file)
-        for file in expected_deps.media
+        expected_deps.duration(file) for file in expected_deps.media
     ]
     assert dataset.file_durations == expected_file_durations
 
     # formats
     expected_formats = sorted(
-        list(
-            set(
-                [
-                    audeer.file_extension(file)
-                    for file in db.files
-                ]
-            )
-        )
+        list(set([audeer.file_extension(file) for file in db.files]))
     )
     assert dataset.formats == expected_formats
 
     # license
-    expected_license = db.license or 'Unknown'
+    expected_license = db.license or "Unknown"
     assert dataset.license == expected_license
 
     # license link
-    if (
-            db.license_url is None
-            or len(db.license_url) == 0
-    ):
+    if db.license_url is None or len(db.license_url) == 0:
         expected_license_link = None
     else:
         expected_license_link = db.license_url
@@ -128,14 +111,14 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # publication_date:
     expected_publication_date = backend.date(
-        backend.join('/', db.name, 'db.yaml'),
+        backend.join("/", db.name, "db.yaml"),
         pytest.VERSION,
     )
     assert dataset.publication_date == expected_publication_date
 
     # publication_owner
     expected_publication_owner = backend.owner(
-        backend.join('/', db.name, 'db.yaml'),
+        backend.join("/", db.name, "db.yaml"),
         pytest.VERSION,
     )
     assert dataset.publication_owner == expected_publication_owner
@@ -147,14 +130,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # sampling_rates
     expected_sampling_rates = sorted(
-        list(
-            set(
-                [
-                    audiofile.sampling_rate(file)
-                    for file in db.files
-                ]
-            )
-        )
+        list(set([audiofile.sampling_rate(file) for file in db.files]))
     )
     assert dataset.sampling_rates == expected_sampling_rates
 
@@ -164,19 +140,21 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # schemes_table
     expected_schemes_table = [
-        ['ID', 'Dtype', 'Min', 'Labels', 'Mappings'],
-        ['age', 'int', 0, '', ''],
-        ['emotion', 'str', '', 'angry, happy, neutral', ''],
-        ['gender', 'str', '', 'female, male', ''],
-        ['speaker', 'int', '', '0, 1', 'age, gender'],
+        ["ID", "Dtype", "Min", "Labels", "Mappings"],
+        ["age", "int", 0, "", ""],
+        ["emotion", "str", "", "angry, happy, neutral", ""],
+        ["gender", "str", "", "female, male", ""],
+        ["speaker", "int", "", "0, 1", "age, gender"],
     ]
     assert dataset.schemes_table == expected_schemes_table
 
     # short_description
     max_desc_length = 150
-    expected_description = db.description if (
-        len(db.description) < max_desc_length
-    ) else f'{db.description[:max_desc_length - 3]}...'
+    expected_description = (
+        db.description
+        if (len(db.description) < max_desc_length)
+        else f"{db.description[:max_desc_length - 3]}..."
+    )
     assert dataset.short_description == expected_description
 
     # tables
@@ -184,14 +162,14 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     assert dataset.tables == expected_tables
 
     # tables_table
-    expected_tables_table = [['ID', 'Type', 'Columns']]
+    expected_tables_table = [["ID", "Type", "Columns"]]
     for table_id in list(db):
         table = db[table_id]
         if isinstance(table, audformat.MiscTable):
-            table_type = 'misc'
+            table_type = "misc"
         else:
             table_type = table.type
-        columns = ', '.join(list(table.columns))
+        columns = ", ".join(list(table.columns))
         expected_tables_table.append([table_id, table_type, columns])
     assert dataset.tables_table == expected_tables_table
 
@@ -203,43 +181,25 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 @pytest.mark.parametrize(
     "languages, iso_languages_expected",
     [
+        (["greek", "Greek", "gr"], ["greek", "Greek", "gr"]),
+        (["en", "English", "english", "En"], ["eng"]),
+        (["de", "German", "german", "deu"], ["deu"]),
         (
-            ['greek', 'Greek', 'gr'], ['greek', 'Greek', 'gr']
+            [
+                "Algerian Arabic",
+                "Egyptian Arabic",
+                "Libyan Arabic",
+                "Moroccan Arabic",
+                "North Levantine Arabic",
+            ],
+            ["arz", "ary", "apc", "ayl", "arq"],
         ),
-        (
-            ['en', 'English', 'english', 'En'], ['eng']
-        ),
-        (
-            ['de', 'German', 'german', 'deu'], ['deu']
-        ),
-        (
-            ['Algerian Arabic',
-             'Egyptian Arabic',
-             'Libyan Arabic',
-             'Moroccan Arabic',
-             'North Levantine Arabic'],
-            ['arz',
-             'ary',
-             'apc',
-             'ayl',
-             'arq']
-        ),
-        (
-            ['Algerian Arabic'], ['arq']
-        ),
-        (
-            ['Egyptian Arabic'], ['arz']
-        ),
-        (
-            ['Libyan Arabic'], ['ayl']
-        ),
-        (
-            ['North Levantine Arabic'], ['apc']
-        ),
-        (
-            ['Moroccan Arabic'], ['ary']
-        )
-    ]
+        (["Algerian Arabic"], ["arq"]),
+        (["Egyptian Arabic"], ["arz"]),
+        (["Libyan Arabic"], ["ayl"]),
+        (["North Levantine Arabic"], ["apc"]),
+        (["Moroccan Arabic"], ["ary"]),
+    ],
 )
 def test_iso_language_mappings(languages, iso_languages_expected):
     """Test ISO 639-3 language mapping method."""
@@ -248,18 +208,106 @@ def test_iso_language_mappings(languages, iso_languages_expected):
 
 
 @pytest.mark.parametrize(
-    'dbs',
+    "dbs",
     [
-        ['minimal_db', 'medium_db'],
+        ["minimal_db", "medium_db"],
     ],
 )
 def test_iso_language_property(dbs, cache, request):
     """Test ISO 639-3 language mapping property."""
     dbs = [request.getfixturevalue(db) for db in dbs]
 
-
     datasets = [
         audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
         for db in dbs
     ]
     _ = [dataset.iso_languages for dataset in datasets]
+
+
+@pytest.fixture
+def constructor(tmpdir, medium_db, request):
+    """Fixture to test memory/timing footprint of constructor."""
+    db = medium_db
+    dataset_cache = audeer.mkdir(tmpdir, "cache")
+    dataset_cache_filename = audbcards.Dataset._dataset_cache_path(
+        db.name, pytest.VERSION, dataset_cache
+    )
+
+    ex0 = os.path.exists(dataset_cache_filename)
+
+    ds_uncached = audbcards.Dataset(
+        db.name, pytest.VERSION, cache_root=dataset_cache
+    )
+
+    ex1 = os.path.exists(dataset_cache_filename)
+
+    ds_cached = audbcards.Dataset(
+        db.name, pytest.VERSION, cache_root=dataset_cache
+    )
+
+    ex2 = os.path.exists(dataset_cache_filename)
+
+    constructor = (ds_uncached, ds_cached, [ex0, ex1, ex2])
+
+    return constructor
+
+
+@pytest.mark.usefixtures("constructor")
+class TestConstructor(object):
+    """Test constructor class method.
+
+    Testing of
+
+    - memory and creation footprints of Dataset instances
+    - equality of property lists
+
+    Currently the property values are not tested.
+    Differences are however unlikely.
+
+    """
+
+    def test_cache_file_existence(self, constructor):
+        """Test that cache file comes into existence properly."""
+        _, _, cache_file_existence = constructor
+        expected_cache_file_existence = [False, True, True]
+        assert cache_file_existence == expected_cache_file_existence
+
+    def test_cache_file_access_times(self, constructor):
+        """Test cached file is accessed later than uncached."""
+        ds_uncached, ds_cached, _ = constructor
+        access_time_uncached = ds_uncached._memperf["last accessed"]
+        access_time_cached = ds_cached._memperf["last accessed"]
+        assert access_time_cached > access_time_uncached
+
+    def test_dataset_creation_duration(self, constructor):
+        """Uncached dataset creation takes longer uncached creation."""
+        ds_uncached, ds_cached, _ = constructor
+        creation_dur_uncached = ds_uncached._memperf["creation"]
+        creation_dur_cached = ds_cached._memperf["creation"]
+        assert creation_dur_uncached > creation_dur_cached
+
+    def test_cached_dataset_is_cached(self, constructor):
+        """Cached dataset object is cached."""
+        ds_uncached, ds_cached, _ = constructor
+        assert ds_cached._memperf["cached"]
+
+    def test_uncached_dataset_is_uncached(self, constructor):
+        """Uncached dataset object is uncached."""
+        ds_uncached, ds_cached, _ = constructor
+        assert ~ds_uncached._memperf["cached"]
+
+    def test_creation_time_equal(self, constructor):
+        """Both datasets were created at the same time."""
+        ds_uncached, ds_cached, _ = constructor
+        mp_cached = ds_cached._memperf
+        mp_uncached = ds_uncached._memperf
+        assert mp_cached["created"] == mp_uncached["created"]
+
+    def test_props_equal(self, constructor):
+        """Cached and uncached datasets have equal props."""
+        ds_uncached, ds_cached, _ = constructor
+        props_uncached = ds_uncached.properties()
+        props_cached = ds_cached.properties()
+        list_props_uncached = list(props_uncached.keys())
+        list_props_cached = list(props_cached.keys())
+        assert list_props_uncached == list_props_cached

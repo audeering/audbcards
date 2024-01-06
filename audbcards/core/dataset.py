@@ -1,11 +1,13 @@
-
+from datetime import datetime
 import functools
 import os
 import pickle
+import time
 import typing
 
 import jinja2
 import pandas as pd
+from pympler import asizeof
 
 import audb
 import audbackend
@@ -28,12 +30,14 @@ class Dataset(object):
         cache_root: cache folder
 
     """
-    def __new__(cls,
-                name: str,
-                version: str,
-                *,
-                cache_root: str = '~/.cache',
-                ):
+
+    def __new__(
+        cls,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = "~/.cache",
+    ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(name, version, cache_root=cache_root)
 
@@ -53,47 +57,59 @@ class Dataset(object):
         ds = _Dataset._load_pickled(path)
         return ds
 
-
     @staticmethod
     def _save_pickled(obj, path: str):
         """Save object instance to path as pickle."""
         return _Dataset._save_pickled(obj, path)
 
 
-
 class _Dataset:
-
     @classmethod
-    def create (cls,
-                name: str,
-                version: str,
-                *,
-                cache_root: str = '~/.cache/',
-                ):
+    def create(
+        cls,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = "~/.cache/",
+    ):
         r"""Instantiate Dataset Object."""
-        dataset_cache_filename = cls._dataset_cache_path(name,
-                                                         version,
-                                                         cache_root)
-
+        memperf = {}
+        memperf["last accessed"] = datetime.now()
+        t0 = time.time()
+        dataset_cache_filename = cls._dataset_cache_path(
+            name, version, cache_root
+        )
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
+            memperf["creation"] = time.time() - t0
+            memperf["size"] = asizeof.asizeof(obj)
+            memperf["cached"] = True
+            memperf["last accessed"] = datetime.now()
+            obj._memperf = {**obj._memperf, **memperf}
+            # we do NOT need to pickle here!
+            # cls._save_pickled(obj, dataset_cache_filename)
             return obj
 
         obj = cls(name, version, cache_root)
         _ = obj.properties()
+        memperf["creation"] = time.time() - t0
+        memperf["size"] = asizeof.asizeof(obj)
+        obj._memperf = {**memperf, **obj._memperf}
+
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
 
-
-
     def __init__(
-            self,
-            name: str,
-            version: str,
-            cache_root: str = './cache',
+        self,
+        name: str,
+        version: str,
+        cache_root: str = "./cache",
     ):
-
+        self._memperf = {}
+        self._memperf["created"] = datetime.now()
+        self._memperf["cached"] = False
+        self._memperf["last accessed"] = datetime.now()
 
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
@@ -128,78 +144,27 @@ class _Dataset:
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
-            audeer.rmdir(
-                audeer.path(self.cache_root, name, other_version)
-            )
+            audeer.rmdir(audeer.path(self.cache_root, name, other_version))
 
-        # self.cache_root = audeer.mkdir(audeer.path(cache_root))
-        # self.header = audb.info.header(
-        #     name,
-        #     version=version,
-        #     load_tables=True,  # ensure misc tables are loaded
-        # )
-        # self.deps = audb.dependencies(
-        #     name,
-        #     version=version,
-        #     verbose=False,
-        # )
+        def __sizeof__(self):  # noqa: N807
+            r"""Return size of the object in bytes.
 
-        # self._version = version
-        # self._repository = audb.repository(name, version)
-        # self._backend = audbackend.access(
-        #     name=self._repository.backend,
-        #     host=self._repository.host,
-        #     repository=self._repository.name,
-        # )
-        # if isinstance(self._backend, audbackend.Artifactory):
-        #     self._backend._use_legacy_file_structure()  # pragma: nocover
-
-        # # Clean up cache
-        # # by removing all other versions of the same dataset
-        # # to reduce its storage size in CI runners
-        # local_repos = [
-        #     x for x in audb.config.REPOSITORIES if x.backend == 'file-system'
-        # ]
-        # assert len(local_repos) == 1, "Expecting single local repo."
-        # local_repo = local_repos[0]
-        # versions = os.listdir(
-        #     audeer.path(
-        #         local_repo.host,
-        #         local_repo.name,
-        #         name,
-        #         'db',
-        #     ))
-
-        # other_versions = [v for v in versions if v != self._version]
-        # for other_version in other_versions:
-        #     audeer.rmdir(
-        #         audeer.path(
-        #             local_repo.host,
-        #             local_repo.name,
-        #             name,
-        #             'db',
-        #             other_version,
-        #         ))
+            Uses pympler to determine
+            """
+            return asizeof.asizeof(self)
 
     @staticmethod
-    def _dataset_cache_path(name: str,
-                            version: str,
-                            cache_root: str) -> str:
+    def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
         r"""Generate the name of the cache file."""
-        cache_dir = audeer.mkdir(audeer.path(
-            cache_root,
-            'audbcards',
-            'dataset',
-            name,
-            version)
+        cache_dir = audeer.mkdir(
+            audeer.path(cache_root, "audbcards", "dataset", name, version)
         )
 
         cache_filename = audeer.path(
             cache_dir,
-            f'{name}-{version}.pkl',
+            f"{name}-{version}.pkl",
         )
         return cache_filename
-
 
     @staticmethod
     def _load_pickled(path: str):
@@ -218,13 +183,10 @@ class _Dataset:
         with open(path, "wb") as f:
             pickle.dump(obj, f, protocol=4)
 
-
     @functools.cached_property
     def archives(self) -> int:
         r"""Number of archives of media files in dataset."""
-        return len(
-            set([self.deps.archive(file) for file in self.deps.media])
-        )
+        return len(set([self.deps.archive(file) for file in self.deps.media]))
 
     @functools.cached_property
     def author(self) -> typing.List[str]:
@@ -272,7 +234,7 @@ class _Dataset:
         durations = [self.deps.duration(file) for file in self.deps.media]
         return pd.to_timedelta(
             sum([d for d in durations if d is not None]),
-            unit='s',
+            unit="s",
         )
 
     @functools.cached_property
@@ -283,22 +245,13 @@ class _Dataset:
     @functools.cached_property
     def file_durations(self) -> typing.List:
         r"""File durations in dataset in seconds."""
-        return [
-            self.deps.duration(file) for file in self.deps.media
-        ]
+        return [self.deps.duration(file) for file in self.deps.media]
 
     @functools.cached_property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
         return sorted(
-            list(
-                set(
-                    [
-                        self.deps.format(file)
-                        for file in self.deps.media
-                    ]
-                )
-            )
+            list(set([self.deps.format(file) for file in self.deps.media]))
         )
 
     @functools.cached_property
@@ -319,7 +272,7 @@ class _Dataset:
         ``'Unknown'`` is returned.
 
         """
-        return self.header.license or 'Unknown'
+        return self.header.license or "Unknown"
 
     @functools.cached_property
     def license_link(self) -> typing.Optional[str]:
@@ -330,8 +283,8 @@ class _Dataset:
 
         """
         if (
-                self.header.license_url is None
-                or len(self.header.license_url) == 0
+            self.header.license_url is None
+            or len(self.header.license_url) == 0
         ):
             return None
         else:
@@ -345,27 +298,29 @@ class _Dataset:
     @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        path = self._backend.join('/', self.name, 'db.yaml')
+        path = self._backend.join("/", self.name, "db.yaml")
         return self._backend.date(path, self._version)
 
     @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        path = self._backend.join('/', self.name, 'db.yaml')
+        path = self._backend.join("/", self.name, "db.yaml")
         return self._backend.owner(path, self._version)
 
     def properties(self):
         """Get list of properties of the object."""
         class_items = self.__class__.__dict__.items()
-        props = dict((k, getattr(self, k))
-                     for k, v in class_items
-                     if isinstance(v, functools.cached_property))
+        props = dict(
+            (k, getattr(self, k))
+            for k, v in class_items
+            if isinstance(v, functools.cached_property)
+        )
         return props
 
     @functools.cached_property
     def repository(self) -> str:
         r"""Repository containing the dataset."""
-        return f'{self._repository.name}'
+        return f"{self._repository.name}"
 
     @functools.cached_property
     def repository_link(self) -> str:
@@ -373,10 +328,10 @@ class _Dataset:
         # NOTE: this needs to be changed
         # as we want to support different backends
         return (
-            f'{self._repository.host}/'
-            f'webapp/#/artifacts/browse/tree/General/'
-            f'{self._repository.name}/'
-            f'{self.name}'
+            f"{self._repository.host}/"
+            f"webapp/#/artifacts/browse/tree/General/"
+            f"{self._repository.name}/"
+            f"{self.name}"
         )
 
     @functools.cached_property
@@ -416,7 +371,7 @@ class _Dataset:
         cols = self._scheme_table_columns
         data = pd.DataFrame.from_dict(dataset_schemes)[cols]
         filter = data.map(lambda d: d == [])
-        data.mask(filter, other='', inplace=True)
+        data.mask(filter, other="", inplace=True)
         scheme_data = data.values.tolist()
         # Add column names
         scheme_data.insert(0, list(data))
@@ -426,11 +381,11 @@ class _Dataset:
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
-        description = self.header.description or ''
+        description = self.header.description or ""
         # Fix RST used signs
-        description = description.replace('`', "'")
+        description = description.replace("`", "'")
         if len(description) > length:
-            description = f'{description[:length - 3]}...'
+            description = f"{description[:length - 3]}..."
         return description
 
     @functools.cached_property
@@ -448,15 +403,15 @@ class _Dataset:
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
-        table_list = [['ID', 'Type', 'Columns']]
+        table_list = [["ID", "Type", "Columns"]]
         db = self.header
         for table_id in self.tables:
             table = db[table_id]
             if isinstance(table, audformat.MiscTable):
-                table_type = 'misc'
+                table_type = "misc"
             else:
                 table_type = table.type
-            columns = ', '.join(list(table.columns))
+            columns = ", ".join(list(table.columns))
             table_list.append([table_id, table_type, columns])
 
         return table_list
@@ -488,35 +443,31 @@ class _Dataset:
         if len(schemes) == 0:
             return []
 
-        columns = ['ID', 'Dtype']
+        columns = ["ID", "Dtype"]
 
         if len(schemes) > 0:
             if any([schemes[s].minimum is not None for s in schemes]):
-                columns.append('Min')
+                columns.append("Min")
             if any([schemes[s].maximum is not None for s in schemes]):
-                columns.append('Max')
+                columns.append("Max")
             if any([schemes[s].labels is not None for s in schemes]):
-                columns.append('Labels')
+                columns.append("Labels")
             if any(
-                    [
-                        isinstance(schemes[s].labels, (str, dict))
-                        for s in schemes
-                    ]
+                [isinstance(schemes[s].labels, (str, dict)) for s in schemes]
             ):
-                columns.append('Mappings')
+                columns.append("Mappings")
 
         return columns
 
     def _scheme_to_list(self, scheme_id):
-
         db = self.header
         scheme_info = self._scheme_table_columns
 
         scheme = db.schemes[scheme_id]
 
         data_dict = {
-            'ID': scheme_id,
-            'Dtype': scheme.dtype,
+            "ID": scheme_id,
+            "Dtype": scheme.dtype,
         }
         data = [scheme_id, scheme.dtype]
         #  minimum, maximum, labels, mappings = "", "", "", ""
@@ -524,17 +475,17 @@ class _Dataset:
         minimum, maximum = None, None
         labels = None
 
-        if 'Min' in scheme_info:
+        if "Min" in scheme_info:
             minimum = scheme.minimum
             if minimum is None:
-                minimum = ''
-            data_dict['Min'] = minimum
-        if 'Max' in scheme_info:
+                minimum = ""
+            data_dict["Min"] = minimum
+        if "Max" in scheme_info:
             maximum = scheme.maximum
             if maximum is None:
-                maximum = ''
-            data_dict['Max'] = maximum
-        if 'Labels' in scheme_info:
+                maximum = ""
+            data_dict["Max"] = maximum
+        if "Labels" in scheme_info:
             if scheme.labels is None:
                 labels = []
             else:
@@ -543,25 +494,23 @@ class _Dataset:
                 # Avoid `_` at end of label,
                 # as this has special meaning in RST (link)
                 labels = [
-                    label[:-1] + r'\_'
-                    if label.endswith('_')
-                    else label
+                    label[:-1] + r"\_" if label.endswith("_") else label
                     for label in labels
                 ]
                 labels = limit_presented_samples(
                     labels,
                     15,
-                    replacement_text='[...]',
+                    replacement_text="[...]",
                 )
                 labels = ", ".join(labels)
-            data_dict['Labels'] = labels
+            data_dict["Labels"] = labels
 
         data.append(minimum)
         data.append(maximum)
         data.append(labels)
-        if 'Mappings' in scheme_info:
+        if "Mappings" in scheme_info:
             if not isinstance(scheme.labels, (str, dict)):
-                mappings = ''
+                mappings = ""
             else:
                 labels = scheme._labels_to_dict()
                 # Mappings can contain a single mapping
@@ -578,15 +527,15 @@ class _Dataset:
                     mappings = f'{", ".join(mappings)}'
                 else:
                     # e.g. {'f': 'female', 'm': 'male'}
-                    mappings = '✓'
+                    mappings = "✓"
 
             data.append(mappings)
-            data_dict['Mappings'] = mappings
+            data_dict["Mappings"] = mappings
 
         return data_dict
 
     @staticmethod
-    def _map_iso_languages(languages : typing.List[str]) -> typing.List[str]:
+    def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
         r"""Calculate ISO languages for a list of languages.
 
         Leaves languages intact if :func:`audformat.utils.map_language`
@@ -610,12 +559,13 @@ class _Dataset:
 
         return sorted(list(set(iso_languages)))
 
+
 def create_datasets_page(
-        datasets: typing.Sequence[Dataset],
-        rst_file: str = './datasets.rst',
-        *,
-        datacards_path: str = './datasets',
-        header: str = 'Datasets',
+    datasets: typing.Sequence[Dataset],
+    rst_file: str = "./datasets.rst",
+    *,
+    datacards_path: str = "./datasets",
+    header: str = "Datasets",
 ):
     r"""Create overview page of datasets.
 
@@ -645,9 +595,9 @@ def create_datasets_page(
     """
     tuples = [
         (
-            f'`{dataset.name} <{datacards_path}/{dataset.name}.html>`__',
+            f"`{dataset.name} <{datacards_path}/{dataset.name}.html>`__",
             dataset.short_description,
-            f'`{dataset.license} <{dataset.license_link}>`__',
+            f"`{dataset.license} <{dataset.license_link}>`__",
             dataset.version,
             format_schemes(dataset.header.schemes),
         )
@@ -655,13 +605,13 @@ def create_datasets_page(
     ]
     df = pd.DataFrame.from_records(
         tuples,
-        columns=['name', 'description', 'license', 'version', 'schemes'],
-        index='name',
+        columns=["name", "description", "license", "version", "schemes"],
+        index="name",
     )
-    csv_file = audeer.replace_file_extension(rst_file, 'csv')
+    csv_file = audeer.replace_file_extension(rst_file, "csv")
     df.to_csv(csv_file)
 
-    template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    template_dir = os.path.join(os.path.dirname(__file__), "templates")
     environment = jinja2.Environment(
         loader=jinja2.FileSystemLoader(template_dir),
         trim_blocks=True,
@@ -676,15 +626,14 @@ def create_datasets_page(
         for dataset in datasets
     ]
     repositories = [
-        f'`{repo.name} <{repo.host}>`__'
-        for repo in audb.config.REPOSITORIES
+        f"`{repo.name} <{repo.host}>`__" for repo in audb.config.REPOSITORIES
     ]
     content = {
-        'data': data,
-        'name': audeer.basename_wo_ext(rst_file),
-        'path': datacards_path,
-        'header': header,
-        'repositories': repositories,
+        "data": data,
+        "name": audeer.basename_wo_ext(rst_file),
+        "path": datacards_path,
+        "header": header,
+        "repositories": repositories,
     }
     content = template.render(content)
 
