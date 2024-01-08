@@ -94,7 +94,7 @@ def minimal_db(
     and a single filewise table.
 
     Further it contains a single file
-    with a length of 0.01 s.
+    with a length of 0.1 s.
 
     """
     name = 'minimal_db'
