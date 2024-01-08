@@ -133,14 +133,15 @@ class Datacard(object):
 
         This generates a single line
         containing the min/max values
-        of files durations
-        and an inline plot of the corresponding distribution,
-        e.g. 1 s |distribution| 10 s.
-        If used outside of ``sphinx``,
-        it return a string with the minimum and maximum values,
-        e.g. 1 s .. 10 s.
+        of files durations.
 
-        .. |distribution| image:: docs/images/file-duration-distribution.png
+        If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set
+        (e.g. when used in the sphinx extension),
+        an inline image is stored
+        in the sphinx source folder
+        under ``<dataset-name>/<dataset-name>-file-durations.png``
+        and displayed
+        between the min and max values.
 
         """
         min_ = 0
