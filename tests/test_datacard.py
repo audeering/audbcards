@@ -150,7 +150,7 @@ def test_datacard_player(tmpdir, db, cache, request):
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, 'datasets')
     datacard = audbcards.Datacard(dataset, path=datacard_path)
