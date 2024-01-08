@@ -282,8 +282,12 @@ class Datacard(object):
             values: sequence of values
 
         """
-        min_ = np.min(values)
-        max_ = np.max(values)
+        if len(values) == 0:
+            min_ = 0
+            max_ = 0
+        else:
+            min_ = np.min(values)
+            max_ = np.max(values)
         plt.figure(figsize=[.5, .15])
         # Remove all margins besides bottom
         plt.subplot(111)

@@ -77,12 +77,20 @@ def test_datacard_example_media(db, cache, request):
 
 
 @pytest.mark.parametrize(
-    'db',
+    'db, expected_min, expected_max',
     [
-        'medium_db',
+        ('bare_db', 0, 0),
+        ('medium_db', 1, 301),
     ],
 )
-def test_datacard_file_duration_distribution(tmpdir, db, cache, request):
+def test_datacard_file_duration_distribution(
+        tmpdir,
+        cache,
+        request,
+        db,
+        expected_min,
+        expected_max,
+):
     r"""Test the Datacard.file_duration_distribution.
 
     It checks if the desired distribution PNG file is created,
@@ -108,7 +116,9 @@ def test_datacard_file_duration_distribution(tmpdir, db, cache, request):
         f'{db.name}-file-durations.png',
     )
     assert not os.path.exists(image_file)
-    expected_distribution_str = '1.0 s .. 301.0 s'
+    expected_distribution_str = (
+        f'{expected_min:.1f} s .. {expected_max:.1f} s'
+    )
     assert expected_distribution_str == distribution_str
 
     # Set sphinx src and build dir and execute again
@@ -117,7 +127,7 @@ def test_datacard_file_duration_distribution(tmpdir, db, cache, request):
     distribution_str = datacard.file_duration_distribution
     assert os.path.exists(image_file)
     expected_distribution_str = (
-        f'1.0 s |{db.name}-file-durations| 301.0 s'
+        f'{expected_min:.1f} s |{db.name}-file-durations| {expected_max:.1f} s'
     )
     assert expected_distribution_str == distribution_str
 
