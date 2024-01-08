@@ -5,6 +5,7 @@ import pickle
 import time
 import typing
 
+import dohq_artifactory
 import jinja2
 import pandas as pd
 from pympler import asizeof
@@ -16,6 +17,18 @@ import audformat
 
 from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
+
+
+def _getstate(self):
+    return self.name
+
+
+def _setstate(self, state):
+    self.name = state
+
+
+dohq_artifactory.GenericRepository.__getstate__ = _getstate
+dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
 
 class Dataset(object):
