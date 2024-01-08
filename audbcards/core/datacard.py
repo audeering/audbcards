@@ -353,7 +353,7 @@ class Datacard(object):
         dataset['file_duration_distribution'] = self.file_duration_distribution
         return dataset
 
-    def _render_template(self):
+    def _render_template(self) -> str:
         r"""Render content of data card with Jinja2.
 
         It uses the dictionary representation
