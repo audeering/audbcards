@@ -101,7 +101,7 @@ class _Dataset:
         self,
         name: str,
         version: str,
-        cache_root: str = "./cache",
+        cache_root: str = "~/.cache/",
     ):
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
@@ -244,12 +244,12 @@ class _Dataset:
         r"""Languages of the database."""
         return self.header.languages
 
-    @property
+    @functools.cached_property
     def iso_languages(self) -> typing.List[str]:
         r"""Languages of the database as ISO 639-3 if possible."""
         return self._map_iso_languages(self.languages)
 
-    @property
+    @functools.cached_property
     def license(self) -> str:
         r"""License of dataset.
 
