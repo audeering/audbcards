@@ -1,14 +1,11 @@
-from datetime import datetime
 import functools
 import os
 import pickle
-import time
 import typing
 
 import dohq_artifactory
 import jinja2
 import pandas as pd
-from pympler import asizeof
 
 import audb
 import audbackend
@@ -86,29 +83,16 @@ class _Dataset:
         cache_root: str = "~/.cache/",
     ):
         r"""Instantiate Dataset Object."""
-        memperf = {}
-        memperf["last accessed"] = datetime.now()
-        t0 = time.time()
         dataset_cache_filename = cls._dataset_cache_path(
             name, version, cache_root
         )
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
-            memperf["creation"] = time.time() - t0
-            memperf["size"] = asizeof.asizeof(obj)
-            memperf["cached"] = True
-            memperf["last accessed"] = datetime.now()
-            obj._memperf = {**obj._memperf, **memperf}
-            # we do NOT need to pickle here!
-            # cls._save_pickled(obj, dataset_cache_filename)
             return obj
 
         obj = cls(name, version, cache_root)
         _ = obj.properties()
-        memperf["creation"] = time.time() - t0
-        memperf["size"] = asizeof.asizeof(obj)
-        obj._memperf = {**memperf, **obj._memperf}
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -119,11 +103,6 @@ class _Dataset:
         version: str,
         cache_root: str = "./cache",
     ):
-        self._memperf = {}
-        self._memperf["created"] = datetime.now()
-        self._memperf["cached"] = False
-        self._memperf["last accessed"] = datetime.now()
-
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
             name,
@@ -158,13 +137,6 @@ class _Dataset:
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(audeer.path(self.cache_root, name, other_version))
-
-        def __sizeof__(self):  # noqa: N807
-            r"""Return size of the object in bytes.
-
-            Uses pympler to determine
-            """
-            return asizeof.asizeof(self)
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:

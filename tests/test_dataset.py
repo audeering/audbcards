@@ -258,7 +258,6 @@ class TestConstructor(object):
 
     Testing of
 
-    - memory and creation footprints of Dataset instances
     - equality of property lists
 
     Currently the property values are not tested.
@@ -271,37 +270,6 @@ class TestConstructor(object):
         _, _, cache_file_existence = constructor
         expected_cache_file_existence = [False, True, True]
         assert cache_file_existence == expected_cache_file_existence
-
-    def test_cache_file_access_times(self, constructor):
-        """Test cached file is accessed later than uncached."""
-        ds_uncached, ds_cached, _ = constructor
-        access_time_uncached = ds_uncached._memperf["last accessed"]
-        access_time_cached = ds_cached._memperf["last accessed"]
-        assert access_time_cached > access_time_uncached
-
-    def test_dataset_creation_duration(self, constructor):
-        """Uncached dataset creation takes longer uncached creation."""
-        ds_uncached, ds_cached, _ = constructor
-        creation_dur_uncached = ds_uncached._memperf["creation"]
-        creation_dur_cached = ds_cached._memperf["creation"]
-        assert creation_dur_uncached > creation_dur_cached
-
-    def test_cached_dataset_is_cached(self, constructor):
-        """Cached dataset object is cached."""
-        ds_uncached, ds_cached, _ = constructor
-        assert ds_cached._memperf["cached"]
-
-    def test_uncached_dataset_is_uncached(self, constructor):
-        """Uncached dataset object is uncached."""
-        ds_uncached, ds_cached, _ = constructor
-        assert ~ds_uncached._memperf["cached"]
-
-    def test_creation_time_equal(self, constructor):
-        """Both datasets were created at the same time."""
-        ds_uncached, ds_cached, _ = constructor
-        mp_cached = ds_cached._memperf
-        mp_uncached = ds_uncached._memperf
-        assert mp_cached["created"] == mp_uncached["created"]
 
     def test_props_equal(self, constructor):
         """Cached and uncached datasets have equal props."""
