@@ -38,7 +38,6 @@ dependencies = [
     'jinja2',
     'pandas >=2.1.0',
     'toml',
-    'pympler',
 ]
 # Get version dynamically from git
 # (needs setuptools_scm tools config below)
