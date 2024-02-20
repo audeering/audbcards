@@ -36,7 +36,7 @@ def test_datacard(db, cache, request):
     for pattern in [
             re.compile('^published.*$', flags=(re.MULTILINE)),
             re.compile('^repository.*$', flags=(re.MULTILINE)),
-            # re.compile('^license.*$', flags=(re.MULTILINE)),
+            re.compile('^license.*$', flags=(re.MULTILINE)),
     ]:
         content = re.sub(pattern, '', content)
         expected_content = re.sub(pattern, '', expected_content)
