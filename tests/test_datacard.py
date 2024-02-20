@@ -15,7 +15,6 @@ from audbcards.core.dataset import create_datasets_page
 from audbcards.core.utils import set_plot_margins
 
 
-@pytest.mark.skip(reason="License Treatment merge problem?")
 @pytest.mark.parametrize(
     'db',
     [
