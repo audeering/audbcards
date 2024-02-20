@@ -49,7 +49,7 @@ class Dataset(object):
         name: str,
         version: str,
         *,
-        cache_root: str = "~/.cache",
+        cache_root: str = "~/.cache/audbcards",
     ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(name, version, cache_root=cache_root)
@@ -83,7 +83,7 @@ class _Dataset:
         name: str,
         version: str,
         *,
-        cache_root: str = "~/.cache/",
+        cache_root: str = "~/.cache/audbcards",
     ):
         r"""Instantiate Dataset Object."""
         memperf = {}
@@ -117,7 +117,7 @@ class _Dataset:
         self,
         name: str,
         version: str,
-        cache_root: str = "./cache",
+        cache_root: str = "~./cache/audbcards",
     ):
         self._memperf = {}
         self._memperf["created"] = datetime.now()
