@@ -25,6 +25,7 @@ def _setstate(self, state):
     self.name = state
 
 
+# Ensure we can pickle the repository
 dohq_artifactory.GenericRepository.__getstate__ = _getstate
 dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
