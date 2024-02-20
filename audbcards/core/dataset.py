@@ -85,27 +85,17 @@ class _Dataset:
         cache_root: str = "~/.cache/audbcards",
     ):
         r"""Instantiate Dataset Object."""
-        memperf = {}
-        memperf["last accessed"] = datetime.now()
-        t0 = time.time()
         dataset_cache_filename = cls._dataset_cache_path(
             name, version, cache_root
         )
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
-            memperf["creation"] = time.time() - t0
-            memperf["cached"] = True
-            memperf["last accessed"] = datetime.now()
-            obj._memperf = {**obj._memperf, **memperf}
-            # we do NOT need to pickle here!
-            # cls._save_pickled(obj, dataset_cache_filename)
+
             return obj
 
         obj = cls(name, version, cache_root)
         _ = obj.properties()
-        memperf["creation"] = time.time() - t0
-        obj._memperf = {**memperf, **obj._memperf}
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
