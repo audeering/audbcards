@@ -226,7 +226,7 @@ def test_iso_language_property(dbs, cache, request):
 
 @pytest.fixture
 def constructor(tmpdir, medium_db, request):
-    """Fixture to test memory/timing footprint of constructor."""
+    """Fixture to test Dataset constructor."""
     db = medium_db
     dataset_cache = audeer.mkdir(tmpdir, "cache")
     dataset_cache_filename = audbcards.Dataset._dataset_cache_path(
