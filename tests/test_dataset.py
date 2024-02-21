@@ -280,3 +280,24 @@ class TestConstructor(object):
         list_props_uncached = list(props_uncached.keys())
         list_props_cached = list(props_cached.keys())
         assert list_props_uncached == list_props_cached
+
+
+def test_dataset_cache_path():
+    """Test Value of default cache path."""
+    cache_path_calculated = (
+        audbcards.core.dataset._Dataset._dataset_cache_path(
+            "emodb",
+            "1.2.1",
+            "~/.cache/audbcards",
+        )
+    )
+
+    cache_path_expected = audeer.path(
+        os.path.expanduser("~"),
+        ".cache",
+        "audbcards",
+        "emodb",
+        "1.2.1",
+        "emodb-1.2.1.pkl",
+    )
+    assert cache_path_calculated == cache_path_expected

@@ -150,7 +150,7 @@ class _Dataset:
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
         r"""Generate the name of the cache file."""
         cache_dir = audeer.mkdir(
-            audeer.path(cache_root, "audbcards", "dataset", name, version)
+            audeer.path(cache_root, name, version)
         )
 
         cache_filename = audeer.path(
