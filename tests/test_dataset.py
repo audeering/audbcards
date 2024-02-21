@@ -258,7 +258,7 @@ class TestConstructor(object):
 
     Testing of
 
-    - creation footprints of Dataset instances
+    - existence of cache files
     - equality of property lists
 
     Currently the property values are not tested.
