@@ -106,11 +106,6 @@ class _Dataset:
         version: str,
         cache_root: str = "~./cache/audbcards",
     ):
-        self._memperf = {}
-        self._memperf["created"] = datetime.now()
-        self._memperf["cached"] = False
-        self._memperf["last accessed"] = datetime.now()
-
         self.cache_root = audeer.mkdir(audeer.path(cache_root))
         self.header = audb.info.header(
             name,
