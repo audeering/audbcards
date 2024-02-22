@@ -53,9 +53,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     pd.testing.assert_frame_equal(dataset.deps(), expected_df)
 
     # archives
-    expected_archives = len(
-        expected_df.loc[expected_deps.media].archive.unique()
-    )
+    expected_archives = len(expected_df.loc[expected_deps.media].archive.unique())
     assert dataset.archives == expected_archives
 
     # bit depths
@@ -218,8 +216,7 @@ def test_iso_language_property(dbs, cache, request):
     dbs = [request.getfixturevalue(db) for db in dbs]
 
     datasets = [
-        audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
-        for db in dbs
+        audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache) for db in dbs
     ]
     _ = [dataset.iso_languages for dataset in datasets]
 
@@ -235,15 +232,11 @@ def constructor(tmpdir, medium_db, request):
 
     ex0 = os.path.exists(dataset_cache_filename)
 
-    ds_uncached = audbcards.Dataset(
-        db.name, pytest.VERSION, cache_root=dataset_cache
-    )
+    ds_uncached = audbcards.Dataset(db.name, pytest.VERSION, cache_root=dataset_cache)
 
     ex1 = os.path.exists(dataset_cache_filename)
 
-    ds_cached = audbcards.Dataset(
-        db.name, pytest.VERSION, cache_root=dataset_cache
-    )
+    ds_cached = audbcards.Dataset(db.name, pytest.VERSION, cache_root=dataset_cache)
 
     ex2 = os.path.exists(dataset_cache_filename)
 
@@ -284,12 +277,10 @@ class TestConstructor(object):
 
 def test_dataset_cache_path():
     """Test Value of default cache path."""
-    cache_path_calculated = (
-        audbcards.core.dataset._Dataset._dataset_cache_path(
-            "emodb",
-            "1.2.1",
-            "~/.cache/audbcards",
-        )
+    cache_path_calculated = audbcards.core.dataset._Dataset._dataset_cache_path(
+        "emodb",
+        "1.2.1",
+        "~/.cache/audbcards",
     )
 
     cache_path_expected = audeer.path(

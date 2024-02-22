@@ -7,9 +7,9 @@ import audformat
 
 
 def format_schemes(
-        schemes: typing.Dict[str, audformat.Scheme],
-        excludes: typing.Sequence[str] = ['duration'],
-        max_schemes: int = 15,
+    schemes: typing.Dict[str, audformat.Scheme],
+    excludes: typing.Sequence[str] = ["duration"],
+    max_schemes: int = 15,
 ) -> str:
     """Convert schemes object into string.
 
@@ -29,7 +29,7 @@ def format_schemes(
             continue
         # schemes[scheme] entries are always dictionaries,
         # so we don't have to check for that
-        if scheme == 'emotion':
+        if scheme == "emotion":
             try:
                 labels = schemes[scheme]._labels_to_list()
                 labels = audeer.flatten_list(labels)
@@ -37,7 +37,7 @@ def format_schemes(
                 max_schemes -= 1
             except KeyError:
                 emotion = [scheme]
-        elif scheme == 'speaker':
+        elif scheme == "speaker":
             try:
                 labels = schemes[scheme]._labels_to_dict()
                 labels = list(labels.values())
@@ -60,25 +60,25 @@ def format_schemes(
     max_schemes = max(max_schemes, 2)
     filtered_schemes = limit_presented_samples(filtered_schemes, max_schemes)
     # Format the information for display
-    info_str = ''
+    info_str = ""
     for scheme in filtered_schemes:
         if isinstance(scheme, dict):
             key = list(scheme.keys())[0]
-            info_str += f'{key}: ['
+            info_str += f"{key}: ["
             for label in scheme[key]:
-                info_str += f'{label}, '
-            info_str = info_str[:-2] + '], '
+                info_str += f"{label}, "
+            info_str = info_str[:-2] + "], "
         else:
-            info_str += f'{scheme}, '
+            info_str += f"{scheme}, "
     info_str = info_str[:-2]
 
     return info_str
 
 
 def limit_presented_samples(
-        samples: typing.Sequence,
-        limit: int,
-        replacement_text: str = '...',
+    samples: typing.Sequence,
+    limit: int,
+    replacement_text: str = "...",
 ) -> typing.List:
     r"""Limit the printing of sequences.
 
@@ -95,22 +95,18 @@ def limit_presented_samples(
 
     """
     if len(samples) >= limit:
-        samples = (
-            samples[:limit // 2]
-            + [replacement_text]
-            + samples[-limit // 2:]
-        )
+        samples = samples[: limit // 2] + [replacement_text] + samples[-limit // 2 :]
     return samples
 
 
 def set_plot_margins(
-        *,
-        left=0,
-        bottom=0,
-        right=1,
-        top=1,
-        wspace=0,
-        hspace=0,
+    *,
+    left=0,
+    bottom=0,
+    right=1,
+    top=1,
+    wspace=0,
+    hspace=0,
 ):
     r"""Set the margins in a plot.
 

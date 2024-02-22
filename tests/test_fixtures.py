@@ -4,10 +4,10 @@ import audb
 
 
 @pytest.mark.parametrize(
-    'db',
+    "db",
     [
-        'minimal_db',
-        'medium_db',
+        "minimal_db",
+        "medium_db",
     ],
 )
 def test_db_fixture(repository, db, request):
