@@ -10,7 +10,7 @@ from audbcards.core.dataset import Dataset
 from audbcards.core.dataset import create_datasets_page
 
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
@@ -18,22 +18,22 @@ def setup(app: sphinx.application.Sphinx):
     r"""Modelcard Sphinx extension."""
     # Config values
     app.add_config_value(
-        'audbcards_datasets',
+        "audbcards_datasets",
         [
             # folder/name, header, repositories, example
-            ('datasets', 'Datasets', [audb.config.REPOSITORIES], True),
+            ("datasets", "Datasets", [audb.config.REPOSITORIES], True),
         ],
         False,
     )
 
     # Connect functions to extension
-    app.connect('builder-inited', builder_inited)
-    app.connect('build-finished', builder_finished)
+    app.connect("builder-inited", builder_inited)
+    app.connect("build-finished", builder_finished)
 
     return {
-        'version': __version__,
-        'parallel_read_safe': True,
-        'parallel_write_safe': True,
+        "version": __version__,
+        "parallel_read_safe": True,
+        "parallel_write_safe": True,
     }
 
 
@@ -54,8 +54,7 @@ def builder_inited(app: sphinx.application.Sphinx):
     sections = app.config.audbcards_datasets
 
     # Gather and build data cards for each requested section
-    for (path, header, repositories, example) in sections:
-
+    for path, header, repositories, example in sections:
         # Clear existing data cards
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
@@ -65,17 +64,17 @@ def builder_inited(app: sphinx.application.Sphinx):
         current_repos = audb.config.REPOSITORIES
         audb.config.REPOSITORIES = audeer.to_list(repositories)
 
-        print('Get list of available datasets... ', end='', flush=True)
+        print("Get list of available datasets... ", end="", flush=True)
         df = audb.available(only_latest=True)
         df = df.sort_index()
-        print('done')
+        print("done")
 
         # Iterate datasets and create data card pages
         names = list(df.index)
-        versions = list(df['version'])
+        versions = list(df["version"])
         datasets = []
-        for (name, version) in zip(names, versions):
-            print(f'Parse {name}-{version}... ', end='', flush=True)
+        for name, version in zip(names, versions):
+            print(f"Parse {name}-{version}... ", end="", flush=True)
             dataset = Dataset(name, version)
             datacard = Datacard(
                 dataset,
@@ -86,12 +85,12 @@ def builder_inited(app: sphinx.application.Sphinx):
             )
             datacard.save()
             datasets.append(dataset)
-            print('done')
+            print("done")
 
         # Create datasets overview page
         create_datasets_page(
             datasets,
-            audeer.path(app.srcdir, f'{path}.rst'),
+            audeer.path(app.srcdir, f"{path}.rst"),
             datacards_path=path,
             header=header,
         )
@@ -100,8 +99,8 @@ def builder_inited(app: sphinx.application.Sphinx):
 
 
 def builder_finished(
-        app: sphinx.application.Sphinx,
-        exception: sphinx.errors.SphinxError,
+    app: sphinx.application.Sphinx,
+    exception: sphinx.errors.SphinxError,
 ):
     r"""Emitted when a build has finished.
 
@@ -121,10 +120,10 @@ def builder_finished(
     """
     # Delete auto-generated data card output folder
     sections = app.config.audbcards_datasets
-    for (path, _, _, _) in sections:
+    for path, _, _, _ in sections:
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
-        for ext in ['rst', 'csv']:
-            file = audeer.path(app.srcdir, f'{path}.{ext}')
+        for ext in ["rst", "csv"]:
+            file = audeer.path(app.srcdir, f"{path}.{ext}")
             if os.path.exists(file):
                 os.remove(file)

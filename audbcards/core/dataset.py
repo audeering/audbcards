@@ -84,9 +84,7 @@ class _Dataset:
         cache_root: str = "~/.cache/audbcards",
     ):
         r"""Instantiate Dataset Object."""
-        dataset_cache_filename = cls._dataset_cache_path(
-            name, version, cache_root
-        )
+        dataset_cache_filename = cls._dataset_cache_path(name, version, cache_root)
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
@@ -143,9 +141,7 @@ class _Dataset:
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
         r"""Generate the name of the cache file."""
-        cache_dir = audeer.mkdir(
-            audeer.path(cache_root, name, version)
-        )
+        cache_dir = audeer.mkdir(audeer.path(cache_root, name, version))
 
         cache_filename = audeer.path(
             cache_dir,
@@ -237,9 +233,7 @@ class _Dataset:
     @functools.cached_property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
-        return sorted(
-            list(set([self.deps.format(file) for file in self.deps.media]))
-        )
+        return sorted(list(set([self.deps.format(file) for file in self.deps.media])))
 
     @functools.cached_property
     def languages(self) -> typing.List[str]:
@@ -269,10 +263,7 @@ class _Dataset:
         ``None`` is returned.
 
         """
-        if (
-            self.header.license_url is None
-            or len(self.header.license_url) == 0
-        ):
+        if self.header.license_url is None or len(self.header.license_url) == 0:
             return None
         else:
             return self.header.license_url
@@ -439,9 +430,7 @@ class _Dataset:
                 columns.append("Max")
             if any([schemes[s].labels is not None for s in schemes]):
                 columns.append("Labels")
-            if any(
-                [isinstance(schemes[s].labels, (str, dict)) for s in schemes]
-            ):
+            if any([isinstance(schemes[s].labels, (str, dict)) for s in schemes]):
                 columns.append("Mappings")
 
         return columns
