@@ -26,7 +26,7 @@ from audbcards.core.utils import set_plot_margins
 def test_datacard(db, cache, request):
     """Test datacard creation from jinja2 templates."""
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
     datacard = audbcards.Datacard(dataset)
     content = datacard._render_template()
     content = content.rstrip()
@@ -36,6 +36,7 @@ def test_datacard(db, cache, request):
     for pattern in [
             re.compile('^published.*$', flags=(re.MULTILINE)),
             re.compile('^repository.*$', flags=(re.MULTILINE)),
+            re.compile('^license.*$', flags=(re.MULTILINE)),
     ]:
         content = re.sub(pattern, '', content)
         expected_content = re.sub(pattern, '', expected_content)
@@ -57,7 +58,7 @@ def test_datacard_example_media(db, cache, request):
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
     datacard = audbcards.Datacard(dataset)
 
     # Relative path to audio file from database
@@ -99,7 +100,7 @@ def test_datacard_file_duration_distribution(
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, 'datasets')
     datacard = audbcards.Datacard(dataset, path=datacard_path)
@@ -148,7 +149,7 @@ def test_datacard_player(tmpdir, db, cache, request):
 
     """
     db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, 'datasets')
     datacard = audbcards.Datacard(dataset, path=datacard_path)
@@ -220,7 +221,7 @@ def test_create_datasets_page(tmpdir, dbs, cache, request):
     r"""Test the creation of an RST file with an datasets overview table."""
     dbs = [request.getfixturevalue(db) for db in dbs]
     datasets = [
-        audbcards.Dataset(db.name, pytest.VERSION, cache)
+        audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
         for db in dbs
     ]
     rst_file = audeer.path(tmpdir, 'datasets_page.rst')
