@@ -11,7 +11,7 @@ the sphinx configuration file ``docs/conf.py``:
 
     extensions = [
         # ...
-        'audbcards.sphinx',
+        "audbcards.sphinx",
     ]
 
 This will automatically create data cards
@@ -55,12 +55,12 @@ and header to the repository name:
 
     audbcards_datasets = [
         (   
-            'data-public',  # folder name
-            'data-public',  # datasets overview page header
+            "data-public",  # folder name
+            "data-public",  # datasets overview page header
             audb.Repository(  # repository to use, can be a list of repos
-                name='data-public',
-                host='https://audeering.jfrog.io/artifactory',
-                backend='artifactory',
+                name="data-public",
+                host="https://audeering.jfrog.io/artifactory",
+                backend="artifactory",
             ),
             True,  # show audio examples
         ),  
@@ -77,22 +77,22 @@ In ``docs/conf.py`` you provide a list of entries:
 
     audbcards_datasets = [
         (   
-            'data-public',  # folder name
-            'data-public',  # datasets overview page header
+            "data-public",  # folder name
+            "data-public",  # datasets overview page header
             audb.Repository(  # repository to use, can be a list of repos
-                name='data-public',
-                host='https://audeering.jfrog.io/artifactory',
-                backend='artifactory',
+                name="data-public",
+                host="https://audeering.jfrog.io/artifactory",
+                backend="artifactory",
             ),
             True,  # show audio examples
         ),  
         (   
-            'data-private',  # folder name
-            'data-private',  # datasets overview page header
+            "data-private",  # folder name
+            "data-private",  # datasets overview page header
             audb.Repository(  # repository to use, can be a list of repos
-                name='data-private',
-                host='https://audeering.jfrog.io/artifactory',
-                backend='artifactory',
+                name="data-private",
+                host="https://audeering.jfrog.io/artifactory",
+                backend="artifactory",
             ),
             False,  # don't show audio examples
         ),  
