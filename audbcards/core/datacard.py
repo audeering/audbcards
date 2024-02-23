@@ -184,7 +184,7 @@ class Datacard(object):
         """
         # use audb cache instead of dataset.cache_root
         media_src_dir = (
-            f"{audb.config.CACHE_ROOT}/"
+            f"{audb.default_cache_root()}/"
             f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
         )
 
