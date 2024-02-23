@@ -185,7 +185,8 @@ class Datacard(object):
         # use audb cache instead of dataset.cache_root
         media_src_dir = (
             f"{audb.config.CACHE_ROOT}/"
-            f"{audb.flavor_path(self.dataset.name, self.dataset.version)}")
+            f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
+        )
 
         # Move file to build folder
         if self.sphinx_build_dir is not None:
