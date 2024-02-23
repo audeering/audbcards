@@ -182,7 +182,6 @@ class Datacard(object):
                 is a good fit
 
         """
-
         # use audb cache instead of dataset.cache_root
         media_src_dir = (
             f"{audb.config.CACHE_ROOT}/"
