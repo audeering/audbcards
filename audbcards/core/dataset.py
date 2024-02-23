@@ -108,12 +108,10 @@ class _Dataset:
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
-            cache_root=self.cache_root,
         )
         self.deps = audb.dependencies(
             name,
             version=version,
-            cache_root=self.cache_root,
             verbose=False,
         )
 

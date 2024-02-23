@@ -117,7 +117,6 @@ class Datacard(object):
                 self.dataset.name,
                 media,
                 version=self.dataset.version,
-                cache_root=self.dataset.cache_root,
                 verbose=False,
             )
         except:  # noqa: E722
@@ -183,10 +182,12 @@ class Datacard(object):
                 is a good fit
 
         """
+        # use audb cache instead of dataset.cache_root
         media_src_dir = (
-            f"{self.dataset.cache_root}/"
+            f"{audb.default_cache_root()}/"
             f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
         )
+
         # Move file to build folder
         if self.sphinx_build_dir is not None:
             media_dst_dir = audeer.path(
