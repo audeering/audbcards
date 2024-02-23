@@ -67,8 +67,8 @@ and call it directly::
 
 It can be restricted to specific folders::
 
-    ruff check audfoo/ tests/
-    codespell audfoo/ tests/
+    ruff check audbcards/ tests/
+    codespell audbcards/ tests/
 
 
 .. _codespell: https://github.com/codespell-project/codespell/
