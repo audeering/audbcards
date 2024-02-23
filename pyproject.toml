@@ -4,7 +4,7 @@
 name = 'audbcards'
 authors = [
     {name = 'Hagen Wierstorf', email = 'hwierstorf@audeering.com'},
-    {name = 'Christioan Geng', email= 'cgeng@audeering.com'},
+    {name = 'Christian Geng', email= 'cgeng@audeering.com'},
     {name = 'BahaEddine Abrougui'},
 ]
 description = 'Create data cards for audb databases'
