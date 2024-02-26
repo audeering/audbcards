@@ -85,7 +85,12 @@ def builder_inited(app: sphinx.application.Sphinx):
             )
             datacard.save()
             datasets.append(dataset)
-            print("done")
+            output_path = os.path.join(
+                os.path.basename(app.srcdir),
+                path,
+                f"{dataset.name}.rst",
+            )
+            print(f"wrote {output_path}")
 
         # Create datasets overview page
         create_datasets_page(

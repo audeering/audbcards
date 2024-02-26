@@ -249,7 +249,6 @@ class Datacard(object):
             )
             with open(rst_file, mode="w", encoding="utf-8") as fp:
                 fp.write(self.content)
-                print(f"... wrote {rst_file}")
 
     def _inline_image(
         self,
