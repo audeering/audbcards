@@ -187,11 +187,11 @@ convention = 'google'
 
 # ----- setuptools --------------------------------------------------------
 #
-# Disable package data to only select the matching binary in setup.py
-[tool.setuptools]
-include-package-data = false
 # Find all (sub-)modules of the Python package
 [tool.setuptools.packages.find]
+
+[tool.setuptools.package-data]
+audbcards = ['core/templates/*']
 
 
 # ----- setuptools_scm ----------------------------------------------------
