@@ -129,10 +129,10 @@ class Datacard(object):
 
     @property
     def file_duration_distribution(self) -> str:
-        r"""Min/max of files durations, and plotted distribution.
+        r"""Minimum and maximum of files durations, and plotted distribution.
 
         This generates a single line
-        containing the min/max values
+        containing the mininimum and maximum values
         of files durations.
 
         If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set
@@ -141,7 +141,7 @@ class Datacard(object):
         in the sphinx source folder
         under ``<dataset-name>/<dataset-name>-file-durations.png``
         and displayed
-        between the min and max values.
+        between the minimum and maximum values.
 
         """
         min_ = 0
