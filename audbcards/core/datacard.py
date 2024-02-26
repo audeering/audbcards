@@ -18,10 +18,14 @@ from audbcards.core.utils import set_plot_margins
 
 
 class Datacard(object):
-    r"""Datacard.
+    r"""Datacard of a dataset.
 
-    Datacard object to write a RST file
-    for a given dataset.
+    The datacard object
+    writes a RST file
+    for a given dataset,
+    which can then be used
+    to generate an HTML datacard page
+    using ``sphinx``.
 
     Args:
         dataset: dataset object
