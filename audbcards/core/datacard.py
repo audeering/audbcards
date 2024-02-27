@@ -176,16 +176,20 @@ class Datacard(object):
 
     def player(
         self,
-        file: str,
+        file: str = None,
     ) -> str:
         r"""Create an audio player showing the waveform.
 
         Args:
             file: input audio file to be used in the player.
+                If ``None``,
                 :attr:`audbcards.Datacard.example_media`
-                is a good fit
+                is used
 
         """
+        if file is None:
+            file = self.example_media
+
         # use audb cache instead of dataset.cache_root
         media_src_dir = (
             f"{audb.default_cache_root()}/"

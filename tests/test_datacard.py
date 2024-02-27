@@ -153,7 +153,7 @@ def test_datacard_player(tmpdir, db, cache, request):
 
     # Execute player
     # without specifying sphinx src and build dirs
-    player_str = datacard.player(datacard.example_media)
+    player_str = datacard.player()
     build_dir = audeer.mkdir(tmpdir, "build", "html")
     src_dir = audeer.mkdir(tmpdir, "docs")
     media_file = audeer.path(
