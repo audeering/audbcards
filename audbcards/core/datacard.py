@@ -18,10 +18,14 @@ from audbcards.core.utils import set_plot_margins
 
 
 class Datacard(object):
-    r"""Datacard.
+    r"""Datacard of a dataset.
 
-    Datacard object to write a RST file
-    for a given dataset.
+    The datacard object
+    writes a RST file
+    for a given dataset,
+    which can then be used
+    to generate an HTML datacard page
+    using ``sphinx``.
 
     Args:
         dataset: dataset object
@@ -125,10 +129,10 @@ class Datacard(object):
 
     @property
     def file_duration_distribution(self) -> str:
-        r"""Min/max of files durations, and plotted distribution.
+        r"""Minimum and maximum of files durations, and plotted distribution.
 
         This generates a single line
-        containing the min/max values
+        containing the mininimum and maximum values
         of files durations.
 
         If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set
@@ -137,7 +141,7 @@ class Datacard(object):
         in the sphinx source folder
         under ``<dataset-name>/<dataset-name>-file-durations.png``
         and displayed
-        between the min and max values.
+        between the minimum and maximum values.
 
         """
         min_ = 0
@@ -172,16 +176,20 @@ class Datacard(object):
 
     def player(
         self,
-        file: str,
+        file: str = None,
     ) -> str:
         r"""Create an audio player showing the waveform.
 
         Args:
             file: input audio file to be used in the player.
+                If ``None``,
                 :attr:`audbcards.Datacard.example_media`
-                is a good fit
+                is used
 
         """
+        if file is None:
+            file = self.example_media
+
         # use audb cache instead of dataset.cache_root
         media_src_dir = (
             f"{audb.default_cache_root()}/"

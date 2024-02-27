@@ -18,11 +18,16 @@ title = project
 # General -----------------------------------------------------------------
 master_doc = "index"
 source_suffix = ".rst"
-exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["build", "Thumbs.db", ".DS_Store", "api-src"]
 pygments_style = None
 extensions = [
     "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",  # support for Google-style docstrings
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
     "sphinx_copybutton",
+    "sphinx_apipages",
     "audbcards.sphinx",
 ]
 # Disable Gitlab as we need to sign in

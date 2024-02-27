@@ -30,7 +30,7 @@ dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
 
 class Dataset(object):
-    r"""Dataset.
+    r"""Dataset representation.
 
     Dataset object that represents a dataset
     that can be loaded with :func:`audb.load()`.
