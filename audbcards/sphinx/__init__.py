@@ -83,9 +83,15 @@ def builder_inited(app: sphinx.application.Sphinx):
                 sphinx_src_dir=app.srcdir,
                 example=example,
             )
-            datacard.save()
+            rst_file = os.path.join(
+                os.path.basename(app.srcdir),
+                path,
+                f"{dataset.name}.rst",
+            )
+            datacard.save(rst_file)
             datasets.append(dataset)
-            print("done")
+            out_file = rst_file.replace(app.srcdir, os.path.basename(app.srcdir))
+            print(f"wrote {out_file}")
 
         # Create datasets overview page
         create_datasets_page(

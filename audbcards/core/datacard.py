@@ -39,7 +39,6 @@ class Datacard(object):
             If not ``None``
             and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
-            or :meth:`audbcards.Datacard.save`
             will store an example audio file
             under
             ``<sphinx_build_dir>/<path>/<db-name>/<media-file-in-db>``
@@ -47,7 +46,6 @@ class Datacard(object):
             If not ``None``
             and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
-            or :meth:`audbcards.Datacard.save`
             will store a wavplot of the example audio file
             under
             ``<sphinx_src_dir>/<path>/<db-name>/<db-name>.png``
@@ -239,17 +237,27 @@ class Datacard(object):
         )
         return player_str
 
-    def save(self):
-        """Save content of rendered template to rst."""
-        if self.sphinx_src_dir is not None:
-            rst_file = audeer.path(
+    def save(self, file: str = None):
+        """Save content of rendered template to rst.
+
+        Args:
+            file: name of output RST file.
+                If ``None``
+                and :attr:`audbcards.Datacard.sphinx_src_dir`
+                is not ``None``,
+                the RST file will be stored
+                as ``<sphinx_src_dir>/<path>/<dataset>.rst``
+
+        """
+        if file is None and self.sphinx_src_dir is not None:
+            file = audeer.path(
                 self.sphinx_src_dir,
                 self.path,
                 f"{self.dataset.name}.rst",
             )
-            with open(rst_file, mode="w", encoding="utf-8") as fp:
+        if file is not None:
+            with open(file, mode="w", encoding="utf-8") as fp:
                 fp.write(self.content)
-                print(f"... wrote {rst_file}")
 
     def _inline_image(
         self,
