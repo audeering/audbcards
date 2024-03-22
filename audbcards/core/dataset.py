@@ -29,51 +29,6 @@ dohq_artifactory.GenericRepository.__getstate__ = _getstate
 dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
 
-class Dataset(object):
-    r"""Dataset representation.
-
-    Dataset object that represents a dataset
-    that can be loaded with :func:`audb.load()`.
-
-    Args:
-        name: name of dataset
-        version: version of dataset
-        cache_root: cache folder
-
-    """
-
-    def __new__(
-        cls,
-        name: str,
-        version: str,
-        *,
-        cache_root: str = "~/.cache/audbcards",
-    ):
-        r"""Create Dataset Instance."""
-        instance = _Dataset.create(name, version, cache_root=cache_root)
-
-        return instance
-
-    @staticmethod
-    def _map_iso_languages(*args):
-        return _Dataset._map_iso_languages(*args)
-
-    @staticmethod
-    def _dataset_cache_path(*args):
-        cache_path = _Dataset._dataset_cache_path(*args)
-        return cache_path
-
-    @staticmethod
-    def _load_pickled(path: str):
-        ds = _Dataset._load_pickled(path)
-        return ds
-
-    @staticmethod
-    def _save_pickled(obj, path: str):
-        """Save object instance to path as pickle."""
-        return _Dataset._save_pickled(obj, path)
-
-
 class _Dataset:
     @classmethod
     def create(
@@ -532,6 +487,82 @@ class _Dataset:
             iso_languages.append(iso_language)
 
         return sorted(list(set(iso_languages)))
+
+
+class Dataset(object):
+    r"""Dataset representation.
+
+    Dataset object that represents a dataset
+    that can be loaded with :func:`audb.load()`.
+
+    Args:
+        name: name of dataset
+        version: version of dataset
+        cache_root: cache folder
+
+    """
+
+    def __new__(
+        cls,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = "~/.cache/audbcards",
+    ):
+        r"""Create Dataset Instance."""
+        instance = _Dataset.create(name, version, cache_root=cache_root)
+
+        return instance
+
+    # Copy attributes and methods
+    # to include in documentation
+    archives = _Dataset.archives
+    author = _Dataset.author
+    bit_depths = _Dataset.bit_depths
+    channels = _Dataset.channels
+    description = _Dataset.description
+    duration = _Dataset.duration
+    files = _Dataset.files
+    file_durations = _Dataset.file_durations
+    formats = _Dataset.formats
+    languages = _Dataset.languages
+    iso_languages = _Dataset.iso_languages
+    license = _Dataset.license
+    license_link = _Dataset.license_link
+    name = _Dataset.name
+    publication_date = _Dataset.publication_date
+    publication_owner = _Dataset.publication_owner
+    properties = _Dataset.properties
+    repository = _Dataset.repository
+    repository_link = _Dataset.repository_link
+    sampling_rates = _Dataset.sampling_rates
+    schemes = _Dataset.schemes
+    schemes_table = _Dataset.schemes_table
+    short_description = _Dataset.short_description
+    source = _Dataset.source
+    tables = _Dataset.tables
+    tables_table = _Dataset.tables_table
+    usage = _Dataset.usage
+    version = _Dataset.version
+
+    @staticmethod
+    def _map_iso_languages(*args):
+        return _Dataset._map_iso_languages(*args)
+
+    @staticmethod
+    def _dataset_cache_path(*args):
+        cache_path = _Dataset._dataset_cache_path(*args)
+        return cache_path
+
+    @staticmethod
+    def _load_pickled(path: str):
+        ds = _Dataset._load_pickled(path)
+        return ds
+
+    @staticmethod
+    def _save_pickled(obj, path: str):
+        """Save object instance to path as pickle."""
+        return _Dataset._save_pickled(obj, path)
 
 
 def create_datasets_page(
