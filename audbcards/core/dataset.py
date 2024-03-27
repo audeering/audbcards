@@ -1,4 +1,5 @@
 import functools
+import inspect
 import os
 import pickle
 import typing
@@ -27,51 +28,6 @@ def _setstate(self, state):
 # Ensure we can pickle the repository
 dohq_artifactory.GenericRepository.__getstate__ = _getstate
 dohq_artifactory.GenericRepository.__setstate__ = _setstate
-
-
-class Dataset(object):
-    r"""Dataset representation.
-
-    Dataset object that represents a dataset
-    that can be loaded with :func:`audb.load()`.
-
-    Args:
-        name: name of dataset
-        version: version of dataset
-        cache_root: cache folder
-
-    """
-
-    def __new__(
-        cls,
-        name: str,
-        version: str,
-        *,
-        cache_root: str = "~/.cache/audbcards",
-    ):
-        r"""Create Dataset Instance."""
-        instance = _Dataset.create(name, version, cache_root=cache_root)
-
-        return instance
-
-    @staticmethod
-    def _map_iso_languages(*args):
-        return _Dataset._map_iso_languages(*args)
-
-    @staticmethod
-    def _dataset_cache_path(*args):
-        cache_path = _Dataset._dataset_cache_path(*args)
-        return cache_path
-
-    @staticmethod
-    def _load_pickled(path: str):
-        ds = _Dataset._load_pickled(path)
-        return ds
-
-    @staticmethod
-    def _save_pickled(obj, path: str):
-        """Save object instance to path as pickle."""
-        return _Dataset._save_pickled(obj, path)
 
 
 class _Dataset:
@@ -532,6 +488,59 @@ class _Dataset:
             iso_languages.append(iso_language)
 
         return sorted(list(set(iso_languages)))
+
+
+class Dataset(object):
+    r"""Dataset representation.
+
+    Dataset object that represents a dataset
+    that can be loaded with :func:`audb.load()`.
+
+    Args:
+        name: name of dataset
+        version: version of dataset
+        cache_root: cache folder
+
+    """
+
+    def __new__(
+        cls,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = "~/.cache/audbcards",
+    ):
+        r"""Create Dataset Instance."""
+        instance = _Dataset.create(name, version, cache_root=cache_root)
+        return instance
+
+    # Copy attributes and methods
+    # to include in documentation
+    for prop in [
+        name
+        for name, value in inspect.getmembers(_Dataset)
+        if isinstance(value, functools.cached_property) and not name.startswith("_")
+    ]:
+        vars()[prop] = getattr(_Dataset, prop)
+
+    @staticmethod
+    def _map_iso_languages(*args):
+        return _Dataset._map_iso_languages(*args)
+
+    @staticmethod
+    def _dataset_cache_path(*args):
+        cache_path = _Dataset._dataset_cache_path(*args)
+        return cache_path
+
+    @staticmethod
+    def _load_pickled(path: str):
+        ds = _Dataset._load_pickled(path)
+        return ds
+
+    @staticmethod
+    def _save_pickled(obj, path: str):
+        """Save object instance to path as pickle."""
+        return _Dataset._save_pickled(obj, path)
 
 
 def create_datasets_page(
