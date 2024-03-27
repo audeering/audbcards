@@ -1,0 +1,120 @@
+﻿Dataset
+=======
+
+.. currentmodule:: audbcards
+
+.. autoclass:: Dataset
+
+
+archives
+--------
+.. autoattribute:: Dataset.archives
+    
+author
+------
+.. autoattribute:: Dataset.author
+    
+bit\_depths
+-----------
+.. autoattribute:: Dataset.bit_depths
+    
+channels
+--------
+.. autoattribute:: Dataset.channels
+    
+description
+-----------
+.. autoattribute:: Dataset.description
+    
+duration
+--------
+.. autoattribute:: Dataset.duration
+    
+file\_durations
+---------------
+.. autoattribute:: Dataset.file_durations
+    
+files
+-----
+.. autoattribute:: Dataset.files
+    
+formats
+-------
+.. autoattribute:: Dataset.formats
+    
+iso\_languages
+--------------
+.. autoattribute:: Dataset.iso_languages
+    
+languages
+---------
+.. autoattribute:: Dataset.languages
+    
+license
+-------
+.. autoattribute:: Dataset.license
+    
+license\_link
+-------------
+.. autoattribute:: Dataset.license_link
+    
+name
+----
+.. autoattribute:: Dataset.name
+    
+prop
+----
+.. autoattribute:: Dataset.prop
+    
+publication\_date
+-----------------
+.. autoattribute:: Dataset.publication_date
+    
+publication\_owner
+------------------
+.. autoattribute:: Dataset.publication_owner
+    
+repository
+----------
+.. autoattribute:: Dataset.repository
+    
+repository\_link
+----------------
+.. autoattribute:: Dataset.repository_link
+    
+sampling\_rates
+---------------
+.. autoattribute:: Dataset.sampling_rates
+    
+schemes
+-------
+.. autoattribute:: Dataset.schemes
+    
+schemes\_table
+--------------
+.. autoattribute:: Dataset.schemes_table
+    
+short\_description
+------------------
+.. autoattribute:: Dataset.short_description
+    
+source
+------
+.. autoattribute:: Dataset.source
+    
+tables
+------
+.. autoattribute:: Dataset.tables
+    
+tables\_table
+-------------
+.. autoattribute:: Dataset.tables_table
+    
+usage
+-----
+.. autoattribute:: Dataset.usage
+    
+version
+-------
+.. autoattribute:: Dataset.version
+    

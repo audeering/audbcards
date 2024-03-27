@@ -1,0 +1,52 @@
+﻿Datacard
+========
+
+.. currentmodule:: audbcards
+
+.. autoclass:: Datacard
+
+
+content
+-------
+.. autoattribute:: Datacard.content
+    
+dataset
+-------
+.. autoattribute:: Datacard.dataset
+    
+example
+-------
+.. autoattribute:: Datacard.example
+    
+example\_media
+--------------
+.. autoattribute:: Datacard.example_media
+    
+file\_duration\_distribution
+----------------------------
+.. autoattribute:: Datacard.file_duration_distribution
+    
+path
+----
+.. autoattribute:: Datacard.path
+    
+player\(\)
+----------
+.. automethod:: Datacard.player
+    
+rst\_preamble
+-------------
+.. autoattribute:: Datacard.rst_preamble
+    
+save\(\)
+--------
+.. automethod:: Datacard.save
+    
+sphinx\_build\_dir
+------------------
+.. autoattribute:: Datacard.sphinx_build_dir
+    
+sphinx\_src\_dir
+----------------
+.. autoattribute:: Datacard.sphinx_src_dir
+    

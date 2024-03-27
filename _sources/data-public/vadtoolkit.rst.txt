@@ -1,0 +1,48 @@
+.. |vadtoolkit-file-durations| image:: ./vadtoolkit/vadtoolkit-file-durations.png
+
+.. _data-public-vadtoolkit:
+
+vadtoolkit
+----------
+
+Created by Kim Jaeseok
+
+============= ======================
+version       1.1.0
+license       `GPLv3 <https://www.gnu.org/licenses/gpl-3.0.en.html>`__
+source        https://github.com/jtkim-kaist/VAD
+usage         commercial
+languages     kor
+format        wav
+channel       1
+sampling rate 16000
+bit depth     16, 32
+duration      0 days 02:00:09.703062500
+files         4, duration distribution: 1801.5 s |vadtoolkit-file-durations| 1804.0 s
+repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/vadtoolkit>`__
+published     2024-01-02 by audeering
+============= ======================
+
+Description
+^^^^^^^^^^^
+
+VAD Toolkit: A Database for Voice Activity Detection At each environment, conversational speech by two Korean male speakers was recorded. The ground truth labels are manually annotated. Because the recording was carried out in the real world, unexpected noises are included to the dataset such as the crying of baby, the chirping of insects, mouse click sound, and etc..
+
+Tables
+^^^^^^
+
+.. csv-table::
+    :header-rows: 1
+    :widths: 20, 10, 70
+
+    "ID", "Type", "Columns"
+    "segments", "segmented", "noise"
+
+Schemes
+^^^^^^^
+
+.. csv-table::
+    :header-rows: 1
+
+    "ID", "Dtype", "Labels", "Mappings"
+    "noise", "int", "0, 1, 2, 3", "✓"

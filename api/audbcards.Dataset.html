@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dataset &mdash; audbcards</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Datacard" href="audbcards.Datacard.html" />
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audbcards</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sphinx-extension.html">Sphinx extension</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example Data Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data-public.html">data-public</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audbcards.html">audbcards</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audbcards.Datacard.html">Datacard</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#archives">archives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#author">author</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bit-depths">bit_depths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#channels">channels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#description">description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#duration">duration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-durations">file_durations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files">files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#formats">formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iso-languages">iso_languages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#languages">languages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#license">license</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#license-link">license_link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#name">name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prop">prop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publication-date">publication_date</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publication-owner">publication_owner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repository">repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repository-link">repository_link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sampling-rates">sampling_rates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemes-table">schemes_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#short-description">short_description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables">tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables-table">tables_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version">version</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audbcards</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="audbcards.html">audbcards</a> &raquo;</li>
+      <li>Dataset</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/audeering/audbcards/" class="fa fa-github"> GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dataset">
+<h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="audbcards.Dataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'~/.cache/audbcards'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset representation.</p>
+<p>Dataset object that represents a dataset
+that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.6.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – name of dataset</p></li>
+<li><p><strong>version</strong> – version of dataset</p></li>
+<li><p><strong>cache_root</strong> – cache folder</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="archives">
+<h2>archives<a class="headerlink" href="#archives" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.archives">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">archives</span></span><a class="headerlink" href="#audbcards.Dataset.archives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of archives of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="author">
+<h2>author<a class="headerlink" href="#author" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.author">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">author</span></span><a class="headerlink" href="#audbcards.Dataset.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Authors of the database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="bit-depths">
+<h2>bit_depths<a class="headerlink" href="#bit-depths" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.bit_depths">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">bit_depths</span></span><a class="headerlink" href="#audbcards.Dataset.bit_depths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bit depths of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="channels">
+<h2>channels<a class="headerlink" href="#channels" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.channels">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#audbcards.Dataset.channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channels of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="description">
+<h2>description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.description">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#audbcards.Dataset.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source of the database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="duration">
+<h2>duration<a class="headerlink" href="#duration" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.duration">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><a class="headerlink" href="#audbcards.Dataset.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total duration of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="file-durations">
+<h2>file_durations<a class="headerlink" href="#file-durations" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.file_durations">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">file_durations</span></span><a class="headerlink" href="#audbcards.Dataset.file_durations" title="Permalink to this definition">¶</a></dt>
+<dd><p>File durations in dataset in seconds.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="files">
+<h2>files<a class="headerlink" href="#files" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.files">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#audbcards.Dataset.files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="formats">
+<h2>formats<a class="headerlink" href="#formats" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.formats">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">formats</span></span><a class="headerlink" href="#audbcards.Dataset.formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>File formats of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="iso-languages">
+<h2>iso_languages<a class="headerlink" href="#iso-languages" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.iso_languages">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">iso_languages</span></span><a class="headerlink" href="#audbcards.Dataset.iso_languages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Languages of the database as ISO 639-3 if possible.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="languages">
+<h2>languages<a class="headerlink" href="#languages" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.languages">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">languages</span></span><a class="headerlink" href="#audbcards.Dataset.languages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Languages of the database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="license">
+<h2>license<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.license">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">license</span></span><a class="headerlink" href="#audbcards.Dataset.license" title="Permalink to this definition">¶</a></dt>
+<dd><p>License of dataset.</p>
+<p>If no license is given,
+<code class="docutils literal notranslate"><span class="pre">'Unknown'</span></code> is returned.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="license-link">
+<h2>license_link<a class="headerlink" href="#license-link" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.license_link">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">license_link</span></span><a class="headerlink" href="#audbcards.Dataset.license_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link to license of dataset.</p>
+<p>If no link is available
+<code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="name">
+<h2>name<a class="headerlink" href="#name" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.name">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#audbcards.Dataset.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="prop">
+<h2>prop<a class="headerlink" href="#prop" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.prop">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">prop</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'version'</span></em><a class="headerlink" href="#audbcards.Dataset.prop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="publication-date">
+<h2>publication_date<a class="headerlink" href="#publication-date" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.publication_date">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">publication_date</span></span><a class="headerlink" href="#audbcards.Dataset.publication_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date dataset was uploaded to repository.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="publication-owner">
+<h2>publication_owner<a class="headerlink" href="#publication-owner" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.publication_owner">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">publication_owner</span></span><a class="headerlink" href="#audbcards.Dataset.publication_owner" title="Permalink to this definition">¶</a></dt>
+<dd><p>User who uploaded dataset to repository.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="repository">
+<h2>repository<a class="headerlink" href="#repository" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.repository">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">repository</span></span><a class="headerlink" href="#audbcards.Dataset.repository" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository containing the dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="repository-link">
+<h2>repository_link<a class="headerlink" href="#repository-link" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.repository_link">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">repository_link</span></span><a class="headerlink" href="#audbcards.Dataset.repository_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link to repository in Artifactory web UI.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sampling-rates">
+<h2>sampling_rates<a class="headerlink" href="#sampling-rates" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.sampling_rates">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">sampling_rates</span></span><a class="headerlink" href="#audbcards.Dataset.sampling_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampling rates of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="schemes">
+<h2>schemes<a class="headerlink" href="#schemes" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.schemes">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><a class="headerlink" href="#audbcards.Dataset.schemes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schemes of dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="schemes-table">
+<h2>schemes_table<a class="headerlink" href="#schemes-table" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.schemes_table">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">schemes_table</span></span><a class="headerlink" href="#audbcards.Dataset.schemes_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schemes table with name, type, min, max, labels, mappings.</p>
+<p>The table is represented as a dictionary
+with column names as keys.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="short-description">
+<h2>short_description<a class="headerlink" href="#short-description" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.short_description">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">short_description</span></span><a class="headerlink" href="#audbcards.Dataset.short_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of dataset shortened to 150 chars.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="source">
+<h2>source<a class="headerlink" href="#source" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.source">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#audbcards.Dataset.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source of the database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tables">
+<h2>tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.tables">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#audbcards.Dataset.tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tables of the dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tables-table">
+<h2>tables_table<a class="headerlink" href="#tables-table" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.tables_table">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables_table</span></span><a class="headerlink" href="#audbcards.Dataset.tables_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tables of the dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.usage">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">usage</span></span><a class="headerlink" href="#audbcards.Dataset.usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Usage of the database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="version">
+<h2>version<a class="headerlink" href="#version" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.version">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#audbcards.Dataset.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of dataset.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="audbcards.Datacard.html" class="btn btn-neutral float-left" title="Datacard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/03/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

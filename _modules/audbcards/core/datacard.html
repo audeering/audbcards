@@ -1,0 +1,614 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>audbcards.core.datacard &mdash; audbcards</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../../../index.html">
+          
+            <img src="../../../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audbcards</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sphinx-extension.html">Sphinx extension</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example Data Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data-public.html">data-public</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/audbcards.html">audbcards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">audbcards</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>audbcards.core.datacard</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for audbcards.core.datacard</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">jinja2</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">import</span> <span class="nn">audb</span>
+<span class="kn">import</span> <span class="nn">audeer</span>
+<span class="kn">import</span> <span class="nn">audiofile</span>
+<span class="kn">import</span> <span class="nn">audplot</span>
+
+<span class="kn">from</span> <span class="nn">audbcards.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">audbcards.core.utils</span> <span class="kn">import</span> <span class="n">set_plot_margins</span>
+
+
+<div class="viewcode-block" id="Datacard"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard">[docs]</a><span class="k">class</span> <span class="nc">Datacard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Datacard of a dataset.</span>
+
+<span class="sd">    The datacard object</span>
+<span class="sd">    writes a RST file</span>
+<span class="sd">    for a given dataset,</span>
+<span class="sd">    which can then be used</span>
+<span class="sd">    to generate an HTML datacard page</span>
+<span class="sd">    using ``sphinx``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: dataset object</span>
+<span class="sd">        path: path to folder</span>
+<span class="sd">            that store datacard files</span>
+<span class="sd">        example: if ``True``,</span>
+<span class="sd">            include an audio example in the data card</span>
+<span class="sd">            showing the waveform of the audio</span>
+<span class="sd">            and an interactive player</span>
+<span class="sd">        sphinx_build_dir: build dir of sphinx.</span>
+<span class="sd">            If not ``None``</span>
+<span class="sd">            and ``example`` is ``True``,</span>
+<span class="sd">            a call to :meth:`audbcards.Datacard.player`</span>
+<span class="sd">            will store an example audio file</span>
+<span class="sd">            under</span>
+<span class="sd">            ``&lt;sphinx_build_dir&gt;/&lt;path&gt;/&lt;db-name&gt;/&lt;media-file-in-db&gt;``</span>
+<span class="sd">        sphinx_src_dir: source dir of sphinx.</span>
+<span class="sd">            If not ``None``</span>
+<span class="sd">            and ``example`` is ``True``,</span>
+<span class="sd">            a call to :meth:`audbcards.Datacard.player`</span>
+<span class="sd">            will store a wavplot of the example audio file</span>
+<span class="sd">            under</span>
+<span class="sd">            ``&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;db-name&gt;/&lt;db-name&gt;.png``</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span><span class="p">,</span>
+        <span class="n">example</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sphinx_build_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sphinx_src_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset object.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Folder to store datacard.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">example</span> <span class="o">=</span> <span class="n">example</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If an audio example should be included.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span> <span class="o">=</span> <span class="n">sphinx_build_dir</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sphinx build dir.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="o">=</span> <span class="n">sphinx_src_dir</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sphinx source dir.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;RST code added at top of data card.&quot;&quot;&quot;</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Property Accessor for rendered jinja2 content.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Select example media file.</span>
+
+<span class="sd">        This select a media file</span>
+<span class="sd">        based on the median duration</span>
+<span class="sd">        of all files</span>
+<span class="sd">        between 0.5 s and 300 s</span>
+<span class="sd">        and downloads it to the cache.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Pick a meaningful duration for the example audio file</span>
+        <span class="n">min_dur</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">max_dur</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 min</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_durations</span>
+        <span class="n">selected_durations</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">durations</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="n">min_dur</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">max_dur</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">selected_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span>
+
+        <span class="c1"># Get index for duration closest to selected duration</span>
+        <span class="c1"># see https://stackoverflow.com/a/9706105</span>
+        <span class="c1"># durations.index(selected_duration)</span>
+        <span class="c1"># is an alternative but fails due to rounding errors</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">durations</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">selected_duration</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># Download of example data might fail</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">media</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">audb</span><span class="o">.</span><span class="n">load_media</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">media</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="n">media</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">media</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of files durations, and plotted distribution.</span>
+
+<span class="sd">        This generates a single line</span>
+<span class="sd">        containing the mininimum and maximum values</span>
+<span class="sd">        of files durations.</span>
+
+<span class="sd">        If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set</span>
+<span class="sd">        (e.g. when used in the sphinx extension),</span>
+<span class="sd">        an inline image is stored</span>
+<span class="sd">        in the sphinx source folder</span>
+<span class="sd">        under ``&lt;dataset-name&gt;/&lt;dataset-name&gt;-file-durations.png``</span>
+<span class="sd">        and displayed</span>
+<span class="sd">        between the minimum and maximum values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_durations</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">min_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+            <span class="n">max_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+        <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Save distribution plot</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_distribution</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;file-durations&quot;</span>
+            <span class="n">image_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">distribution_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inline_image</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">distribution_str</span>
+
+<div class="viewcode-block" id="Datacard.player"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>    <span class="k">def</span> <span class="nf">player</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an audio player showing the waveform.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: input audio file to be used in the player.</span>
+<span class="sd">                If ``None``,</span>
+<span class="sd">                :attr:`audbcards.Datacard.example_media`</span>
+<span class="sd">                is used</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_media</span>
+
+        <span class="c1"># use audb cache instead of dataset.cache_root</span>
+        <span class="n">media_src_dir</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">()</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">audb</span><span class="o">.</span><span class="n">flavor_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Move file to build folder</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">media_dst_dir</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file</span><span class="p">)))</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_src_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Add plot of waveform</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_src_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">image_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+            <span class="n">audplot</span><span class="o">.</span><span class="n">waveform</span><span class="p">(</span><span class="n">signal</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+            <span class="n">set_plot_margins</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">player_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">player_str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;.. image:: ./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;.. raw:: html</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s1">&#39;    &lt;p&gt;&lt;audio controls src=&quot;</span><span class="si">{</span><span class="n">player_src</span><span class="si">}</span><span class="s1">&quot;&gt;&lt;/audio&gt;&lt;/p&gt;&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">player_str</span></div>
+
+<div class="viewcode-block" id="Datacard.save"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save content of rendered template to rst.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file: name of output RST file.</span>
+<span class="sd">                If ``None``</span>
+<span class="sd">                and :attr:`audbcards.Datacard.sphinx_src_dir`</span>
+<span class="sd">                is not ``None``,</span>
+<span class="sd">                the RST file will be stored</span>
+<span class="sd">                as ``&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;dataset&gt;.rst``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.rst&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_inline_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">text1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">text2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;RST string for rendering inline image between text.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text1: text to the left of the image</span>
+<span class="sd">            file: image file</span>
+<span class="sd">            text2: text to the right of the image</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RST code to generate the desired inline image</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># In RST there is no easy way to insert inline images.</span>
+        <span class="c1"># We use the following workaround:</span>
+        <span class="c1">#</span>
+        <span class="c1"># .. |ref| image:: file</span>
+        <span class="c1">#</span>
+        <span class="c1"># text1 |ref| text2</span>
+        <span class="c1">#</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">basename_wo_ext</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;.. |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| image:: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text1</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">text2</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_plot_distribution</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot inline distribution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: sequence of values</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">min_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">max_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">])</span>
+        <span class="c1"># Remove all margins besides bottom</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span>
+            <span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">bottom</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+            <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Plot duration distribution</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span>
+            <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">cut</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">clip</span><span class="o">=</span><span class="p">(</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">),</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#d54239&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Remove all tiks, labels</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+            <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+            <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_expand_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Expand dataset dict by additional entries.</span>
+
+<span class="sd">        Additional properties are added</span>
+<span class="sd">        that are only part of the data card,</span>
+<span class="sd">        but not the dataset object,</span>
+<span class="sd">        e.g. :meth:`audbcards.Datacard.player`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset: dataset object as dictionary representation</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            extended datasets dictionary</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Add path of datacard folder</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="c1"># Add audio player for example file</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">:</span>
+            <span class="n">example</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_media</span>
+            <span class="k">if</span> <span class="n">example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">player</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;file_duration_distribution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_duration_distribution</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+
+    <span class="k">def</span> <span class="nf">_render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Render content of data card with Jinja2.</span>
+
+<span class="sd">        It uses the dictionary representation</span>
+<span class="sd">        :attr:`audbcards.Datacard._dataset_dict`</span>
+<span class="sd">        as bases for rendering.</span>
+<span class="sd">        The result might vary</span>
+<span class="sd">        depending if :meth:`audbcards.Datacard._expand_dataset`</span>
+<span class="sd">        was called before or not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">template_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+        <span class="n">environment</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span>
+            <span class="n">loader</span><span class="o">=</span><span class="n">jinja2</span><span class="o">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">template_dir</span><span class="p">),</span>
+            <span class="n">trim_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;datacard.j2&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert dataset object to dictionary</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span>
+
+        <span class="c1"># Add additional datacard only properties</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="c1"># Add RST preamble</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">content</span>
+
+        <span class="k">return</span> <span class="n">content</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div>
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/03/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
