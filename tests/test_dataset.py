@@ -18,6 +18,38 @@ import audbcards
         "medium_db",
     ],
 )
+def test_dataset_property_scope(tmpdir, db, request):
+    r"""Test visibility of properties in local and global scopes."""
+    db = request.getfixturevalue(db)
+
+    dataset_cache = audeer.mkdir(tmpdir, "cache")
+    dataset = audbcards.Dataset(
+        db.name,
+        pytest.VERSION,
+        cache_root=dataset_cache,
+    )
+
+    props = [x for x in dataset.properties().keys()]
+
+    # should not exist in local scope
+    for prop in props:
+        assert prop not in vars()
+
+    # should not exist in global scope either
+    for prop in props:
+        assert prop not in globals()
+
+    # dummy identifier must be in local scope
+    repository = "foo"  # noqa F841
+    assert "repository" in vars()
+
+
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+    ],
+)
 def test_dataset(audb_cache, tmpdir, repository, db, request):
     r"""Test audbcards.Dataset object and all its properties."""
     db = request.getfixturevalue(db)
