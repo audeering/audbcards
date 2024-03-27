@@ -39,6 +39,10 @@ def test_dataset_property_scope(tmpdir, db, request):
     for prop in props:
         assert prop not in globals()
 
+# ensure Dataset has desired attributes
+for prop in props:
+    assert hasattr(dataset, prop)
+     
     # dummy identifier must be in local scope
     repository = "foo"  # noqa F841
     assert "repository" in vars()
