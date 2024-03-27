@@ -1,4 +1,5 @@
 import functools
+import inspect
 import os
 import pickle
 import typing
@@ -511,39 +512,16 @@ class Dataset(object):
     ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(name, version, cache_root=cache_root)
-
         return instance
 
     # Copy attributes and methods
     # to include in documentation
-    archives = _Dataset.archives
-    author = _Dataset.author
-    bit_depths = _Dataset.bit_depths
-    channels = _Dataset.channels
-    description = _Dataset.description
-    duration = _Dataset.duration
-    files = _Dataset.files
-    file_durations = _Dataset.file_durations
-    formats = _Dataset.formats
-    languages = _Dataset.languages
-    iso_languages = _Dataset.iso_languages
-    license = _Dataset.license
-    license_link = _Dataset.license_link
-    name = _Dataset.name
-    publication_date = _Dataset.publication_date
-    publication_owner = _Dataset.publication_owner
-    properties = _Dataset.properties
-    repository = _Dataset.repository
-    repository_link = _Dataset.repository_link
-    sampling_rates = _Dataset.sampling_rates
-    schemes = _Dataset.schemes
-    schemes_table = _Dataset.schemes_table
-    short_description = _Dataset.short_description
-    source = _Dataset.source
-    tables = _Dataset.tables
-    tables_table = _Dataset.tables_table
-    usage = _Dataset.usage
-    version = _Dataset.version
+    for prop in [
+        name
+        for name, value in inspect.getmembers(_Dataset)
+        if isinstance(value, functools.cached_property) and not name.startswith("_")
+    ]:
+        vars()[prop] = getattr(_Dataset, prop)
 
     @staticmethod
     def _map_iso_languages(*args):
