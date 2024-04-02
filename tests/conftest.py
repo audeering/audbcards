@@ -221,11 +221,9 @@ def medium_db(
     # Create audio files and store database
     durations = [1, 301]
     create_audio_files(db, db_path, durations)
-    print(f"CONFTEST {db.description=}")
     db.save(db_path)
 
     # Publish and load database
-    print(f"{repository=}")
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
     tmp_root = str(tmpdir.parts()[1])
