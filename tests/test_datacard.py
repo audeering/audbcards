@@ -26,7 +26,9 @@ from audbcards.core.utils import set_plot_margins
 def test_datacard(db, cache, request):
     """Test datacard creation from jinja2 templates."""
     db = request.getfixturevalue(db)
+    print(f"{db.description=}")
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    print(f"{dataset.description=}")
     datacard = audbcards.Datacard(dataset)
     content = datacard._render_template()
     content = content.rstrip()
