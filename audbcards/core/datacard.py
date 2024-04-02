@@ -140,7 +140,6 @@ class Datacard(object):
         under ``<dataset-name>/<dataset-name>-file-durations.png``
         and displayed
         between the minimum and maximum values.
-
         If all duration values are the same,
         no distribution plot is created.
 
