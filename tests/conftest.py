@@ -1,5 +1,4 @@
 import os
-import tempfile
 import typing
 
 import numpy as np
@@ -21,7 +20,6 @@ pytest.TEMPLATE_DIR = audeer.mkdir(
         "rendered_templates",
     )
 )
-TMP = tempfile.gettempdir()
 
 
 @pytest.fixture
@@ -80,7 +78,8 @@ def bare_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    assert db.root.startswith(TMP)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
     return db
 
 
@@ -132,7 +131,8 @@ def minimal_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    assert db.root.startswith(TMP)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
     return db
 
 
@@ -226,7 +226,8 @@ def medium_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    assert db.root.startswith(TMP)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
     return db
 
 
