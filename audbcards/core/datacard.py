@@ -133,7 +133,7 @@ class Datacard(object):
         containing the mininimum and maximum values
         of files durations.
 
-        If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set
+        If :attr:`audbcards.Datacard.sphinx_src_dir` is set
         (e.g. when used in the sphinx extension),
         an inline image is stored
         in the sphinx source folder
