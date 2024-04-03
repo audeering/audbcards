@@ -140,6 +140,8 @@ class Datacard(object):
         under ``<dataset-name>/<dataset-name>-file-durations.png``
         and displayed
         between the minimum and maximum values.
+        If all duration values are the same,
+        no distribution plot is created.
 
         """
         min_ = 0
@@ -149,6 +151,12 @@ class Datacard(object):
         if len(durations) > 0:
             min_ = np.min(durations)
             max_ = np.max(durations)
+
+        # Skip creating a distribution plot,
+        # if all durations are the same
+        if min_ == max_:
+            return f"each file is {max_:.1f} {unit}"
+
         distribution_str = f"{min_:.1f} {unit} .. {max_:.1f} {unit}"
 
         # Save distribution plot

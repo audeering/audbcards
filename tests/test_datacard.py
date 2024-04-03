@@ -116,17 +116,21 @@ def test_datacard_file_duration_distribution(
         f"{db.name}-file-durations.png",
     )
     assert not os.path.exists(image_file)
-    expected_distribution_str = f"{expected_min:.1f} s .. {expected_max:.1f} s"
+    if expected_min == expected_max:
+        expected_distribution_str = f"each file is {expected_max:.1f} s"
+    else:
+        expected_distribution_str = f"{expected_min:.1f} s .. {expected_max:.1f} s"
     assert expected_distribution_str == distribution_str
 
     # Set sphinx src and build dir and execute again
     datacard.sphinx_build_dir = build_dir
     datacard.sphinx_src_dir = src_dir
     distribution_str = datacard.file_duration_distribution
-    assert os.path.exists(image_file)
-    expected_distribution_str = (
-        f"{expected_min:.1f} s |{db.name}-file-durations| {expected_max:.1f} s"
-    )
+    if expected_min != expected_max:
+        assert os.path.exists(image_file)
+        expected_distribution_str = (
+            f"{expected_min:.1f} s |{db.name}-file-durations| {expected_max:.1f} s"
+        )
     assert expected_distribution_str == distribution_str
 
 
