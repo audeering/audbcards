@@ -5,5 +5,5 @@ Description
 {% for n in range("Description"|length) %}^{% endfor %}
 
 
-{{ description }}
+{{ description|replace('|', '\\|') }}
 {% endif %}

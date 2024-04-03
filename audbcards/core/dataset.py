@@ -163,10 +163,7 @@ class _Dataset:
     @functools.cached_property
     def description(self) -> str:
         r"""Source of the database."""
-        description = self.header.description
-        if description is not None:
-            description = description.replace("|", r"\|")
-        return description
+        return self.header.description
 
     @functools.cached_property
     def duration(self) -> pd.Timedelta:
