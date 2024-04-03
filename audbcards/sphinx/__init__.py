@@ -70,6 +70,11 @@ def builder_inited(app: sphinx.application.Sphinx):
         df = df.sort_index()
         print("done")
 
+        # Store list of datasets in app
+        # to make them accessible in `docs/conf.py`
+        app.audbcards = {}
+        app.audbcards["df"] = df
+
         # Iterate datasets and create data card pages
         names = list(df.index)
         versions = list(df["version"])
