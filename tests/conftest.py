@@ -164,7 +164,7 @@ def medium_db(
         usage="unrestricted",
         expires=None,
         languages=["eng", "de"],
-        description="Medium database.",
+        description="Medium database. | Some description |.",
         author="H Wierstorf, C Geng, B E Abrougui",
         organization="audEERING",
         license=audformat.define.License.CC0_1_0,

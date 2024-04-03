@@ -24,7 +24,7 @@ published     2023-04-05 by author
 Description
 ^^^^^^^^^^^
 
-Medium database.
+Medium database. \| Some description \|.
 
 Example
 ^^^^^^^
