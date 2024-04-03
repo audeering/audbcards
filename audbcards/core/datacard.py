@@ -155,7 +155,7 @@ class Datacard(object):
         # Skip creating a distribution plot,
         # if all durations are the same
         if min_ == max_:
-            return f"{max_:.1f} {unit}"
+            return f"each file is {max_:.1f} {unit}"
 
         distribution_str = f"{min_:.1f} {unit} .. {max_:.1f} {unit}"
 

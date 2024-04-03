@@ -117,7 +117,7 @@ def test_datacard_file_duration_distribution(
     )
     assert not os.path.exists(image_file)
     if expected_min == expected_max:
-        expected_distribution_str = f"{expected_max:.1f} s"
+        expected_distribution_str = f"each file is {expected_max:.1f} s"
     else:
         expected_distribution_str = f"{expected_min:.1f} s .. {expected_max:.1f} s"
     assert expected_distribution_str == distribution_str

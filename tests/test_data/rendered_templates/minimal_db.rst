@@ -16,7 +16,7 @@ channel       1
 sampling rate 8000
 bit depth     16
 duration      0 days 00:00:00.100000
-files         1, duration distribution: 0.1 s
+files         1, duration distribution: each file is 0.1 s
 repository    `data-local <.../data-local/minimal_db>`__
 published     2023-04-05 by author
 ============= ======================
