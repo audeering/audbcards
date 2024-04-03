@@ -55,6 +55,7 @@ def repository(tmpdir, scope="session"):
 def bare_db(
     tmpdir,
     repository,
+    audb_cache,
     scope="session",
     autouse=True,
 ):
@@ -76,13 +77,17 @@ def bare_db(
 
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
-    return audb.load(name, version=pytest.VERSION, verbose=False)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
+    return db
 
 
 @pytest.fixture
 def minimal_db(
     tmpdir,
     repository,
+    audb_cache,
     scope="session",
     autouse=True,
 ):
@@ -125,13 +130,17 @@ def minimal_db(
 
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
-    return audb.load(name, version=pytest.VERSION, verbose=False)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
+    return db
 
 
 @pytest.fixture
 def medium_db(
     tmpdir,
     repository,
+    audb_cache,
     scope="session",
     autouse=True,
 ):
@@ -216,7 +225,10 @@ def medium_db(
 
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
-    return audb.load(name, version=pytest.VERSION, verbose=False)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
+    return db
 
 
 def create_audio_files(
