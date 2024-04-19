@@ -142,4 +142,14 @@ Which will render as:
     :ref:`data-public-emodb` shows the data card for emodb.
 
 
+List of available datasets
+--------------------------
+
+The sphinx extension calls at the beginning :func:`audb.available`
+to get an overview of all available datasets.
+This information can be reused inside ``docs/conf.py``
+as it is stored in the ``app.audbcards`` dictionary
+under the ``"df"`` key.
+
+
 .. _sphinx extension: https://www.sphinx-doc.org/en/master/usage/extensions/index.html
