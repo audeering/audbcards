@@ -145,11 +145,17 @@ Which will render as:
 List of available datasets
 --------------------------
 
-The sphinx extension calls at the beginning :func:`audb.available`
+The sphinx extension calls :func:`audb.available`
 to get an overview of all available datasets.
 This information can be reused inside ``docs/conf.py``
 as it is stored in the ``app.audbcards`` dictionary
-under the ``"df"`` key.
+under the ``"df"`` key, e.g.
 
+.. code-block:: python
+
+    def setup(app: sphinx.application.Sphinx):
+        df = app.audbcards["df"]
+        # ...
+        
 
 .. _sphinx extension: https://www.sphinx-doc.org/en/master/usage/extensions/index.html
