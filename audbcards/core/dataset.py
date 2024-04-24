@@ -312,6 +312,11 @@ class _Dataset:
         on schemes named ``'emotion'`` and ``'speaker'``,
         e.g. ``'speaker: [age, gender, language]'``.
 
+        Example:
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> ds.schemes_summary
+            'emotion: [anger, ..., neutral], speaker: [age, ..., language], ...'
+
         """
         return format_schemes(self.header.schemes)
 

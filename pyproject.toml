@@ -70,6 +70,10 @@ skip = './audbcards.egg-info,./build'
 [tool.pytest.ini_options]
 cache_dir = '.cache/pytest'
 xfail_strict = true
+addopts = '''
+    --doctest-modules
+    --ignore=docs/
+'''
 
 
 # ----- ruff --------------------------------------------------------------
