@@ -30,8 +30,10 @@ class _Dataset:
         if cache_root is None:
             cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
         dataset_cache_filename = cls._dataset_cache_path(name, version, cache_root)
+        print(f"{dataset_cache_filename=}")
 
         if os.path.exists(dataset_cache_filename):
+            print("Loading from cache")
             obj = cls._load_pickled(dataset_cache_filename)
 
             return obj
