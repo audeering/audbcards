@@ -304,6 +304,18 @@ class _Dataset:
         return list(self._header.schemes)
 
     @functools.cached_property
+    def schemes_summary(self) -> str:
+        r"""Summary of dataset schemes.
+
+        It lists all schemes in a string,
+        showing additional information
+        on schemes named ``'emotion'`` and ``'speaker'``,
+        e.g. ``'speaker: [age, gender, language]'``.
+
+        """
+        return format_schemes(self._header.schemes)
+
+    @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
         """Schemes table with name, type, min, max, labels, mappings.
 
@@ -599,7 +611,7 @@ def create_datasets_page(
             dataset.short_description,
             f"`{dataset.license} <{dataset.license_link}>`__",
             dataset.version,
-            format_schemes(dataset.header.schemes),
+            dataset.schemes_summary,
         )
         for dataset in datasets
     ]
