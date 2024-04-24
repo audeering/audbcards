@@ -4,7 +4,6 @@ import os
 import pickle
 import typing
 
-# import dohq_artifactory
 import jinja2
 import pandas as pd
 
@@ -16,19 +15,6 @@ import audformat
 from audbcards.core.config import config
 from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
-
-
-# def _getstate(self):
-#     return self.name
-#
-#
-# def _setstate(self, state):
-#     self.name = state
-#
-#
-# # Ensure we can pickle the repository
-# dohq_artifactory.GenericRepository.__getstate__ = _getstate
-# dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
 
 class _Dataset:
@@ -62,19 +48,24 @@ class _Dataset:
         version: str,
         cache_root: str = None,
     ):
-        self.cache_root = audeer.mkdir(audeer.path(cache_root))
-        self.header = audb.info.header(
+        self.cache_root = audeer.mkdir(cache_root)
+
+        # Store name and version in private attributes here,
+        # ``self.name`` and ``self.version``
+        # are implemented as cached properties below
+        self._name = name
+        self._version = version
+
+        self._header = audb.info.header(
             name,
             version=version,
             load_tables=True,  # ensure misc tables are loaded
         )
-        self.deps = audb.dependencies(
+        self._deps = audb.dependencies(
             name,
             version=version,
             verbose=False,
         )
-
-        self._version = version
         self._repository = audb.repository(name, version)
         self._backend = audbackend.access(
             name=self._repository.backend,
@@ -126,6 +117,28 @@ class _Dataset:
 
         with open(path, "wb") as f:
             pickle.dump(obj, f, protocol=4)
+
+    @property
+    def deps(self) -> audb.Dependencies:
+        r"""Dataset dependency table."""
+        if self._deps is None:  # when loaded from cache
+            self._deps = audb.dependencies(
+                self.name,
+                version=self.version,
+                verbose=False,
+            )
+        return self._deps
+
+    @property
+    def header(self) -> audformat.Database:
+        r"""Dataset header."""
+        if self._header is None:  # when loaded from cache
+            self._header = audb.info.header(
+                self.name,
+                version=self.version,
+                load_tables=True,  # ensure misc tables are loaded
+            )
+        return self._header
 
     @functools.cached_property
     def archives(self) -> int:
@@ -232,7 +245,7 @@ class _Dataset:
     @functools.cached_property
     def name(self) -> str:
         r"""Name of dataset."""
-        return self.header.name
+        return self._name
 
     @functools.cached_property
     def publication_date(self) -> str:
