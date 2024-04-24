@@ -73,6 +73,7 @@ xfail_strict = true
 addopts = '''
     --doctest-modules
     --ignore=docs/
+    --ignore=audbcards/sphinx/
 '''
 
 
