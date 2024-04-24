@@ -94,7 +94,7 @@ class _Dataset:
 
     def __getstate__(self):
         r"""Returns attributes to be pickled."""
-        return self.properties
+        return self.properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
