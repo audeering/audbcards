@@ -311,6 +311,42 @@ class TestConstructor(object):
         assert list_props_uncached == list_props_cached
 
 
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+    ],
+)
+def test_dataset_cache_root(tmpdir, request, db):
+    """Test configuration of cache root.
+
+    ``cache_root`` can be provided by different options,
+    in the following hierarchy:
+
+    * as argument to ``audbcards.Dataset()``
+    * as environment variable ``AUDBCARDS_CACHE_ROOT``
+    * as ``audbcards.config.CACHE_ROOT`` entry
+
+    """
+    db = request.getfixturevalue(db)
+    cache_root1 = audeer.mkdir(tmpdir, "cache1")
+    cache_root2 = audeer.mkdir(tmpdir, "cache2")
+    cache_root3 = audeer.mkdir(tmpdir, "cache3")
+    assert audbcards.config.CACHE_ROOT == "~/.cache/audbcards"
+    audbcards.config.CACHE_ROOT = cache_root1
+    dataset = audbcards.Dataset(db.name, pytest.VERSION)
+    assert dataset.cache_root == cache_root1
+    os.environ["AUDBCARDS_CACHE_ROOT"] = cache_root2
+    dataset = audbcards.Dataset(db.name, pytest.VERSION)
+    assert dataset.cache_root == cache_root2
+    dataset = audbcards.Dataset(
+        db.name,
+        pytest.VERSION,
+        cache_root=cache_root3,
+    )
+    assert dataset.cache_root == cache_root3
+
+
 def test_dataset_cache_path():
     """Test Value of default cache path."""
     cache_path_calculated = audbcards.core.dataset._Dataset._dataset_cache_path(
