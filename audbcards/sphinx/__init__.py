@@ -40,7 +40,7 @@ def setup(app: sphinx.application.Sphinx):
 
 # ===== SPHINX EXTENSION FUNCTIONS ========================================
 #
-# All fctions defined here
+# All functions defined here
 # are added to the extension
 # via app.connect()
 # in setup()

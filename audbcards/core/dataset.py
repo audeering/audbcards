@@ -12,6 +12,7 @@ import audbackend
 import audeer
 import audformat
 
+from audbcards.core.config import config
 from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
 
@@ -23,9 +24,11 @@ class _Dataset:
         name: str,
         version: str,
         *,
-        cache_root: str = "~/.cache/audbcards",
+        cache_root: str = None,
     ):
         r"""Instantiate Dataset Object."""
+        if cache_root is None:
+            cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
         dataset_cache_filename = cls._dataset_cache_path(name, version, cache_root)
 
         if os.path.exists(dataset_cache_filename):
@@ -43,7 +46,7 @@ class _Dataset:
         self,
         name: str,
         version: str,
-        cache_root: str = "~./cache/audbcards",
+        cache_root: str = None,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
@@ -552,7 +555,11 @@ class Dataset(object):
     Args:
         name: name of dataset
         version: version of dataset
-        cache_root: cache folder
+        cache_root: cache folder.
+            If ``None``,
+            the environmental variable ``AUDBCARDS_CACHE_ROOT``,
+            or :attr:`audbcards.config.CACHE_ROOT`
+            is used
 
     """
 
@@ -561,7 +568,7 @@ class Dataset(object):
         name: str,
         version: str,
         *,
-        cache_root: str = "~/.cache/audbcards",
+        cache_root: str = None,
     ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(name, version, cache_root=cache_root)
