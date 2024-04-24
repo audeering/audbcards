@@ -114,7 +114,8 @@ class Datacard(object):
         )
         # Download of example data might fail
         try:
-            media = self.dataset.deps.media[index]
+            files = audb.info.files(self.dataset.name, version=self.dataset.version)
+            media = files[index]
             audb.load_media(
                 self.dataset.name,
                 media,
