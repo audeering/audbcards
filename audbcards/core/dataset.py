@@ -48,7 +48,8 @@ class _Dataset:
         version: str,
         cache_root: str = None,
     ):
-        audeer.mkdir(cache_root)
+        self.cache_root = audeer.mkdir(cache_root)
+        r"""Cache root folder."""
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
