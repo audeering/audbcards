@@ -121,7 +121,7 @@ class _Dataset:
     @property
     def deps(self) -> audb.Dependencies:
         r"""Dataset dependency table."""
-        if self._deps is None:  # when loaded from cache
+        if not hasattr(self, "_deps"):  # when loaded from cache
             self._deps = audb.dependencies(
                 self.name,
                 version=self.version,
@@ -132,7 +132,7 @@ class _Dataset:
     @property
     def header(self) -> audformat.Database:
         r"""Dataset header."""
-        if self._header is None:  # when loaded from cache
+        if not hasattr(self, "_header"):  # when loaded from cache
             self._header = audb.info.header(
                 self.name,
                 version=self.version,
@@ -143,12 +143,12 @@ class _Dataset:
     @functools.cached_property
     def archives(self) -> int:
         r"""Number of archives of media files in dataset."""
-        return len(set([self._deps.archive(file) for file in self._deps.media]))
+        return len(set([self.deps.archive(file) for file in self.deps.media]))
 
     @functools.cached_property
     def author(self) -> typing.List[str]:
         r"""Authors of the database."""
-        return self._header.author
+        return self.header.author
 
     @functools.cached_property
     def bit_depths(self) -> typing.List[int]:
@@ -157,9 +157,9 @@ class _Dataset:
             list(
                 set(
                     [
-                        self._deps.bit_depth(file)
-                        for file in self._deps.media
-                        if self._deps.bit_depth(file)
+                        self.deps.bit_depth(file)
+                        for file in self.deps.media
+                        if self.deps.bit_depth(file)
                     ]
                 )
             )
@@ -172,9 +172,9 @@ class _Dataset:
             list(
                 set(
                     [
-                        self._deps.channels(file)
-                        for file in self._deps.media
-                        if self._deps.channels(file)
+                        self.deps.channels(file)
+                        for file in self.deps.media
+                        if self.deps.channels(file)
                     ]
                 )
             )
@@ -183,12 +183,12 @@ class _Dataset:
     @functools.cached_property
     def description(self) -> str:
         r"""Source of the database."""
-        return self._header.description
+        return self.header.description
 
     @functools.cached_property
     def duration(self) -> pd.Timedelta:
         r"""Total duration of media files in dataset."""
-        durations = [self._deps.duration(file) for file in self._deps.media]
+        durations = [self.deps.duration(file) for file in self.deps.media]
         return pd.to_timedelta(
             sum([d for d in durations if d is not None]),
             unit="s",
@@ -197,22 +197,22 @@ class _Dataset:
     @functools.cached_property
     def files(self) -> int:
         r"""Number of media files in dataset."""
-        return len(self._deps.media)
+        return len(self.deps.media)
 
     @functools.cached_property
     def file_durations(self) -> typing.List:
         r"""File durations in dataset in seconds."""
-        return [self._deps.duration(file) for file in self._deps.media]
+        return [self.deps.duration(file) for file in self.deps.media]
 
     @functools.cached_property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
-        return sorted(list(set([self._deps.format(file) for file in self._deps.media])))
+        return sorted(list(set([self.deps.format(file) for file in self.deps.media])))
 
     @functools.cached_property
     def languages(self) -> typing.List[str]:
         r"""Languages of the database."""
-        return self._header.languages
+        return self.header.languages
 
     @functools.cached_property
     def iso_languages(self) -> typing.List[str]:
@@ -227,7 +227,7 @@ class _Dataset:
         ``'Unknown'`` is returned.
 
         """
-        return self._header.license or "Unknown"
+        return self.header.license or "Unknown"
 
     @functools.cached_property
     def license_link(self) -> typing.Optional[str]:
@@ -237,10 +237,10 @@ class _Dataset:
         ``None`` is returned.
 
         """
-        if self._header.license_url is None or len(self._header.license_url) == 0:
+        if self.header.license_url is None or len(self.header.license_url) == 0:
             return None
         else:
-            return self._header.license_url
+            return self.header.license_url
 
     @functools.cached_property
     def name(self) -> str:
@@ -293,9 +293,9 @@ class _Dataset:
             list(
                 set(
                     [
-                        self._deps.sampling_rate(file)
-                        for file in self._deps.media
-                        if self._deps.sampling_rate(file)
+                        self.deps.sampling_rate(file)
+                        for file in self.deps.media
+                        if self.deps.sampling_rate(file)
                     ]
                 )
             )
@@ -304,7 +304,7 @@ class _Dataset:
     @functools.cached_property
     def schemes(self) -> typing.List[str]:
         r"""Schemes of dataset."""
-        return list(self._header.schemes)
+        return list(self.header.schemes)
 
     @functools.cached_property
     def schemes_summary(self) -> str:
@@ -316,7 +316,7 @@ class _Dataset:
         e.g. ``'speaker: [age, gender, language]'``.
 
         """
-        return format_schemes(self._header.schemes)
+        return format_schemes(self.header.schemes)
 
     @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
@@ -326,7 +326,7 @@ class _Dataset:
         with column names as keys.
 
         """
-        db = self._header
+        db = self.header
         dataset_schemes = []
         for scheme_id in db.schemes:
             dataset_scheme = self._scheme_to_list(scheme_id)
@@ -345,7 +345,7 @@ class _Dataset:
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
-        description = self._header.description or ""
+        description = self.header.description or ""
         # Fix RST used signs
         description = description.replace("`", "'")
         if len(description) > length:
@@ -355,12 +355,12 @@ class _Dataset:
     @functools.cached_property
     def source(self) -> str:
         r"""Source of the database."""
-        return self._header.source
+        return self.header.source
 
     @functools.cached_property
     def tables(self) -> typing.List[str]:
         """Tables of the dataset."""
-        db = self._header
+        db = self.header
         tables = list(db)
         return tables
 
@@ -368,7 +368,7 @@ class _Dataset:
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
         table_list = [["ID", "Type", "Columns"]]
-        db = self._header
+        db = self.header
         for table_id in self.tables:
             table = db[table_id]
             if isinstance(table, audformat.MiscTable):
@@ -383,7 +383,7 @@ class _Dataset:
     @functools.cached_property
     def usage(self) -> str:
         r"""Usage of the database."""
-        return self._header.usage
+        return self.header.usage
 
     @functools.cached_property
     def version(self) -> str:
@@ -402,7 +402,7 @@ class _Dataset:
         ``'Mappings'``.
 
         """
-        schemes = self._header.schemes
+        schemes = self.header.schemes
 
         if len(schemes) == 0:
             return []
@@ -422,7 +422,7 @@ class _Dataset:
         return columns
 
     def _scheme_to_list(self, scheme_id):
-        db = self._header
+        db = self.header
         scheme_info = self._scheme_table_columns
 
         scheme = db.schemes[scheme_id]
