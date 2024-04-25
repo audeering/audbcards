@@ -365,3 +365,49 @@ def test_dataset_cache_path():
         "emodb-1.2.1.pkl",
     )
     assert cache_path_calculated == cache_path_expected
+
+
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+    ],
+)
+def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
+    """Test cached properties after loading from cache.
+
+    We no longer store all attributes/properties
+    in cache as pickle files,
+    but limit ourselves to the cached properties.
+    This test ensures,
+    that other attributes will be re-calculated.
+
+    """
+    db = request.getfixturevalue(db)
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache_root)
+    del dataset
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache_root)
+    deps = audb.dependencies(
+        db.name,
+        version=pytest.VERSION,
+        cache_root=audb_cache,
+    )
+    backend = audbackend.access(
+        name=repository.backend,
+        host=repository.host,
+        repository=repository.name,
+    )
+    # header = audb.info.header(
+    #     db.name,
+    #     version=pytest.VERSION,
+    #     cache_root=audb_cache,
+    # )
+    assert dataset.backend == backend
+    assert dataset.deps == deps
+    # Disabled due to potential audformat issue:
+    # the `files` table cannot be found in cache,
+    # which is requested when using `load_tables=True`
+    # in `audb.info.header`.
+    # assert dataset.header == header
+    assert dataset.repository_object == repository
