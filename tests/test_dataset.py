@@ -321,7 +321,7 @@ def test_dataset_cache_root(tmpdir, request, db):
     """Test configuration of cache root.
 
     ``cache_root`` can be provided by different options,
-    in the following hierarchy:
+    in the following precedence:
 
     * as argument to ``audbcards.Dataset()``
     * as environment variable ``AUDBCARDS_CACHE_ROOT``
