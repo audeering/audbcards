@@ -5,6 +5,7 @@ import pickle
 import typing
 
 import jinja2
+import numpy as np
 import pandas as pd
 
 import audb
@@ -188,6 +189,39 @@ class _Dataset:
             sum([d for d in durations if d is not None]),
             unit="s",
         )
+
+    @functools.cached_property
+    def example_media(self) -> typing.Optional[str]:
+        r"""Example media file.
+
+        The media file is selected
+        by its median duration
+        from all files in the dataset
+        with a duration
+        between 0.5 s and 300 s.
+        If no media file meets this criterium,
+        ``None`` is returned instead.
+
+        """
+        # Pick a meaningful duration for the example audio file
+        min_dur = 0.5
+        max_dur = 300  # 5 min
+        durations = self.file_durations
+        selected_durations = [d for d in durations if d >= min_dur and d <= max_dur]
+
+        if len(selected_durations) == 0:
+            return None
+
+        selected_duration = np.median(selected_durations)
+        # Get index for duration closest to selected duration
+        # see https://stackoverflow.com/a/9706105
+        # durations.index(selected_duration)
+        # is an alternative but fails due to rounding errors
+        index = min(
+            range(len(durations)),
+            key=lambda n: abs(durations[n] - selected_duration),
+        )
+        return self.deps.media[index]
 
     @functools.cached_property
     def files(self) -> int:

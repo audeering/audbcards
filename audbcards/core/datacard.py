@@ -13,6 +13,7 @@ import audeer
 import audiofile
 import audplot
 
+from audbcards.core.config import config
 from audbcards.core.dataset import Dataset
 from audbcards.core.utils import set_plot_margins
 
@@ -49,6 +50,11 @@ class Datacard(object):
             will store a wavplot of the example audio file
             under
             ``<sphinx_src_dir>/<path>/<db-name>/<db-name>.png``
+        cache_root: cache folder.
+            If ``None``,
+            the environmental variable ``AUDBCARDS_CACHE_ROOT``,
+            or :attr:`audbcards.config.CACHE_ROOT`
+            is used
 
     """
 
@@ -60,6 +66,7 @@ class Datacard(object):
         example: bool = True,
         sphinx_build_dir: str = None,
         sphinx_src_dir: str = None,
+        cache_root: str = None,
     ):
         self.dataset = dataset
         """Dataset object."""
@@ -76,6 +83,11 @@ class Datacard(object):
         self.sphinx_src_dir = sphinx_src_dir
         """Sphinx source dir."""
 
+        if cache_root is None:
+            cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
+        self.cache_root = audeer.mkdir(cache_root)
+        r"""Cache root folder."""
+
         self.rst_preamble = ""
         """RST code added at top of data card."""
 
@@ -83,47 +95,6 @@ class Datacard(object):
     def content(self):
         """Property Accessor for rendered jinja2 content."""
         return self._render_template()
-
-    @property
-    def example_media(self) -> typing.Optional[str]:
-        r"""Select example media file.
-
-        This select a media file
-        based on the median duration
-        of all files
-        between 0.5 s and 300 s
-        and downloads it to the cache.
-
-        """
-        # Pick a meaningful duration for the example audio file
-        min_dur = 0.5
-        max_dur = 300  # 5 min
-        durations = self.dataset.file_durations
-        selected_durations = [d for d in durations if d >= min_dur and d <= max_dur]
-        if len(selected_durations) == 0:
-            return None
-        selected_duration = np.median(selected_durations)
-
-        # Get index for duration closest to selected duration
-        # see https://stackoverflow.com/a/9706105
-        # durations.index(selected_duration)
-        # is an alternative but fails due to rounding errors
-        index = min(
-            range(len(durations)),
-            key=lambda n: abs(durations[n] - selected_duration),
-        )
-        # Download of example data might fail
-        try:
-            media = self.dataset.deps.media[index]
-            audb.load_media(
-                self.dataset.name,
-                media,
-                version=self.dataset.version,
-                verbose=False,
-            )
-        except:  # noqa: E722
-            media = None
-        return media
 
     @property
     def file_duration_distribution(self) -> str:
@@ -161,83 +132,131 @@ class Datacard(object):
 
         # Save distribution plot
         if self.sphinx_src_dir is not None:
-            self._plot_distribution(durations)
-            name = "file-durations"
+            file_name = f"{self.dataset.name}-{self.dataset.version}-file-durations.png"
+
+            # Plot distribution to cache,
+            # if not found there already.
+            # Cache is organized as `<cache_root>/<name>/<version>/`
+            cache_file = audeer.path(
+                self.cache_root,
+                self.dataset.name,
+                self.dataset.version,
+                file_name,
+            )
+            if not os.path.exists(cache_file):
+                audeer.mkdir(os.path.dirname(cache_file))
+                self._plot_distribution(durations)
+                plt.savefig(cache_file, transparent=True)
+                plt.close()
+
             image_file = audeer.path(
                 self.sphinx_src_dir,
                 self.path,
                 self.dataset.name,
-                f"{self.dataset.name}-{name}.png",
+                file_name,
             )
             audeer.mkdir(os.path.dirname(image_file))
-            plt.savefig(image_file, transparent=True)
-            plt.close()
+            shutil.copyfile(cache_file, image_file)
             distribution_str = self._inline_image(
                 f"{min_:.1f} {unit}",
-                f"./{self.dataset.name}/{self.dataset.name}-{name}.png",
+                f"./{self.dataset.name}/{file_name}",
                 f"{max_:.1f} {unit}",
             )
 
         return distribution_str
 
-    def player(
-        self,
-        file: str = None,
-    ) -> str:
+    def player(self) -> str:
         r"""Create an audio player showing the waveform.
 
-        Args:
-            file: input audio file to be used in the player.
-                If ``None``,
-                :attr:`audbcards.Datacard.example_media`
-                is used
+        Returns:
+            String containing RST code to include the player
 
         """
-        if file is None:
-            file = self.example_media
 
-        # use audb cache instead of dataset.cache_root
-        media_src_dir = (
-            f"{audb.default_cache_root()}/"
-            f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
+        def load_media_to_cache(cache_path):
+            # Path to corresponding media files in audb
+            media_src_dir = (
+                f"{audb.default_cache_root()}/"
+                f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
+            )
+            try:
+                audb.load_media(
+                    self.dataset.name,
+                    self.dataset.example_media,
+                    version=self.dataset.version,
+                    verbose=False,
+                )
+            except:  # noqa: E722
+                return False
+            audeer.mkdir(os.path.dirname(cache_path))
+            shutil.copy(
+                os.path.join(media_src_dir, self.dataset.example_media),
+                cache_path,
+            )
+            return True
+
+        # Cache is organized as `<cache_root>/<name>/<version>/`
+        cache_folder = audeer.path(
+            self.cache_root,
+            self.dataset.name,
+            self.dataset.version,
         )
+        cache_media_file = audeer.path(
+            cache_folder,
+            "media-example",
+            self.dataset.example_media,
+        )
+        plot_file_name = f"{self.dataset.name}-{self.dataset.version}-player.png"
+        cache_plot_file = audeer.path(cache_folder, plot_file_name)
 
-        # Move file to build folder
+        # Add plot of waveform
+        if self.sphinx_src_dir is not None:
+            if not os.path.exists(cache_media_file):
+                load_media_to_cache(cache_media_file)
+
+            if not os.path.exists(cache_plot_file):
+                signal, sampling_rate = audiofile.read(
+                    cache_media_file,
+                    always_2d=True,
+                )
+                audeer.mkdir(os.path.dirname(cache_plot_file))
+                plt.figure(figsize=[3, 0.5])
+                ax = plt.subplot(111)
+                audplot.waveform(signal[0, :], ax=ax)
+                set_plot_margins()
+                plt.savefig(cache_plot_file)
+                plt.close()
+
+            plot_dst_dir = audeer.path(
+                self.sphinx_src_dir,
+                self.path,
+                self.dataset.name,
+            )
+            audeer.mkdir(plot_dst_dir)
+            shutil.copy(
+                cache_plot_file,
+                os.path.join(plot_dst_dir, plot_file_name),
+            )
+
+        # Copy media file to build folder
         if self.sphinx_build_dir is not None:
+            if not os.path.exists(cache_media_file):
+                load_media_to_cache(cache_media_file)
+
             media_dst_dir = audeer.path(
                 self.sphinx_build_dir,
                 self.path,
                 self.dataset.name,
             )
-            audeer.mkdir(os.path.join(media_dst_dir, os.path.dirname(file)))
+            audeer.mkdir(media_dst_dir, os.path.dirname(self.dataset.example_media))
             shutil.copy(
-                os.path.join(media_src_dir, file),
-                os.path.join(media_dst_dir, file),
+                cache_media_file,
+                os.path.join(media_dst_dir, self.dataset.example_media),
             )
 
-        # Add plot of waveform
-        if self.sphinx_src_dir is not None:
-            signal, sampling_rate = audiofile.read(
-                os.path.join(media_src_dir, file),
-                always_2d=True,
-            )
-            image_file = audeer.path(
-                self.sphinx_src_dir,
-                self.path,
-                self.dataset.name,
-                f"{self.dataset.name}.png",
-            )
-            audeer.mkdir(os.path.dirname(image_file))
-            plt.figure(figsize=[3, 0.5])
-            ax = plt.subplot(111)
-            audplot.waveform(signal[0, :], ax=ax)
-            set_plot_margins()
-            plt.savefig(image_file)
-            plt.close()
-
-        player_src = f"./{self.dataset.name}/{file}"
+        player_src = f"./{self.dataset.name}/{self.dataset.example_media}"
         player_str = (
-            f".. image:: ./{self.dataset.name}/{self.dataset.name}.png\n"
+            f".. image:: ./{self.dataset.name}/{plot_file_name}\n"
             "\n"
             ".. raw:: html\n"
             "\n"
@@ -365,14 +384,10 @@ class Datacard(object):
         """
         # Add path of datacard folder
         dataset["path"] = self.path
-        # Add audio player for example file
-        dataset["example"] = None
         if self.example:
-            example = self.example_media
-            if example is not None:
-                player = self.player(example)
+            if self.dataset.example_media is not None:
+                player = self.player()
                 dataset["player"] = player
-                dataset["example"] = example
         dataset["file_duration_distribution"] = self.file_duration_distribution
         return dataset
 

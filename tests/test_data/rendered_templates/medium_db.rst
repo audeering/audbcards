@@ -31,7 +31,7 @@ Example
 
 :file:`data/f0.wav`
 
-.. image:: ./medium_db/medium_db.png
+.. image:: ./medium_db/medium_db-1.0.0-player.png
 
 .. raw:: html
 

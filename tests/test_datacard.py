@@ -1,9 +1,7 @@
 import os
-import posixpath
 import re
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pytest
 
 import audeer
@@ -45,38 +43,6 @@ def test_datacard(db, cache, request):
 
 
 @pytest.mark.parametrize(
-    "db",
-    [
-        "medium_db",
-    ],
-)
-def test_datacard_example_media(db, cache, request):
-    r"""Test Datacard.example_media.
-
-    It checks that the desired audio file
-    is selected as example.
-
-    """
-    db = request.getfixturevalue(db)
-    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
-    datacard = audbcards.Datacard(dataset)
-
-    # Relative path to audio file from database
-    # as written in the dependencies table,
-    # for example data/file.wav
-    durations = [d.total_seconds() for d in db.files_duration(db.files)]
-    median_duration = np.median([d for d in durations if 0.5 < d < 300])
-    expected_example_index = min(
-        range(len(durations)), key=lambda n: abs(durations[n] - median_duration)
-    )
-    expected_example = audeer.path(db.files[expected_example_index]).replace(
-        os.sep, posixpath.sep
-    )
-    expected_example = "/".join(expected_example.split("/")[-2:])
-    assert datacard.example_media == expected_example
-
-
-@pytest.mark.parametrize(
     "db, expected_min, expected_max",
     [
         ("bare_db", 0, 0),
@@ -113,7 +79,7 @@ def test_datacard_file_duration_distribution(
         build_dir,
         datacard.path,
         db.name,
-        f"{db.name}-file-durations.png",
+        f"{db.name}-{pytest.VERSION}-file-durations.png",
     )
     assert not os.path.exists(image_file)
     if expected_min == expected_max:
@@ -129,7 +95,9 @@ def test_datacard_file_duration_distribution(
     if expected_min != expected_max:
         assert os.path.exists(image_file)
         expected_distribution_str = (
-            f"{expected_min:.1f} s |{db.name}-file-durations| {expected_max:.1f} s"
+            f"{expected_min:.1f} s "
+            f"|{db.name}-{pytest.VERSION}-file-durations| "
+            f"{expected_max:.1f} s"
         )
     assert expected_distribution_str == distribution_str
 
@@ -164,13 +132,13 @@ def test_datacard_player(tmpdir, db, cache, request):
         build_dir,
         datacard.path,
         db.name,
-        datacard.example_media,
+        datacard.dataset.example_media,
     )
     image_file = audeer.path(
         src_dir,
         datacard.path,
         db.name,
-        f"{db.name}.png",
+        f"{db.name}-{pytest.VERSION}-player.png",
     )
     assert not os.path.exists(media_file)
     assert not os.path.exists(image_file)
@@ -178,7 +146,7 @@ def test_datacard_player(tmpdir, db, cache, request):
     # Set sphinx src and build dir and execute again
     datacard.sphinx_build_dir = build_dir
     datacard.sphinx_src_dir = src_dir
-    player_str = datacard.player(datacard.example_media)
+    player_str = datacard.player()
     assert os.path.exists(media_file)
     assert os.path.exists(image_file)
 
@@ -201,11 +169,11 @@ def test_datacard_player(tmpdir, db, cache, request):
 
     # Append audio to the expected player_str
     expected_player_str = (
-        f".. image:: ./{db.name}/{db.name}.png\n"
+        f".. image:: ./{db.name}/{db.name}-{pytest.VERSION}-player.png\n"
         "\n"
         ".. raw:: html\n"
         "\n"
-        f'    <p><audio controls src="./{db.name}/{datacard.example_media}">'
+        f'    <p><audio controls src="./{db.name}/{datacard.dataset.example_media}">'
         f"</audio></p>"
     )
     # Check if the generated player_str and the expected matches
