@@ -73,7 +73,8 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     # __init__
     assert dataset.name == db.name
     assert dataset.version == pytest.VERSION
-    assert dataset._repository == repository
+    assert dataset.repository_object == repository
+    assert dataset.backend == backend
     expected_header = audb.info.header(
         db.name,
         version=pytest.VERSION,

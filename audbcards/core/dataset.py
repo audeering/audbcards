@@ -57,24 +57,12 @@ class _Dataset:
         self._name = name
         self._version = version
 
-        self._header = audb.info.header(
-            name,
-            version=version,
-            load_tables=True,  # ensure misc tables are loaded
-        )
-        self._deps = audb.dependencies(
-            name,
-            version=version,
-            verbose=False,
-        )
-        self._repository = audb.repository(name, version)
-        self._backend = audbackend.access(
-            name=self._repository.backend,
-            host=self._repository.host,
-            repository=self._repository.name,
-        )
-        if isinstance(self._backend, audbackend.Artifactory):
-            self._backend._use_legacy_file_structure()  # pragma: nocover
+        # Private attributes,
+        # used inside corresponding properties.
+        self._header = self._load_header()
+        self._deps = self._load_dependencies()
+        self._repository_object = self._load_repository_object()  # load before backend
+        self._backend = self._load_backend()
 
         # Clean up cache
         # by removing all other versions of the same dataset
@@ -120,26 +108,32 @@ class _Dataset:
             pickle.dump(obj, f, protocol=4)
 
     @property
+    def backend(self) -> audbackend.Backend:
+        r"""Dataset dependency table."""
+        if not hasattr(self, "_backend"):  # when loaded from cache
+            self._backend = self._load_backend()
+        return self._backend
+
+    @property
     def deps(self) -> audb.Dependencies:
         r"""Dataset dependency table."""
         if not hasattr(self, "_deps"):  # when loaded from cache
-            self._deps = audb.dependencies(
-                self.name,
-                version=self.version,
-                verbose=False,
-            )
+            self._deps = self._load_dependencies()
         return self._deps
 
     @property
     def header(self) -> audformat.Database:
         r"""Dataset header."""
         if not hasattr(self, "_header"):  # when loaded from cache
-            self._header = audb.info.header(
-                self.name,
-                version=self.version,
-                load_tables=True,  # ensure misc tables are loaded
-            )
+            self._header = self._load_header()
         return self._header
+
+    @property
+    def repository_object(self) -> audb.Repository:
+        r"""Repository containing dataset."""
+        if not hasattr(self, "_repository_object"):  # when loaded from cache
+            self._repository_object = self._load_repository_object()
+        return self._repository_object
 
     @functools.cached_property
     def archives(self) -> int:
@@ -273,7 +267,7 @@ class _Dataset:
     @functools.cached_property
     def repository(self) -> str:
         r"""Repository containing the dataset."""
-        return f"{self._repository.name}"
+        return f"{self.repository_object.name}"
 
     @functools.cached_property
     def repository_link(self) -> str:
@@ -281,9 +275,9 @@ class _Dataset:
         # NOTE: this needs to be changed
         # as we want to support different backends
         return (
-            f"{self._repository.host}/"
+            f"{self.repository_object.host}/"
             f"webapp/#/artifacts/browse/tree/General/"
-            f"{self._repository.name}/"
+            f"{self.repository}/"
             f"{self.name}"
         )
 
@@ -395,6 +389,30 @@ class _Dataset:
     def version(self) -> str:
         r"""Version of dataset."""
         return self._version
+
+    def _load_backend(self) -> audbackend.Backend:
+        r"""Load backend containing dataset."""
+        backend = audbackend.access(
+            name=self._repository_object.backend,
+            host=self._repository_object.host,
+            repository=self.repository,
+        )
+        if isinstance(backend, audbackend.Artifactory):
+            backend._use_legacy_file_structure()  # pragma: nocover
+        return backend
+
+    def _load_dependencies(self) -> audb.Dependencies:
+        r"""Load dataset dependencies."""
+        return audb.dependencies(self.name, version=self.version, verbose=False)
+
+    def _load_header(self) -> audformat.Database:
+        r"""Load dataset header."""
+        # Ensure misc tables are loaded
+        return audb.info.header(self.name, version=self.version, load_tables=True)
+
+    def _load_repository_object(self) -> audb.Repository:
+        r"""Load repository object containing dataset."""
+        return audb.repository(self.name, self.version)
 
     @functools.cached_property
     def _scheme_table_columns(self) -> typing.List[str]:
