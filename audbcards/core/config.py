@@ -8,6 +8,9 @@ class config:
         >>> config.CACHE_ROOT
         '~/audbcards'
 
+    .. Ensure to restore the default value
+        >>> config.CACHE_ROOT = "~/.cache/audbcards"
+
     """
 
     CACHE_ROOT = "~/.cache/audbcards"
