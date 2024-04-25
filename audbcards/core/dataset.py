@@ -242,14 +242,14 @@ class _Dataset:
     @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        path = self._backend.join("/", self.name, "db.yaml")
-        return self._backend.date(path, self._version)
+        path = self.backend.join("/", self.name, "db.yaml")
+        return self.backend.date(path, self.version)
 
     @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        path = self._backend.join("/", self.name, "db.yaml")
-        return self._backend.owner(path, self._version)
+        path = self.backend.join("/", self.name, "db.yaml")
+        return self.backend.owner(path, self.version)
 
     def properties(self):
         """Get list of properties of the object."""
@@ -390,8 +390,8 @@ class _Dataset:
     def _load_backend(self) -> audbackend.Backend:
         r"""Load backend containing dataset."""
         backend = audbackend.access(
-            name=self._repository_object.backend,
-            host=self._repository_object.host,
+            name=self.repository_object.backend,
+            host=self.repository_object.host,
             repository=self.repository,
         )
         if isinstance(backend, audbackend.Artifactory):
