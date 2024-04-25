@@ -1,3 +1,4 @@
+from audbcards.core.config import config
 from audbcards.core.datacard import Datacard
 from audbcards.core.dataset import Dataset
 
