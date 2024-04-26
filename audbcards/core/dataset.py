@@ -37,7 +37,7 @@ class _Dataset:
             return obj
 
         obj = cls(name, version, cache_root)
-        _ = obj.properties()
+        _ = obj.cached_properties()
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -77,7 +77,7 @@ class _Dataset:
 
     def __getstate__(self):
         r"""Returns attributes to be pickled."""
-        return self.properties()
+        return self.cached_properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
@@ -254,16 +254,6 @@ class _Dataset:
         path = self.backend.join("/", self.name, "db.yaml")
         return self.backend.owner(path, self.version)
 
-    def properties(self):
-        """Get list of properties of the object."""
-        class_items = self.__class__.__dict__.items()
-        props = dict(
-            (k, getattr(self, k))
-            for k, v in class_items
-            if isinstance(v, functools.cached_property)
-        )
-        return props
-
     @functools.cached_property
     def repository(self) -> str:
         r"""Repository containing the dataset."""
@@ -384,6 +374,16 @@ class _Dataset:
     def version(self) -> str:
         r"""Version of dataset."""
         return self._version
+
+    def cached_properties(self):
+        """Get list of cached properties of the object."""
+        class_items = self.__class__.__dict__.items()
+        props = dict(
+            (k, getattr(self, k))
+            for k, v in class_items
+            if isinstance(v, functools.cached_property)
+        )
+        return props
 
     def _load_backend(self) -> audbackend.Backend:
         r"""Load backend containing dataset."""

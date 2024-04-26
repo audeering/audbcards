@@ -29,7 +29,7 @@ def test_dataset_property_scope(tmpdir, db, request):
         cache_root=dataset_cache,
     )
 
-    props = [x for x in dataset.properties().keys()]
+    props = [x for x in dataset.cached_properties().keys()]
 
     # should not exist in local scope
     for prop in props:
@@ -305,8 +305,8 @@ class TestConstructor(object):
     def test_props_equal(self, constructor):
         """Cached and uncached datasets have equal props."""
         ds_uncached, ds_cached, _ = constructor
-        props_uncached = ds_uncached.properties()
-        props_cached = ds_cached.properties()
+        props_uncached = ds_uncached.cached_properties()
+        props_cached = ds_cached.cached_properties()
         list_props_uncached = list(props_uncached.keys())
         list_props_cached = list(props_cached.keys())
         assert list_props_uncached == list_props_cached
