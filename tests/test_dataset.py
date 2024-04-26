@@ -398,16 +398,16 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         host=repository.host,
         repository=repository.name,
     )
-    # header = audb.info.header(
-    #     db.name,
-    #     version=pytest.VERSION,
-    #     cache_root=audb_cache,
-    # )
+    header = audb.info.header(
+        db.name,
+        version=pytest.VERSION,
+        load_tables=True,
+        cache_root=audb_cache,
+    )
     assert dataset.backend == backend
     assert dataset.deps == deps
-    # Disabled due to potential audformat issue:
-    # the `files` table cannot be found in cache,
-    # which is requested when using `load_tables=True`
-    # in `audb.info.header`.
-    # assert dataset.header == header
+    # The dataset header is a not fully loaded `audformat.Database` object,
+    # so we cannot directly use `audformat.Database.__eq__()`
+    # to compare it.
+    assert str(dataset.header) == str(header)
     assert dataset.repository_object == repository
