@@ -130,7 +130,7 @@ class _Dataset:
 
     @property
     def repository_object(self) -> audb.Repository:
-        r"""Repository containing dataset."""
+        r"""Repository object containing dataset."""
         if not hasattr(self, "_repository_object"):  # when loaded from cache
             self._repository_object = self._load_repository_object()
         return self._repository_object
