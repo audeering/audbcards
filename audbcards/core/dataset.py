@@ -109,7 +109,7 @@ class _Dataset:
 
     @property
     def backend(self) -> audbackend.Backend:
-        r"""Dataset dependency table."""
+        r"""Dataset backend object."""
         if not hasattr(self, "_backend"):  # when loaded from cache
             self._backend = self._load_backend()
         return self._backend
