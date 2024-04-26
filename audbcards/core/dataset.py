@@ -569,6 +569,18 @@ class Dataset(object):
         instance = _Dataset.create(name, version, cache_root=cache_root)
         return instance
 
+    # Add an __init__() function,
+    # to allow documenting instance variables
+    def __init__(
+        self,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = None,
+    ):
+        self.cache_root = audeer.mkdir(cache_root)
+        r"""Cache root folder."""
+
     # Copy attributes and methods
     # to include in documentation
     for prop in [
