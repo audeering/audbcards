@@ -571,12 +571,12 @@ class Dataset(object):
 
     # Copy attributes and methods
     # to include in documentation
-    for _prop in [  # use private variable `_prop` to avoid inclusion in API doc
+    for prop in [
         name
         for name, value in inspect.getmembers(_Dataset)
         if not name.startswith("_") and name not in ["create"]
     ]:
-        vars()[_prop] = getattr(_Dataset, _prop)
+        vars()[prop] = getattr(_Dataset, prop)
 
     @staticmethod
     def _map_iso_languages(*args):
