@@ -37,7 +37,7 @@ class _Dataset:
             return obj
 
         obj = cls(name, version, cache_root)
-        _ = obj.cached_properties()
+        _ = obj._cached_properties()
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -77,7 +77,7 @@ class _Dataset:
 
     def __getstate__(self):
         r"""Returns attributes to be pickled."""
-        return self.cached_properties()
+        return self._cached_properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
@@ -375,7 +375,7 @@ class _Dataset:
         r"""Version of dataset."""
         return self._version
 
-    def cached_properties(self):
+    def _cached_properties(self):
         """Get list of cached properties of the object."""
         class_items = self.__class__.__dict__.items()
         props = dict(
