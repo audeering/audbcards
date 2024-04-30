@@ -1,6 +1,7 @@
 import os
 
 import sphinx
+import sphinx.application
 
 import audb
 import audeer

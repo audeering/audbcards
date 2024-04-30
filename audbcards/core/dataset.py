@@ -4,7 +4,6 @@ import os
 import pickle
 import typing
 
-import dohq_artifactory
 import jinja2
 import pandas as pd
 
@@ -16,19 +15,6 @@ import audformat
 from audbcards.core.config import config
 from audbcards.core.utils import format_schemes
 from audbcards.core.utils import limit_presented_samples
-
-
-def _getstate(self):
-    return self.name
-
-
-def _setstate(self, state):
-    self.name = state
-
-
-# Ensure we can pickle the repository
-dohq_artifactory.GenericRepository.__getstate__ = _getstate
-dohq_artifactory.GenericRepository.__setstate__ = _setstate
 
 
 class _Dataset:
@@ -51,7 +37,7 @@ class _Dataset:
             return obj
 
         obj = cls(name, version, cache_root)
-        _ = obj.properties()
+        _ = obj._cached_properties()
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -62,43 +48,41 @@ class _Dataset:
         version: str,
         cache_root: str = None,
     ):
-        self.cache_root = audeer.mkdir(audeer.path(cache_root))
-        self.header = audb.info.header(
-            name,
-            version=version,
-            load_tables=True,  # ensure misc tables are loaded
-        )
-        self.deps = audb.dependencies(
-            name,
-            version=version,
-            verbose=False,
-        )
+        self.cache_root = audeer.mkdir(cache_root)
+        r"""Cache root folder."""
 
+        # Store name and version in private attributes here,
+        # ``self.name`` and ``self.version``
+        # are implemented as cached properties below
+        self._name = name
         self._version = version
-        self._repository = audb.repository(name, version)
-        self._backend = audbackend.access(
-            name=self._repository.backend,
-            host=self._repository.host,
-            repository=self._repository.name,
-        )
-        if isinstance(self._backend, audbackend.Artifactory):
-            self._backend._use_legacy_file_structure()  # pragma: nocover
+
+        # Private attributes,
+        # used inside corresponding properties.
+        self._header = self._load_header()
+        self._deps = self._load_dependencies()
+        self._repository_object = self._load_repository_object()  # load before backend
+        self._backend = self._load_backend()
 
         # Clean up cache
         # by removing all other versions of the same dataset
         # to reduce its storage size in CI runners
         versions = audeer.list_dir_names(
-            audeer.path(self.cache_root, name),
+            audeer.path(cache_root, name),
             basenames=True,
         )
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
-            audeer.rmdir(audeer.path(self.cache_root, name, other_version))
+            audeer.rmdir(cache_root, name, other_version)
+
+    def __getstate__(self):
+        r"""Returns attributes to be pickled."""
+        return self._cached_properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
         r"""Generate the name of the cache file."""
-        cache_dir = audeer.mkdir(audeer.path(cache_root, name, version))
+        cache_dir = audeer.mkdir(cache_root, name, version)
 
         cache_filename = audeer.path(
             cache_dir,
@@ -122,6 +106,34 @@ class _Dataset:
 
         with open(path, "wb") as f:
             pickle.dump(obj, f, protocol=4)
+
+    @property
+    def backend(self) -> audbackend.Backend:
+        r"""Dataset backend object."""
+        if not hasattr(self, "_backend"):  # when loaded from cache
+            self._backend = self._load_backend()
+        return self._backend
+
+    @property
+    def deps(self) -> audb.Dependencies:
+        r"""Dataset dependency table."""
+        if not hasattr(self, "_deps"):  # when loaded from cache
+            self._deps = self._load_dependencies()
+        return self._deps
+
+    @property
+    def header(self) -> audformat.Database:
+        r"""Dataset header."""
+        if not hasattr(self, "_header"):  # when loaded from cache
+            self._header = self._load_header()
+        return self._header
+
+    @property
+    def repository_object(self) -> audb.Repository:
+        r"""Repository object containing dataset."""
+        if not hasattr(self, "_repository_object"):  # when loaded from cache
+            self._repository_object = self._load_repository_object()
+        return self._repository_object
 
     @functools.cached_property
     def archives(self) -> int:
@@ -228,34 +240,24 @@ class _Dataset:
     @functools.cached_property
     def name(self) -> str:
         r"""Name of dataset."""
-        return self.header.name
+        return self._name
 
     @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        path = self._backend.join("/", self.name, "db.yaml")
-        return self._backend.date(path, self._version)
+        path = self.backend.join("/", self.name, "db.yaml")
+        return self.backend.date(path, self.version)
 
     @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        path = self._backend.join("/", self.name, "db.yaml")
-        return self._backend.owner(path, self._version)
-
-    def properties(self):
-        """Get list of properties of the object."""
-        class_items = self.__class__.__dict__.items()
-        props = dict(
-            (k, getattr(self, k))
-            for k, v in class_items
-            if isinstance(v, functools.cached_property)
-        )
-        return props
+        path = self.backend.join("/", self.name, "db.yaml")
+        return self.backend.owner(path, self.version)
 
     @functools.cached_property
     def repository(self) -> str:
         r"""Repository containing the dataset."""
-        return f"{self._repository.name}"
+        return f"{self.repository_object.name}"
 
     @functools.cached_property
     def repository_link(self) -> str:
@@ -263,9 +265,9 @@ class _Dataset:
         # NOTE: this needs to be changed
         # as we want to support different backends
         return (
-            f"{self._repository.host}/"
+            f"{self.repository_object.host}/"
             f"webapp/#/artifacts/browse/tree/General/"
-            f"{self._repository.name}/"
+            f"{self.repository}/"
             f"{self.name}"
         )
 
@@ -288,6 +290,18 @@ class _Dataset:
     def schemes(self) -> typing.List[str]:
         r"""Schemes of dataset."""
         return list(self.header.schemes)
+
+    @functools.cached_property
+    def schemes_summary(self) -> str:
+        r"""Summary of dataset schemes.
+
+        It lists all schemes in a string,
+        showing additional information
+        on schemes named ``'emotion'`` and ``'speaker'``,
+        e.g. ``'speaker: [age, gender, language]'``.
+
+        """
+        return format_schemes(self.header.schemes)
 
     @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
@@ -360,6 +374,40 @@ class _Dataset:
     def version(self) -> str:
         r"""Version of dataset."""
         return self._version
+
+    def _cached_properties(self):
+        """Get list of cached properties of the object."""
+        class_items = self.__class__.__dict__.items()
+        props = dict(
+            (k, getattr(self, k))
+            for k, v in class_items
+            if isinstance(v, functools.cached_property)
+        )
+        return props
+
+    def _load_backend(self) -> audbackend.Backend:
+        r"""Load backend containing dataset."""
+        backend = audbackend.access(
+            name=self.repository_object.backend,
+            host=self.repository_object.host,
+            repository=self.repository,
+        )
+        if isinstance(backend, audbackend.Artifactory):
+            backend._use_legacy_file_structure()
+        return backend
+
+    def _load_dependencies(self) -> audb.Dependencies:
+        r"""Load dataset dependencies."""
+        return audb.dependencies(self.name, version=self.version, verbose=False)
+
+    def _load_header(self) -> audformat.Database:
+        r"""Load dataset header."""
+        # Ensure misc tables are loaded
+        return audb.info.header(self.name, version=self.version, load_tables=True)
+
+    def _load_repository_object(self) -> audb.Repository:
+        r"""Load repository object containing dataset."""
+        return audb.repository(self.name, self.version)
 
     @functools.cached_property
     def _scheme_table_columns(self) -> typing.List[str]:
@@ -521,12 +569,24 @@ class Dataset(object):
         instance = _Dataset.create(name, version, cache_root=cache_root)
         return instance
 
+    # Add an __init__() function,
+    # to allow documenting instance variables
+    def __init__(
+        self,
+        name: str,
+        version: str,
+        *,
+        cache_root: str = None,
+    ):
+        self.cache_root = audeer.mkdir(cache_root)
+        r"""Cache root folder."""
+
     # Copy attributes and methods
     # to include in documentation
     for prop in [
         name
         for name, value in inspect.getmembers(_Dataset)
-        if isinstance(value, functools.cached_property) and not name.startswith("_")
+        if not name.startswith("_") and name not in ["create"]
     ]:
         vars()[prop] = getattr(_Dataset, prop)
 
@@ -589,7 +649,7 @@ def create_datasets_page(
             dataset.short_description,
             f"`{dataset.license} <{dataset.license_link}>`__",
             dataset.version,
-            format_schemes(dataset.header.schemes),
+            dataset.schemes_summary,
         )
         for dataset in datasets
     ]

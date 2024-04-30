@@ -29,7 +29,7 @@ def test_dataset_property_scope(tmpdir, db, request):
         cache_root=dataset_cache,
     )
 
-    props = [x for x in dataset.properties().keys()]
+    props = [x for x in dataset._cached_properties().keys()]
 
     # should not exist in local scope
     for prop in props:
@@ -73,7 +73,8 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     # __init__
     assert dataset.name == db.name
     assert dataset.version == pytest.VERSION
-    assert dataset._repository == repository
+    assert dataset.repository_object == repository
+    assert dataset.backend == backend
     expected_header = audb.info.header(
         db.name,
         version=pytest.VERSION,
@@ -304,8 +305,8 @@ class TestConstructor(object):
     def test_props_equal(self, constructor):
         """Cached and uncached datasets have equal props."""
         ds_uncached, ds_cached, _ = constructor
-        props_uncached = ds_uncached.properties()
-        props_cached = ds_cached.properties()
+        props_uncached = ds_uncached._cached_properties()
+        props_cached = ds_cached._cached_properties()
         list_props_uncached = list(props_uncached.keys())
         list_props_cached = list(props_cached.keys())
         assert list_props_uncached == list_props_cached
@@ -364,3 +365,49 @@ def test_dataset_cache_path():
         "emodb-1.2.1.pkl",
     )
     assert cache_path_calculated == cache_path_expected
+
+
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+    ],
+)
+def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
+    """Test cached properties after loading from cache.
+
+    We no longer store all attributes/properties
+    in cache as pickle files,
+    but limit ourselves to the cached properties.
+    This test ensures,
+    that other attributes will be re-calculated.
+
+    """
+    db = request.getfixturevalue(db)
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache_root)
+    del dataset
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache_root)
+    deps = audb.dependencies(
+        db.name,
+        version=pytest.VERSION,
+        cache_root=audb_cache,
+    )
+    backend = audbackend.access(
+        name=repository.backend,
+        host=repository.host,
+        repository=repository.name,
+    )
+    header = audb.info.header(
+        db.name,
+        version=pytest.VERSION,
+        load_tables=True,
+        cache_root=audb_cache,
+    )
+    assert dataset.backend == backend
+    assert dataset.deps == deps
+    # The dataset header is a not fully loaded `audformat.Database` object,
+    # so we cannot directly use `audformat.Database.__eq__()`
+    # to compare it.
+    assert str(dataset.header) == str(header)
+    assert dataset.repository_object == repository
