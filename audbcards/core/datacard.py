@@ -111,7 +111,7 @@ class Datacard(object):
         which is cached in
         ``<cache-root>/<dataset-name>/<dataset-version>/``
         and copied to the sphinx source folder
-        under
+        into
         ``<sphinx-src-dir>/<dataset-name>/``.
         The image is displayed inline
         between the minimum and maximum values.
@@ -187,11 +187,11 @@ class Datacard(object):
         is not ``None``,
         the media sub-folder structure
         is also copied
-        to the sphinx build dir under
+        to the sphinx build dir into
         ``<sphinx-build-dir>/<repository-name>/<dataset-name>/``.
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``,
-        an plot of the waveform of the media file
+        a plot of the waveform of the media file
         is cached under
         ``<dataset-name>-<dataset-version>-player-waveform.png``
         inside
