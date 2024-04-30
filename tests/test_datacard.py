@@ -79,7 +79,7 @@ def test_datacard_file_duration_distribution(
         build_dir,
         datacard.path,
         db.name,
-        f"{db.name}-{pytest.VERSION}-file-durations.png",
+        f"{db.name}-{pytest.VERSION}-file-duration-distribution.png",
     )
     assert not os.path.exists(image_file)
     if expected_min == expected_max:
@@ -96,7 +96,7 @@ def test_datacard_file_duration_distribution(
         assert os.path.exists(image_file)
         expected_distribution_str = (
             f"{expected_min:.1f} s "
-            f"|{db.name}-{pytest.VERSION}-file-durations| "
+            f"|{db.name}-{pytest.VERSION}-file-duration-distribution| "
             f"{expected_max:.1f} s"
         )
     assert expected_distribution_str == distribution_str

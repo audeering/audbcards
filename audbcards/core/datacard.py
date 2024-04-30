@@ -104,17 +104,32 @@ class Datacard(object):
         containing the mininimum and maximum values
         of files durations.
 
-        If :attr:`audbcards.Datacard.sphinx_src_dir` is set
+        If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``
         (e.g. when used in the sphinx extension),
-        an inline image is stored
-        in the sphinx source folder
-        under ``<dataset-name>/<dataset-name>-file-durations.png``
-        and displayed
+        an image is stored in the file
+        ``<dataset-name>-<dataset-version>-file-duration-distribution.png``,
+        which is cached in
+        ``<cache-root>/<dataset-name>/<dataset-version>/``
+        and copied to the sphinx source folder
+        under
+        ``<dataset-name>/``.
+        The image is displayed inline
         between the minimum and maximum values.
         If all duration values are the same,
         no distribution plot is created.
 
-        """
+        """  # noqa: E501
+        file_name = (
+            f"{self.dataset.name}-{self.dataset.version}-file-duration-distribution.png"
+        )
+        # Cache is organized as `<cache_root>/<name>/<version>/`
+        cache_file = audeer.path(
+            self.cache_root,
+            self.dataset.name,
+            self.dataset.version,
+            file_name,
+        )
+
         min_ = 0
         max_ = 0
         unit = "s"
@@ -132,17 +147,8 @@ class Datacard(object):
 
         # Save distribution plot
         if self.sphinx_src_dir is not None:
-            file_name = f"{self.dataset.name}-{self.dataset.version}-file-durations.png"
-
             # Plot distribution to cache,
             # if not found there already.
-            # Cache is organized as `<cache_root>/<name>/<version>/`
-            cache_file = audeer.path(
-                self.cache_root,
-                self.dataset.name,
-                self.dataset.version,
-                file_name,
-            )
             if not os.path.exists(cache_file):
                 audeer.mkdir(os.path.dirname(cache_file))
                 self._plot_distribution(durations)
