@@ -176,7 +176,7 @@ class Datacard(object):
 
         If :attr:`audbcards.Datacard.sphinx_build_dir`
         or :attr:`audbcards.Datacard.sphinx_src_dir`
-        are not ``None``,
+        is not ``None``,
         an example media file is cached in the folder
         ``<dataset-name>-<dataset-version>-player-media/``
         inside
