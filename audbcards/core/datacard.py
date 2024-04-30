@@ -112,7 +112,7 @@ class Datacard(object):
         ``<cache-root>/<dataset-name>/<dataset-version>/``
         and copied to the sphinx source folder
         under
-        ``<dataset-name>/``.
+        ``<sphinx-src-dir>/<dataset-name>/``.
         The image is displayed inline
         between the minimum and maximum values.
         If all duration values are the same,
@@ -178,14 +178,26 @@ class Datacard(object):
         or :attr:`audbcards.Datacard.sphinx_src_dir`
         are not ``None``,
         an example media file is cached in the folder
-        ``${cache_root}/{name}-{version}-player-media/``,
+        ``<dataset-name>-<dataset-version>-player-media/``
+        inside
+        ``<cache-root>/<dataset-name>/<dataset-version>/``,
         using the same sub-folder structure
         as the media file has inside its dataset.
+        If :attr:`audbcards.Datacard.sphinx_build_dir`
+        is not ``None``,
+        the media sub-folder structure
+        is also copied
+        to the sphinx build dir under
+        ``<sphinx-build-dir>/<repository-name>/<dataset-name>/``.
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``,
         an plot of the waveform of the media file
-        is cached at
-        ``${cache_root}/{name}-{version}-player-waveform.png``.
+        is cached under
+        ``<dataset-name>-<dataset-version>-player-waveform.png``
+        inside
+        ``<cache-root>/<dataset-name>/<dataset-version>/``.
+        It is also copied to the sphinx source folder into
+        ``<sphinx-src-dir>/<repository-name>/<dataset-name>/``.
 
         Returns:
             String containing RST code to include the player
