@@ -211,7 +211,7 @@ class Datacard(object):
         )
         cache_example_media = audeer.path(
             cache_folder,
-            "player-media",
+            f"{self.dataset.name}-{self.dataset.version}-player-media",
             self.dataset.example_media,
         )
         cache_waveform_file = audeer.path(
