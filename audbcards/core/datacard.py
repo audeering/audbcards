@@ -118,7 +118,7 @@ class Datacard(object):
         If all duration values are the same,
         no distribution plot is created.
 
-        """  # noqa: E501
+        """
         file_name = (
             f"{self.dataset.name}-{self.dataset.version}-file-duration-distribution.png"
         )
