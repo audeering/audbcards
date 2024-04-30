@@ -138,7 +138,7 @@ def test_datacard_player(tmpdir, db, cache, request):
         src_dir,
         datacard.path,
         db.name,
-        f"{db.name}-{pytest.VERSION}-player.png",
+        f"{db.name}-{pytest.VERSION}-player-waveform.png",
     )
     assert not os.path.exists(media_file)
     assert not os.path.exists(image_file)
@@ -169,7 +169,7 @@ def test_datacard_player(tmpdir, db, cache, request):
 
     # Append audio to the expected player_str
     expected_player_str = (
-        f".. image:: ./{db.name}/{db.name}-{pytest.VERSION}-player.png\n"
+        f".. image:: ./{db.name}/{db.name}-{pytest.VERSION}-player-waveform.png\n"
         "\n"
         ".. raw:: html\n"
         "\n"
