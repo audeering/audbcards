@@ -42,14 +42,14 @@ class Datacard(object):
             a call to :meth:`audbcards.Datacard.player`
             will store an example audio file
             under
-            ``<sphinx_build_dir>/<path>/<db-name>/<media-file-in-db>``
+            ``<sphinx_build_dir>/<path>/<dataset-name>/``
         sphinx_src_dir: source dir of sphinx.
             If not ``None``
             and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
-            will store a wavplot of the example audio file
+            will store a wavform plot of the example audio file
             under
-            ``<sphinx_src_dir>/<path>/<db-name>/<db-name>.png``
+            ``<sphinx_src_dir>/<path>/<dataset-name>/``
         cache_root: cache folder.
             If ``None``,
             the environmental variable ``AUDBCARDS_CACHE_ROOT``,
@@ -112,7 +112,7 @@ class Datacard(object):
         ``<cache-root>/<dataset-name>/<dataset-version>/``
         and copied to the sphinx source folder
         into
-        ``<sphinx-src-dir>/<dataset-name>/``.
+        ``<sphinx-src-dir>/<path><dataset-name>/``.
         The image is displayed inline
         between the minimum and maximum values.
         If all duration values are the same,
@@ -188,7 +188,7 @@ class Datacard(object):
         the media sub-folder structure
         is also copied
         to the sphinx build dir into
-        ``<sphinx-build-dir>/<repository-name>/<dataset-name>/``.
+        ``<sphinx-build-dir>/<path>/<dataset-name>/``.
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``,
         a plot of the waveform of the media file
@@ -197,7 +197,7 @@ class Datacard(object):
         inside
         ``<cache-root>/<dataset-name>/<dataset-version>/``.
         It is also copied to the sphinx source folder into
-        ``<sphinx-src-dir>/<repository-name>/<dataset-name>/``.
+        ``<sphinx-src-dir>/<path>/<dataset-name>/``.
 
         Returns:
             String containing RST code to include the player
