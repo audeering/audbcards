@@ -393,7 +393,7 @@ class _Dataset:
             repository=self.repository,
         )
         if isinstance(backend, audbackend.Artifactory):
-            backend._use_legacy_file_structure()  # pragma: nocover
+            backend._use_legacy_file_structure()
         return backend
 
     def _load_dependencies(self) -> audb.Dependencies:
