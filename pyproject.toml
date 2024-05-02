@@ -33,8 +33,7 @@ classifiers = [
 ]
 requires-python = '>=3.9'
 dependencies = [
-    'audb >=1.6.0',
-    'audbackend >=1.0.1',
+    'audb @ git+https://github.com/audeering/audb.git@audbackend-2.0.0',
     'audplot >=1.4.6',
     'jinja2',
     'pandas >=2.1.0',

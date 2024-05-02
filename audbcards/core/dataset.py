@@ -109,7 +109,7 @@ class _Dataset:
             pickle.dump(obj, f, protocol=4)
 
     @property
-    def backend(self) -> audbackend.Backend:
+    def backend(self) -> audbackend.interface.Base:
         r"""Dataset backend object."""
         if not hasattr(self, "_backend"):  # when loaded from cache
             self._backend = self._load_backend()
@@ -419,16 +419,11 @@ class _Dataset:
         )
         return props
 
-    def _load_backend(self) -> audbackend.Backend:
-        r"""Load backend containing dataset."""
-        backend = audbackend.access(
-            name=self.repository_object.backend,
-            host=self.repository_object.host,
-            repository=self.repository,
-        )
-        if isinstance(backend, audbackend.Artifactory):
-            backend._use_legacy_file_structure()
-        return backend
+    def _load_backend(self) -> audbackend.interface.Base:
+        r"""Load backend object containing dataset."""
+        backend_interface = self.repository_object()
+        backend_interface.backend.open()
+        return backend_interface
 
     def _load_dependencies(self) -> audb.Dependencies:
         r"""Load dataset dependencies."""
