@@ -226,22 +226,14 @@ class Datacard(object):
                 cache_example_media: full path to media file in cache
 
             """
-            # Path to corresponding media files in audb
-            media_src_dir = (
-                f"{audb.default_cache_root()}/"
-                f"{audb.flavor_path(self.dataset.name, self.dataset.version)}"
-            )
-            audb.load_media(
+            media = audb.load_media(
                 self.dataset.name,
                 self.dataset.example_media,
                 version=self.dataset.version,
                 verbose=False,
-            )
+            )[0]
             audeer.mkdir(os.path.dirname(cache_example_media))
-            shutil.copy(
-                os.path.join(media_src_dir, self.dataset.example_media),
-                cache_example_media,
-            )
+            shutil.copy(media, cache_example_media)
 
         # Add plot of waveform
         if self.sphinx_src_dir is not None:
