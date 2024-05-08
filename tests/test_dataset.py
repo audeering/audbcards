@@ -65,7 +65,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         pytest.VERSION,
         cache_root=dataset_cache,
     )
-    backend_interface = repository()
+    backend_interface = repository.create_backend_interface()
 
     # __init__
     assert dataset.name == db.name
@@ -425,7 +425,7 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         version=pytest.VERSION,
         cache_root=audb_cache,
     )
-    backend_interface = repository()
+    backend_interface = repository.create_backend_interface()
     with backend_interface.backend:
         header = audb.info.header(
             db.name,
