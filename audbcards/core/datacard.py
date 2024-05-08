@@ -47,7 +47,7 @@ class Datacard(object):
             If not ``None``
             and ``example`` is ``True``,
             a call to :meth:`audbcards.Datacard.player`
-            will store a wavform plot of the example audio file
+            will store a waveform plot of the example audio file
             under
             ``<sphinx_src_dir>/<path>/<dataset-name>/``
         cache_root: cache folder.
