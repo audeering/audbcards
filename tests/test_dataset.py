@@ -1,5 +1,7 @@
 import os
+import posixpath
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -256,6 +258,37 @@ def test_iso_language_property(dbs, cache, request):
         audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache) for db in dbs
     ]
     _ = [dataset.iso_languages for dataset in datasets]
+
+
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+    ],
+)
+def test_dataset_example_media(db, cache, request):
+    r"""Test Dataset.example_media.
+
+    It checks that the desired audio file
+    is selected as example.
+
+    """
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+
+    # Relative path to audio file from database
+    # as written in the dependencies table,
+    # for example data/file.wav
+    durations = [d.total_seconds() for d in db.files_duration(db.files)]
+    median_duration = np.median([d for d in durations if 0.5 < d < 300])
+    expected_example_index = min(
+        range(len(durations)), key=lambda n: abs(durations[n] - median_duration)
+    )
+    expected_example = audeer.path(db.files[expected_example_index]).replace(
+        os.sep, posixpath.sep
+    )
+    expected_example = "/".join(expected_example.split("/")[-2:])
+    assert dataset.example_media == expected_example
 
 
 @pytest.fixture

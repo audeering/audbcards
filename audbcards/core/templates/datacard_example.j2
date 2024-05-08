@@ -1,10 +1,12 @@
-{% if example is not none %}
+{% if example_media is not none %}
 
 Example
 {% for n in range("Example"|length) %}^{% endfor %}
 
 
-:file:`{{ example }}`
+:file:`{{ example_media }}`
+{% if player %}
 
 {{ player }}
+{% endif %}
 {% endif %}
