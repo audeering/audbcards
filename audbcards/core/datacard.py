@@ -203,21 +203,6 @@ class Datacard(object):
             String containing RST code to include the player
 
         """
-        # Cache is organized as `<cache_root>/<name>/<version>/`
-        cache_folder = audeer.path(
-            self.cache_root,
-            self.dataset.name,
-            self.dataset.version,
-        )
-        cache_example_media = audeer.path(
-            cache_folder,
-            f"{self.dataset.name}-{self.dataset.version}-player-media",
-            self.dataset.example_media,
-        )
-        cache_waveform_file = audeer.path(
-            cache_folder,
-            f"{self.dataset.name}-{self.dataset.version}-player-waveform.png",
-        )
 
         def load_media_to_cache(cache_example_media: str):
             r"""Load media file with audb and copy to audbcards cache.
@@ -234,6 +219,22 @@ class Datacard(object):
             )[0]
             audeer.mkdir(os.path.dirname(cache_example_media))
             shutil.copy(media, cache_example_media)
+
+        # Cache is organized as `<cache_root>/<name>/<version>/`
+        cache_folder = audeer.path(
+            self.cache_root,
+            self.dataset.name,
+            self.dataset.version,
+        )
+        cache_example_media = audeer.path(
+            cache_folder,
+            f"{self.dataset.name}-{self.dataset.version}-player-media",
+            self.dataset.example_media,
+        )
+        cache_waveform_file = audeer.path(
+            cache_folder,
+            f"{self.dataset.name}-{self.dataset.version}-player-waveform.png",
+        )
 
         # Add plot of waveform
         if self.sphinx_src_dir is not None:
