@@ -188,7 +188,9 @@ class Datacard(object):
         the media sub-folder structure
         is also copied
         to the sphinx build dir into
-        ``<sphinx-build-dir>/<path>/<dataset-name>/``.
+        ``<sphinx-build-dir>/<path>/<dataset-name>/``,
+        and an audio element referencing this file
+        is added to the returned RST string.
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``,
         a plot of the waveform of the media file
@@ -197,73 +199,86 @@ class Datacard(object):
         inside
         ``<cache-root>/<dataset-name>/<dataset-version>/``.
         It is also copied to the sphinx source folder into
-        ``<sphinx-src-dir>/<path>/<dataset-name>/``.
+        ``<sphinx-src-dir>/<path>/<dataset-name>/``,
+        and referenced at the beginning of the returned RST string.
+
+        If :attr:`audbcards.Datacard.sphinx_build_dir`
+        and :attr:`audbcards.Datacard.sphinx_src_dir`
+        are ``None``,
+        an empty string is returned.
 
         Returns:
             String containing RST code to include the player
 
         """
-
-        def load_media_to_cache(cache_example_media: str):
-            r"""Load media file with audb and copy to audbcards cache.
-
-            Args:
-                cache_example_media: full path to media file in cache
-
-            """
-            media = audb.load_media(
-                self.dataset.name,
-                self.dataset.example_media,
-                version=self.dataset.version,
-                verbose=False,
-            )[0]
-            audeer.mkdir(os.path.dirname(cache_example_media))
-            shutil.copy(media, cache_example_media)
-
-        def plot_waveform_to_cache(cache_example_media: str, cache_waveform_file: str):
-            r"""Plot waveform of example media to cache.
-
-            Args:
-                cache_example_media: full path to media file in cache
-                cache_waveform_file: full path to waveform file in cache
-
-            """
-            signal, sampling_rate = audiofile.read(
-                cache_example_media,
-                always_2d=True,
-            )
-            audeer.mkdir(os.path.dirname(cache_waveform_file))
-            plt.figure(figsize=[3, 0.5])
-            ax = plt.subplot(111)
-            audplot.waveform(signal[0, :], ax=ax)
-            set_plot_margins()
-            plt.savefig(cache_waveform_file)
-            plt.close()
-
         # Cache is organized as `<cache_root>/<name>/<version>/`
         cache_folder = audeer.path(
             self.cache_root,
             self.dataset.name,
             self.dataset.version,
         )
-        cache_example_media = audeer.path(
-            cache_folder,
-            f"{self.dataset.name}-{self.dataset.version}-player-media",
-            self.dataset.example_media,
-        )
-        cache_waveform_file = audeer.path(
-            cache_folder,
-            f"{self.dataset.name}-{self.dataset.version}-player-waveform.png",
-        )
 
-        # Add plot of waveform
-        if self.sphinx_src_dir is not None:
+        def load_media_to_cache() -> str:
+            r"""Load media file with audb and copy to audbcards cache.
+
+            Load example media file to cache,
+            if not existent.
+
+            Returns:
+                full path to media file in cache
+
+            """
+            cache_example_media = audeer.path(
+                cache_folder,
+                f"{self.dataset.name}-{self.dataset.version}-player-media",
+                self.dataset.example_media,
+            )
             if not os.path.exists(cache_example_media):
-                load_media_to_cache(cache_example_media)
+                media = audb.load_media(
+                    self.dataset.name,
+                    self.dataset.example_media,
+                    version=self.dataset.version,
+                    verbose=False,
+                )[0]
+                audeer.mkdir(os.path.dirname(cache_example_media))
+                shutil.copy(media, cache_example_media)
+            return cache_example_media
 
+        def plot_waveform_to_cache(cache_example_media: str) -> str:
+            r"""Plot waveform of example media to cache.
+
+            Args:
+                cache_example_media: full path to media file in cache
+
+            Returns:
+                full path to waveform file in cache
+
+            """
+            cache_waveform_file = audeer.path(
+                cache_folder,
+                f"{self.dataset.name}-{self.dataset.version}-player-waveform.png",
+            )
             if not os.path.exists(cache_waveform_file):
-                plot_waveform_to_cache(cache_example_media, cache_waveform_file)
+                signal, sampling_rate = audiofile.read(
+                    cache_example_media,
+                    always_2d=True,
+                )
+                audeer.mkdir(os.path.dirname(cache_waveform_file))
+                plt.figure(figsize=[3, 0.5])
+                ax = plt.subplot(111)
+                audplot.waveform(signal[0, :], ax=ax)
+                set_plot_margins()
+                plt.savefig(cache_waveform_file)
+                plt.close()
+            return cache_waveform_file
 
+        # String holding the RST code to include the player
+        player_str = ""
+
+        # Add plot of waveform to Sphinx source folder (e.g. docs/)
+        if self.sphinx_src_dir is not None:
+            cache_example_media = load_media_to_cache()
+            cache_waveform_file = plot_waveform_to_cache(cache_example_media)
             plot_dst_dir = audeer.path(
                 self.sphinx_src_dir,
                 self.path,
@@ -274,12 +289,14 @@ class Datacard(object):
                 cache_waveform_file,
                 os.path.join(plot_dst_dir, os.path.basename(cache_waveform_file)),
             )
+            waveform_src = (
+                f"./{self.dataset.name}/{os.path.basename(cache_waveform_file)}"
+            )
+            player_str += f".. image:: {waveform_src}\n\n"
 
-        # Copy media file to build folder
+        # Copy media file to Sphinx build folder (e.g. build/)
         if self.sphinx_build_dir is not None:
-            if not os.path.exists(cache_example_media):
-                load_media_to_cache(cache_example_media)
-
+            cache_example_media = load_media_to_cache()
             media_dst_dir = audeer.path(
                 self.sphinx_build_dir,
                 self.path,
@@ -291,15 +308,13 @@ class Datacard(object):
                 os.path.join(media_dst_dir, self.dataset.example_media),
             )
 
-        waveform_src = f"./{self.dataset.name}/{os.path.basename(cache_waveform_file)}"
-        player_src = f"./{self.dataset.name}/{self.dataset.example_media}"
-        player_str = (
-            f".. image:: {waveform_src}\n"
-            "\n"
-            ".. raw:: html\n"
-            "\n"
-            f'    <p><audio controls src="{player_src}"></audio></p>'
-        )
+            player_src = f"./{self.dataset.name}/{self.dataset.example_media}"
+            player_str += (
+                ".. raw:: html\n"
+                "\n"
+                f'    <p><audio controls src="{player_src}"></audio></p>'
+            )
+
         return player_str
 
     def save(self, file: str = None):
