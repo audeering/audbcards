@@ -220,6 +220,26 @@ class Datacard(object):
             audeer.mkdir(os.path.dirname(cache_example_media))
             shutil.copy(media, cache_example_media)
 
+        def plot_waveform_to_cache(cache_example_media: str, cache_waveform_file: str):
+            r"""Plot waveform of example media to cache.
+
+            Args:
+                cache_example_media: full path to media file in cache
+                cache_waveform_file: full path to waveform file in cache
+
+            """
+            signal, sampling_rate = audiofile.read(
+                cache_example_media,
+                always_2d=True,
+            )
+            audeer.mkdir(os.path.dirname(cache_waveform_file))
+            plt.figure(figsize=[3, 0.5])
+            ax = plt.subplot(111)
+            audplot.waveform(signal[0, :], ax=ax)
+            set_plot_margins()
+            plt.savefig(cache_waveform_file)
+            plt.close()
+
         # Cache is organized as `<cache_root>/<name>/<version>/`
         cache_folder = audeer.path(
             self.cache_root,
@@ -242,17 +262,7 @@ class Datacard(object):
                 load_media_to_cache(cache_example_media)
 
             if not os.path.exists(cache_waveform_file):
-                signal, sampling_rate = audiofile.read(
-                    cache_example_media,
-                    always_2d=True,
-                )
-                audeer.mkdir(os.path.dirname(cache_waveform_file))
-                plt.figure(figsize=[3, 0.5])
-                ax = plt.subplot(111)
-                audplot.waveform(signal[0, :], ax=ax)
-                set_plot_margins()
-                plt.savefig(cache_waveform_file)
-                plt.close()
+                plot_waveform_to_cache(cache_example_media, cache_waveform_file)
 
             plot_dst_dir = audeer.path(
                 self.sphinx_src_dir,
