@@ -279,14 +279,16 @@ class _Dataset:
     @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        path = self.backend.join("/", self.name, "db.yaml")
-        return self.backend.date(path, self.version)
+        with self.backend.backend:
+            path = self.backend.join("/", self.name, "db.yaml")
+            return self.backend.date(path, self.version)
 
     @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        path = self.backend.join("/", self.name, "db.yaml")
-        return self.backend.owner(path, self.version)
+        with self.backend.backend:
+            path = self.backend.join("/", self.name, "db.yaml")
+            return self.backend.owner(path, self.version)
 
     @functools.cached_property
     def repository(self) -> str:
@@ -421,8 +423,8 @@ class _Dataset:
 
     def _load_backend(self) -> audbackend.interface.Base:
         r"""Load backend object containing dataset."""
-        backend_interface = self.repository_object()
-        backend_interface.backend.open()
+        backend_interface = self.repository_object.create_backend_interface()
+        # backend_interface.backend.open()
         return backend_interface
 
     def _load_dependencies(self) -> audb.Dependencies:

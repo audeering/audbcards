@@ -33,7 +33,7 @@ def audb_cache(tmpdir, scope="session", autouse=True):
     """Local audb cache folder."""
     cache = audeer.mkdir(audeer.path(tmpdir, "audb-cache"))
     audb.config.CACHE_ROOT = cache
-    audb.config.SHARED_CACHE = cache
+    audb.config.SHARED_CACHE_ROOT = cache
 
 
 @pytest.fixture
