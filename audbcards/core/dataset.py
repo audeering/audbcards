@@ -424,7 +424,6 @@ class _Dataset:
     def _load_backend(self) -> audbackend.interface.Base:
         r"""Load backend object containing dataset."""
         backend_interface = self.repository_object.create_backend_interface()
-        # backend_interface.backend.open()
         return backend_interface
 
     def _load_dependencies(self) -> audb.Dependencies:
