@@ -109,7 +109,7 @@ class _Dataset:
             pickle.dump(obj, f, protocol=4)
 
     @property
-    def backend(self) -> audbackend.interface.Base:
+    def backend(self) -> typing.Type[audbackend.interface.Base]:
         r"""Dataset backend object."""
         if not hasattr(self, "_backend"):  # when loaded from cache
             self._backend = self._load_backend()
@@ -421,7 +421,7 @@ class _Dataset:
         )
         return props
 
-    def _load_backend(self) -> audbackend.interface.Base:
+    def _load_backend(self) -> typing.Type[audbackend.interface.Base]:
         r"""Load backend object containing dataset."""
         backend_interface = self.repository_object.create_backend_interface()
         return backend_interface
