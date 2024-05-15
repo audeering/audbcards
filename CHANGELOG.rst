@@ -14,7 +14,7 @@ Version 0.2.0 (2024-05-15)
   to configure the default cache root
 * Added: store the result of ``audb.available()``
   in the sphinx extension
-  to make it re-useable
+  to make it reusable
 * Added: ``audbcards.Dataset.example_media``
 * Added: ``cache_root`` argument to ``audbcards.Datacard``
 * Added: support for Python 3.11
