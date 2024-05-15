@@ -11,7 +11,7 @@ Version 0.2.0 (2024-05-15)
 --------------------------
 
 * Added: ``audbcards.config.CACHE_ROOT``
-  to configure the cache root
+  to configure the default cache root
 * Added: store the result of ``audb.available()``
   in the sphinx extension
   to make it re-useable
@@ -29,7 +29,7 @@ Version 0.2.0 (2024-05-15)
 * Fixed: support ``|`` character
   in dataset description
 * Fixed: remove ``audbcards.Dataset.prop``
-  from the API documentation
+  from API documentation
 * Removed: ``audbcards.Datacard.example_media``,
   use ``audbcards.Dataset.example_media`` instead
 
