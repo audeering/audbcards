@@ -1,4 +1,4 @@
-.. |emodb-file-durations| image:: ./emodb/emodb-file-durations.png
+.. |emodb-1.4.1-file-duration-distribution| image:: ./emodb/emodb-1.4.1-file-duration-distribution.png
 
 .. _data-public-emodb:
 
@@ -18,7 +18,7 @@ channel       1
 sampling rate 16000
 bit depth     16
 duration      0 days 00:24:47.092187500
-files         535, duration distribution: 1.2 s |emodb-file-durations| 9.0 s
+files         535, duration distribution: 1.2 s |emodb-1.4.1-file-duration-distribution| 9.0 s
 repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/emodb>`__
 published     2023-04-05 by audeering-unittest
 ============= ======================
@@ -33,7 +33,7 @@ Example
 
 :file:`wav/13b09La.wav`
 
-.. image:: ./emodb/emodb.png
+.. image:: ./emodb/emodb-1.4.1-player-waveform.png
 
 .. raw:: html
 

@@ -14,13 +14,25 @@ author
 ------
 .. autoattribute:: Dataset.author
     
+backend
+-------
+.. autoattribute:: Dataset.backend
+    
 bit\_depths
 -----------
 .. autoattribute:: Dataset.bit_depths
     
+cache\_root
+-----------
+.. autoattribute:: Dataset.cache_root
+    
 channels
 --------
 .. autoattribute:: Dataset.channels
+    
+deps
+----
+.. autoattribute:: Dataset.deps
     
 description
 -----------
@@ -29,6 +41,10 @@ description
 duration
 --------
 .. autoattribute:: Dataset.duration
+    
+example\_media
+--------------
+.. autoattribute:: Dataset.example_media
     
 file\_durations
 ---------------
@@ -41,6 +57,10 @@ files
 formats
 -------
 .. autoattribute:: Dataset.formats
+    
+header
+------
+.. autoattribute:: Dataset.header
     
 iso\_languages
 --------------
@@ -62,10 +82,6 @@ name
 ----
 .. autoattribute:: Dataset.name
     
-prop
-----
-.. autoattribute:: Dataset.prop
-    
 publication\_date
 -----------------
 .. autoattribute:: Dataset.publication_date
@@ -82,6 +98,10 @@ repository\_link
 ----------------
 .. autoattribute:: Dataset.repository_link
     
+repository\_object
+------------------
+.. autoattribute:: Dataset.repository_object
+    
 sampling\_rates
 ---------------
 .. autoattribute:: Dataset.sampling_rates
@@ -89,6 +109,10 @@ sampling\_rates
 schemes
 -------
 .. autoattribute:: Dataset.schemes
+    
+schemes\_summary
+----------------
+.. autoattribute:: Dataset.schemes_summary
     
 schemes\_table
 --------------

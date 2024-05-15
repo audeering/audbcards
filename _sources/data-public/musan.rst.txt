@@ -1,4 +1,4 @@
-.. |musan-file-durations| image:: ./musan/musan-file-durations.png
+.. |musan-1.0.0-file-duration-distribution| image:: ./musan/musan-1.0.0-file-duration-distribution.png
 
 .. _data-public-musan:
 
@@ -18,7 +18,7 @@ channel       1
 sampling rate 16000
 bit depth     16
 duration      4 days 13:17:22.582937499
-files         2016, duration distribution: 0.0 s |musan-file-durations| 1048.0 s
+files         2016, duration distribution: 0.0 s |musan-1.0.0-file-duration-distribution| 1048.0 s
 repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/musan>`__
 published     2023-12-20 by audeering-unittest
 ============= ======================
@@ -33,7 +33,7 @@ Example
 
 :file:`noise/free-sound/noise-free-sound-0324.wav`
 
-.. image:: ./musan/musan.png
+.. image:: ./musan/musan-1.0.0-player-waveform.png
 
 .. raw:: html
 

@@ -1,4 +1,4 @@
-.. |cough-speech-sneeze-file-durations| image:: ./cough-speech-sneeze/cough-speech-sneeze-file-durations.png
+.. |cough-speech-sneeze-2.0.1-file-duration-distribution| image:: ./cough-speech-sneeze/cough-speech-sneeze-2.0.1-file-duration-distribution.png
 
 .. _data-public-cough-speech-sneeze:
 
@@ -18,7 +18,7 @@ channel       1
 sampling rate 16000, 44100
 bit depth     16
 duration      0 days 03:02:29.436148526
-files         4310, duration distribution: 0.5 s |cough-speech-sneeze-file-durations| 29.3 s
+files         4310, duration distribution: 0.5 s |cough-speech-sneeze-2.0.1-file-duration-distribution| 29.3 s
 repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/cough-speech-sneeze>`__
 published     2024-01-02 by audeering
 ============= ======================
@@ -33,7 +33,7 @@ Example
 
 :file:`coughing/6hw6_4eb_hq_18.41-19.81.wav`
 
-.. image:: ./cough-speech-sneeze/cough-speech-sneeze.png
+.. image:: ./cough-speech-sneeze/cough-speech-sneeze-2.0.1-player-waveform.png
 
 .. raw:: html
 

@@ -1,0 +1,12 @@
+﻿config
+======
+
+.. currentmodule:: audbcards
+
+.. autoclass:: config
+
+
+CACHE\_ROOT
+-----------
+.. autoattribute:: config.CACHE_ROOT
+    

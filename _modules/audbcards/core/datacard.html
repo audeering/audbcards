@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v0.1.0
+                v0.2.0
               </div>
             
           
@@ -157,6 +157,7 @@
 <span class="kn">import</span> <span class="nn">audiofile</span>
 <span class="kn">import</span> <span class="nn">audplot</span>
 
+<span class="kn">from</span> <span class="nn">audbcards.core.config</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">audbcards.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">audbcards.core.utils</span> <span class="kn">import</span> <span class="n">set_plot_margins</span>
 
@@ -185,14 +186,19 @@
 <span class="sd">            a call to :meth:`audbcards.Datacard.player`</span>
 <span class="sd">            will store an example audio file</span>
 <span class="sd">            under</span>
-<span class="sd">            ``&lt;sphinx_build_dir&gt;/&lt;path&gt;/&lt;db-name&gt;/&lt;media-file-in-db&gt;``</span>
+<span class="sd">            ``&lt;sphinx_build_dir&gt;/&lt;path&gt;/&lt;dataset-name&gt;/``</span>
 <span class="sd">        sphinx_src_dir: source dir of sphinx.</span>
 <span class="sd">            If not ``None``</span>
 <span class="sd">            and ``example`` is ``True``,</span>
 <span class="sd">            a call to :meth:`audbcards.Datacard.player`</span>
-<span class="sd">            will store a wavplot of the example audio file</span>
+<span class="sd">            will store a waveform plot of the example audio file</span>
 <span class="sd">            under</span>
-<span class="sd">            ``&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;db-name&gt;/&lt;db-name&gt;.png``</span>
+<span class="sd">            ``&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;dataset-name&gt;/``</span>
+<span class="sd">        cache_root: cache folder.</span>
+<span class="sd">            If ``None``,</span>
+<span class="sd">            the environmental variable ``AUDBCARDS_CACHE_ROOT``,</span>
+<span class="sd">            or :attr:`audbcards.config.CACHE_ROOT`</span>
+<span class="sd">            is used</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -204,6 +210,7 @@
         <span class="n">example</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sphinx_build_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sphinx_src_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset object.&quot;&quot;&quot;</span>
@@ -220,6 +227,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="o">=</span> <span class="n">sphinx_src_dir</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sphinx source dir.&quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDBCARDS_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;RST code added at top of data card.&quot;&quot;&quot;</span>
 
@@ -229,47 +241,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Select example media file.</span>
-
-<span class="sd">        This select a media file</span>
-<span class="sd">        based on the median duration</span>
-<span class="sd">        of all files</span>
-<span class="sd">        between 0.5 s and 300 s</span>
-<span class="sd">        and downloads it to the cache.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Pick a meaningful duration for the example audio file</span>
-        <span class="n">min_dur</span> <span class="o">=</span> <span class="mf">0.5</span>
-        <span class="n">max_dur</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 min</span>
-        <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_durations</span>
-        <span class="n">selected_durations</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">durations</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="n">min_dur</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">max_dur</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">selected_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span>
-
-        <span class="c1"># Get index for duration closest to selected duration</span>
-        <span class="c1"># see https://stackoverflow.com/a/9706105</span>
-        <span class="c1"># durations.index(selected_duration)</span>
-        <span class="c1"># is an alternative but fails due to rounding errors</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)),</span>
-            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">durations</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">selected_duration</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="c1"># Download of example data might fail</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">media</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="n">audb</span><span class="o">.</span><span class="n">load_media</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">media</span><span class="p">,</span>
-                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-            <span class="n">media</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">media</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of files durations, and plotted distribution.</span>
 
@@ -277,15 +248,32 @@
 <span class="sd">        containing the mininimum and maximum values</span>
 <span class="sd">        of files durations.</span>
 
-<span class="sd">        If :attr:`audbcards.Datacard.self.sphinx_src_dir` is set</span>
+<span class="sd">        If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``</span>
 <span class="sd">        (e.g. when used in the sphinx extension),</span>
-<span class="sd">        an inline image is stored</span>
-<span class="sd">        in the sphinx source folder</span>
-<span class="sd">        under ``&lt;dataset-name&gt;/&lt;dataset-name&gt;-file-durations.png``</span>
-<span class="sd">        and displayed</span>
+<span class="sd">        an image is stored in the file</span>
+<span class="sd">        ``&lt;dataset-name&gt;-&lt;dataset-version&gt;-file-duration-distribution.png``,</span>
+<span class="sd">        which is cached in</span>
+<span class="sd">        ``&lt;cache-root&gt;/&lt;dataset-name&gt;/&lt;dataset-version&gt;/``</span>
+<span class="sd">        and copied to the sphinx source folder</span>
+<span class="sd">        into</span>
+<span class="sd">        ``&lt;sphinx-src-dir&gt;/&lt;path&gt;&lt;dataset-name&gt;/``.</span>
+<span class="sd">        The image is displayed inline</span>
 <span class="sd">        between the minimum and maximum values.</span>
+<span class="sd">        If all duration values are the same,</span>
+<span class="sd">        no distribution plot is created.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-file-duration-distribution.png&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># Cache is organized as `&lt;cache_root&gt;/&lt;name&gt;/&lt;version&gt;/`</span>
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
@@ -293,92 +281,184 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">min_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
             <span class="n">max_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+
+        <span class="c1"># Skip creating a distribution plot,</span>
+        <span class="c1"># if all durations are the same</span>
+        <span class="k">if</span> <span class="n">min_</span> <span class="o">==</span> <span class="n">max_</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;each file is </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="c1"># Save distribution plot</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_distribution</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;file-durations&quot;</span>
+            <span class="c1"># Plot distribution to cache,</span>
+            <span class="c1"># if not found there already.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
+                <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cache_file</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_plot_distribution</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
             <span class="n">image_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
             <span class="n">distribution_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inline_image</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">distribution_str</span>
 
-<div class="viewcode-block" id="Datacard.player"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>    <span class="k">def</span> <span class="nf">player</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="Datacard.player"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>    <span class="k">def</span> <span class="nf">player</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an audio player showing the waveform.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            file: input audio file to be used in the player.</span>
-<span class="sd">                If ``None``,</span>
-<span class="sd">                :attr:`audbcards.Datacard.example_media`</span>
-<span class="sd">                is used</span>
+<span class="sd">        If :attr:`audbcards.Datacard.sphinx_build_dir`</span>
+<span class="sd">        or :attr:`audbcards.Datacard.sphinx_src_dir`</span>
+<span class="sd">        is not ``None``,</span>
+<span class="sd">        an example media file is cached in the folder</span>
+<span class="sd">        ``&lt;dataset-name&gt;-&lt;dataset-version&gt;-player-media/``</span>
+<span class="sd">        inside</span>
+<span class="sd">        ``&lt;cache-root&gt;/&lt;dataset-name&gt;/&lt;dataset-version&gt;/``,</span>
+<span class="sd">        using the same sub-folder structure</span>
+<span class="sd">        as the media file has inside its dataset.</span>
+<span class="sd">        If :attr:`audbcards.Datacard.sphinx_build_dir`</span>
+<span class="sd">        is not ``None``,</span>
+<span class="sd">        the media sub-folder structure</span>
+<span class="sd">        is also copied</span>
+<span class="sd">        to the sphinx build dir into</span>
+<span class="sd">        ``&lt;sphinx-build-dir&gt;/&lt;path&gt;/&lt;dataset-name&gt;/``,</span>
+<span class="sd">        and an audio element referencing this file</span>
+<span class="sd">        is added to the returned RST string.</span>
+
+<span class="sd">        If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``,</span>
+<span class="sd">        a plot of the waveform of the media file</span>
+<span class="sd">        is cached under</span>
+<span class="sd">        ``&lt;dataset-name&gt;-&lt;dataset-version&gt;-player-waveform.png``</span>
+<span class="sd">        inside</span>
+<span class="sd">        ``&lt;cache-root&gt;/&lt;dataset-name&gt;/&lt;dataset-version&gt;/``.</span>
+<span class="sd">        It is also copied to the sphinx source folder into</span>
+<span class="sd">        ``&lt;sphinx-src-dir&gt;/&lt;path&gt;/&lt;dataset-name&gt;/``,</span>
+<span class="sd">        and referenced at the beginning of the returned RST string.</span>
+
+<span class="sd">        If :attr:`audbcards.Datacard.sphinx_build_dir`</span>
+<span class="sd">        and :attr:`audbcards.Datacard.sphinx_src_dir`</span>
+<span class="sd">        are ``None``,</span>
+<span class="sd">        an empty string is returned.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            String containing RST code to include the player</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_media</span>
-
-        <span class="c1"># use audb cache instead of dataset.cache_root</span>
-        <span class="n">media_src_dir</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">audb</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">()</span><span class="si">}</span><span class="s2">/&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">audb</span><span class="o">.</span><span class="n">flavor_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># Cache is organized as `&lt;cache_root&gt;/&lt;name&gt;/&lt;version&gt;/`</span>
+        <span class="n">cache_folder</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="c1"># Move file to build folder</span>
+        <span class="k">def</span> <span class="nf">load_media_to_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file with audb and copy to audbcards cache.</span>
+
+<span class="sd">            Load example media file to cache,</span>
+<span class="sd">            if not existent.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                full path to media file in cache</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">cache_example_media</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="n">cache_folder</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-media&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">):</span>
+                <span class="n">media</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_media</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">))</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">cache_example_media</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cache_example_media</span>
+
+        <span class="k">def</span> <span class="nf">plot_waveform_to_cache</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot waveform of example media to cache.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                cache_example_media: full path to media file in cache</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                full path to waveform file in cache</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">cache_waveform_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="n">cache_folder</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-waveform.png&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">):</span>
+                <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+                    <span class="n">cache_example_media</span><span class="p">,</span>
+                    <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+                <span class="n">audplot</span><span class="o">.</span><span class="n">waveform</span><span class="p">(</span><span class="n">signal</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+                <span class="n">set_plot_margins</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">cache_waveform_file</span>
+
+        <span class="c1"># String holding the RST code to include the player</span>
+        <span class="n">player_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Add plot of waveform to Sphinx source folder (e.g. docs/)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache_example_media</span> <span class="o">=</span> <span class="n">load_media_to_cache</span><span class="p">()</span>
+            <span class="n">cache_waveform_file</span> <span class="o">=</span> <span class="n">plot_waveform_to_cache</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">)</span>
+            <span class="n">plot_dst_dir</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">plot_dst_dir</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span>
+                <span class="n">cache_waveform_file</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plot_dst_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">waveform_src</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">player_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;.. image:: </span><span class="si">{</span><span class="n">waveform_src</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Copy media file to Sphinx build folder (e.g. build/)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache_example_media</span> <span class="o">=</span> <span class="n">load_media_to_cache</span><span class="p">()</span>
             <span class="n">media_dst_dir</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file</span><span class="p">)))</span>
+            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">))</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_src_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
+                <span class="n">cache_example_media</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="c1"># Add plot of waveform</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_src_dir</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span>
-                <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">player_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">player_str</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="s2">&quot;.. raw:: html</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;    &lt;p&gt;&lt;audio controls src=&quot;</span><span class="si">{</span><span class="n">player_src</span><span class="si">}</span><span class="s1">&quot;&gt;&lt;/audio&gt;&lt;/p&gt;&#39;</span>
             <span class="p">)</span>
-            <span class="n">image_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
-            <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
-            <span class="n">audplot</span><span class="o">.</span><span class="n">waveform</span><span class="p">(</span><span class="n">signal</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="n">set_plot_margins</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="n">player_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">player_str</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;.. image:: ./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.png</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;.. raw:: html</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s1">&#39;    &lt;p&gt;&lt;audio controls src=&quot;</span><span class="si">{</span><span class="n">player_src</span><span class="si">}</span><span class="s1">&quot;&gt;&lt;/audio&gt;&lt;/p&gt;&#39;</span>
-        <span class="p">)</span>
         <span class="k">return</span> <span class="n">player_str</span></div>
 
 <div class="viewcode-block" id="Datacard.save"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -501,14 +581,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Add path of datacard folder</span>
         <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
-        <span class="c1"># Add audio player for example file</span>
-        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">:</span>
-            <span class="n">example</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_media</span>
-            <span class="k">if</span> <span class="n">example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">()</span>
                 <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">player</span>
-                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">example</span>
         <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;file_duration_distribution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_duration_distribution</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
@@ -531,7 +607,7 @@
         <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;datacard.j2&quot;</span><span class="p">)</span>
 
         <span class="c1"># Convert dataset object to dictionary</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">()</span>
 
         <span class="c1"># Add additional datacard only properties</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
@@ -558,7 +634,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/03/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

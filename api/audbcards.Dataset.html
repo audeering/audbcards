@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v0.1.0
+                v0.2.0
               </div>
             
           
@@ -100,29 +100,36 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="audbcards.html">audbcards</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audbcards.config.html">config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audbcards.Datacard.html">Datacard</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dataset</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#archives">archives</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#author">author</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backend">backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bit-depths">bit_depths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cache-root">cache_root</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#channels">channels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deps">deps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#description">description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#duration">duration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-media">example_media</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#file-durations">file_durations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#files">files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#formats">formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#header">header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iso-languages">iso_languages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#languages">languages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#license">license</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#license-link">license_link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#name">name</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#prop">prop</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#publication-date">publication_date</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#publication-owner">publication_owner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repository">repository</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repository-link">repository_link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repository-object">repository_object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sampling-rates">sampling_rates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemes-summary">schemes_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes-table">schemes_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#short-description">short_description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
@@ -181,16 +188,20 @@
 <h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audbcards.Dataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'~/.cache/audbcards'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset representation.</p>
 <p>Dataset object that represents a dataset
-that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.6.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
+that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – name of dataset</p></li>
-<li><p><strong>version</strong> – version of dataset</p></li>
-<li><p><strong>cache_root</strong> – cache folder</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – name of dataset</p></li>
+<li><p><strong>version</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – version of dataset</p></li>
+<li><p><strong>cache_root</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – cache folder.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+the environmental variable <code class="docutils literal notranslate"><span class="pre">AUDBCARDS_CACHE_ROOT</span></code>,
+or <a class="reference internal" href="audbcards.config.html#audbcards.config.CACHE_ROOT" title="audbcards.config.CACHE_ROOT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.config.CACHE_ROOT</span></code></a>
+is used</p></li>
 </ul>
 </dd>
 </dl>
@@ -214,6 +225,15 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 </dd></dl>
 
 </div>
+<div class="section" id="backend">
+<h2>backend<a class="headerlink" href="#backend" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.backend">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#audbcards.Dataset.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset backend object.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="bit-depths">
 <h2>bit_depths<a class="headerlink" href="#bit-depths" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -223,12 +243,30 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 </dd></dl>
 
 </div>
+<div class="section" id="cache-root">
+<h2>cache_root<a class="headerlink" href="#cache-root" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.cache_root">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">cache_root</span></span><a class="headerlink" href="#audbcards.Dataset.cache_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cache root folder.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="channels">
 <h2>channels<a class="headerlink" href="#channels" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audbcards.Dataset.channels">
 <span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#audbcards.Dataset.channels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Channels of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="deps">
+<h2>deps<a class="headerlink" href="#deps" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.deps">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">deps</span></span><a class="headerlink" href="#audbcards.Dataset.deps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset dependency table.</p>
 </dd></dl>
 
 </div>
@@ -247,6 +285,22 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 <dt class="sig sig-object py" id="audbcards.Dataset.duration">
 <span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><a class="headerlink" href="#audbcards.Dataset.duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total duration of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="example-media">
+<h2>example_media<a class="headerlink" href="#example-media" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.example_media">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">example_media</span></span><a class="headerlink" href="#audbcards.Dataset.example_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example media file.</p>
+<p>The media file is selected
+by its median duration
+from all files in the dataset
+with a duration
+between 0.5 s and 300 s.
+If no media file meets this criterium,
+<code class="docutils literal notranslate"><span class="pre">None</span></code> is returned instead.</p>
 </dd></dl>
 
 </div>
@@ -274,6 +328,15 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 <dt class="sig sig-object py" id="audbcards.Dataset.formats">
 <span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">formats</span></span><a class="headerlink" href="#audbcards.Dataset.formats" title="Permalink to this definition">¶</a></dt>
 <dd><p>File formats of media files in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="header">
+<h2>header<a class="headerlink" href="#header" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.header">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#audbcards.Dataset.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset header.</p>
 </dd></dl>
 
 </div>
@@ -326,14 +389,6 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 </dd></dl>
 
 </div>
-<div class="section" id="prop">
-<h2>prop<a class="headerlink" href="#prop" title="Permalink to this heading">¶</a></h2>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="audbcards.Dataset.prop">
-<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">prop</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'version'</span></em><a class="headerlink" href="#audbcards.Dataset.prop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
 <div class="section" id="publication-date">
 <h2>publication_date<a class="headerlink" href="#publication-date" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -370,6 +425,15 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 </dd></dl>
 
 </div>
+<div class="section" id="repository-object">
+<h2>repository_object<a class="headerlink" href="#repository-object" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.repository_object">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">repository_object</span></span><a class="headerlink" href="#audbcards.Dataset.repository_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository object containing dataset.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="sampling-rates">
 <h2>sampling_rates<a class="headerlink" href="#sampling-rates" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -385,6 +449,19 @@ that can be loaded with <a class="reference external" href="https://audeering.gi
 <dt class="sig sig-object py" id="audbcards.Dataset.schemes">
 <span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">schemes</span></span><a class="headerlink" href="#audbcards.Dataset.schemes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Schemes of dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="schemes-summary">
+<h2>schemes_summary<a class="headerlink" href="#schemes-summary" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.schemes_summary">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">schemes_summary</span></span><a class="headerlink" href="#audbcards.Dataset.schemes_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary of dataset schemes.</p>
+<p>It lists all schemes in a string,
+showing additional information
+on schemes named <code class="docutils literal notranslate"><span class="pre">'emotion'</span></code> and <code class="docutils literal notranslate"><span class="pre">'speaker'</span></code>,
+e.g. <code class="docutils literal notranslate"><span class="pre">'speaker:</span> <span class="pre">[age,</span> <span class="pre">gender,</span> <span class="pre">language]'</span></code>.</p>
 </dd></dl>
 
 </div>
@@ -476,7 +553,7 @@ with column names as keys.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/03/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

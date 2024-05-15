@@ -1,4 +1,4 @@
-.. |vadtoolkit-file-durations| image:: ./vadtoolkit/vadtoolkit-file-durations.png
+.. |vadtoolkit-1.1.0-file-duration-distribution| image:: ./vadtoolkit/vadtoolkit-1.1.0-file-duration-distribution.png
 
 .. _data-public-vadtoolkit:
 
@@ -18,7 +18,7 @@ channel       1
 sampling rate 16000
 bit depth     16, 32
 duration      0 days 02:00:09.703062500
-files         4, duration distribution: 1801.5 s |vadtoolkit-file-durations| 1804.0 s
+files         4, duration distribution: 1801.5 s |vadtoolkit-1.1.0-file-duration-distribution| 1804.0 s
 repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/vadtoolkit>`__
 published     2024-01-02 by audeering
 ============= ======================

@@ -1,4 +1,4 @@
-.. |air-file-durations| image:: ./air/air-file-durations.png
+.. |air-1.4.2-file-duration-distribution| image:: ./air/air-1.4.2-file-duration-distribution.png
 
 .. _data-public-air:
 
@@ -18,7 +18,7 @@ channel       2
 sampling rate 48000
 bit depth     16
 duration      0 days 00:04:43.719958333
-files         107, duration distribution: 0.7 s |air-file-durations| 10.0 s
+files         107, duration distribution: 0.7 s |air-1.4.2-file-duration-distribution| 10.0 s
 repository    `data-public <https://audeering.jfrog.io/artifactory/webapp/#/artifacts/browse/tree/General/data-public/air>`__
 published     2023-12-21 by audeering-unittest
 ============= ======================
@@ -33,7 +33,7 @@ Example
 
 :file:`data/air_binaural_stairway_1_1_0.wav`
 
-.. image:: ./air/air.png
+.. image:: ./air/air-1.4.2-player-waveform.png
 
 .. raw:: html
 

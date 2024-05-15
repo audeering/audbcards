@@ -6,6 +6,10 @@
 .. autoclass:: Datacard
 
 
+cache\_root
+-----------
+.. autoattribute:: Datacard.cache_root
+    
 content
 -------
 .. autoattribute:: Datacard.content
@@ -17,10 +21,6 @@ dataset
 example
 -------
 .. autoattribute:: Datacard.example
-    
-example\_media
---------------
-.. autoattribute:: Datacard.example_media
     
 file\_duration\_distribution
 ----------------------------

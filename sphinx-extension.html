@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v0.1.0
+                v0.2.0
               </div>
             
           
@@ -95,6 +95,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sphinx extension</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#referencing">Referencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#list-of-available-datasets">List of available datasets</a></li>
 </ul>
 </li>
 </ul>
@@ -179,7 +180,7 @@ E.g. you can list it in a TOC inside <code class="docutils literal notranslate">
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h2>
 <p>You can configure the extension
-to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.6.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
+to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.7.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
 to look for datasets,
 select a name for the folder
 the data cards are stored,
@@ -272,6 +273,19 @@ e.g.</p>
 <div><p><a class="reference internal" href="data-public/emodb.html#data-public-emodb"><span class="std std-ref">emodb</span></a> shows the data card for emodb.</p>
 </div></blockquote>
 </div>
+<div class="section" id="list-of-available-datasets">
+<h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Permalink to this heading">¶</a></h2>
+<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
+to get an overview of all available datasets.
+This information can be reused inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>
+as it is stored in the <code class="docutils literal notranslate"><span class="pre">app.audbcards</span></code> dictionary
+under the <code class="docutils literal notranslate"><span class="pre">&quot;df&quot;</span></code> key, e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">sphinx</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">Sphinx</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">audbcards</span><span class="p">[</span><span class="s2">&quot;df&quot;</span><span class="p">]</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -297,7 +311,7 @@ e.g.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/03/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

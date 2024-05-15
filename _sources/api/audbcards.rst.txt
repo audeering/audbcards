@@ -7,5 +7,6 @@ audbcards
     :toctree:
     :nosignatures:
 
+    config
     Datacard
     Dataset
