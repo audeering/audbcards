@@ -22,6 +22,7 @@ Version 0.2.0 (2024-05-15)
 * Changed: cache resulting files
   of ``audbcards.Datacard.file_duration_distribution()``
   and ``audbcards.Datacard.player()``
+* Changed: depend on ``audb>=1.7.0``
 * Fixed: skip duration distribution plots
   for datasets
   that only contain files with the same duration
