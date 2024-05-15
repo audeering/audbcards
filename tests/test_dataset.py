@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 import audb
-import audbackend
 import audeer
 import audformat
 import audiofile
@@ -66,17 +65,16 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         pytest.VERSION,
         cache_root=dataset_cache,
     )
-    backend = audbackend.access(
-        name=repository.backend,
-        host=repository.host,
-        repository=repository.name,
-    )
+    backend_interface = repository.create_backend_interface()
 
     # __init__
     assert dataset.name == db.name
     assert dataset.version == pytest.VERSION
     assert dataset.repository_object == repository
-    assert dataset.backend == backend
+    with backend_interface.backend:
+        # Compare only string,
+        # as backends are not identical
+        assert str(dataset.backend) == str(backend_interface)
     expected_header = audb.info.header(
         db.name,
         version=pytest.VERSION,
@@ -146,19 +144,20 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
         expected_license_link = db.license_url
     assert dataset.license_link == expected_license_link
 
-    # publication_date:
-    expected_publication_date = backend.date(
-        backend.join("/", db.name, "db.yaml"),
-        pytest.VERSION,
-    )
-    assert dataset.publication_date == expected_publication_date
+    with backend_interface.backend:
+        # publication_date:
+        expected_publication_date = backend_interface.date(
+            backend_interface.join("/", db.name, "db.yaml"),
+            pytest.VERSION,
+        )
+        assert dataset.publication_date == expected_publication_date
 
-    # publication_owner
-    expected_publication_owner = backend.owner(
-        backend.join("/", db.name, "db.yaml"),
-        pytest.VERSION,
-    )
-    assert dataset.publication_owner == expected_publication_owner
+        # publication_owner
+        expected_publication_owner = backend_interface.owner(
+            backend_interface.join("/", db.name, "db.yaml"),
+            pytest.VERSION,
+        )
+        assert dataset.publication_owner == expected_publication_owner
 
     # repository
     assert dataset.repository == repository.name
@@ -426,21 +425,20 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         version=pytest.VERSION,
         cache_root=audb_cache,
     )
-    backend = audbackend.access(
-        name=repository.backend,
-        host=repository.host,
-        repository=repository.name,
-    )
-    header = audb.info.header(
-        db.name,
-        version=pytest.VERSION,
-        load_tables=True,
-        cache_root=audb_cache,
-    )
-    assert dataset.backend == backend
-    assert dataset.deps == deps
-    # The dataset header is a not fully loaded `audformat.Database` object,
-    # so we cannot directly use `audformat.Database.__eq__()`
-    # to compare it.
-    assert str(dataset.header) == str(header)
-    assert dataset.repository_object == repository
+    backend_interface = repository.create_backend_interface()
+    with backend_interface.backend:
+        header = audb.info.header(
+            db.name,
+            version=pytest.VERSION,
+            load_tables=True,
+            cache_root=audb_cache,
+        )
+        # Compare only string representation,
+        # as objects are not identical
+        assert str(dataset.backend) == str(backend_interface)
+        assert dataset.deps == deps
+        # The dataset header is a not fully loaded `audformat.Database` object,
+        # so we cannot directly use `audformat.Database.__eq__()`
+        # to compare it.
+        assert str(dataset.header) == str(header)
+        assert dataset.repository_object == repository

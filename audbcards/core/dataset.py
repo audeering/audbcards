@@ -109,7 +109,7 @@ class _Dataset:
             pickle.dump(obj, f, protocol=4)
 
     @property
-    def backend(self) -> audbackend.Backend:
+    def backend(self) -> typing.Type[audbackend.interface.Base]:
         r"""Dataset backend object."""
         if not hasattr(self, "_backend"):  # when loaded from cache
             self._backend = self._load_backend()
@@ -279,14 +279,16 @@ class _Dataset:
     @functools.cached_property
     def publication_date(self) -> str:
         r"""Date dataset was uploaded to repository."""
-        path = self.backend.join("/", self.name, "db.yaml")
-        return self.backend.date(path, self.version)
+        with self.backend.backend:
+            path = self.backend.join("/", self.name, "db.yaml")
+            return self.backend.date(path, self.version)
 
     @functools.cached_property
     def publication_owner(self) -> str:
         r"""User who uploaded dataset to repository."""
-        path = self.backend.join("/", self.name, "db.yaml")
-        return self.backend.owner(path, self.version)
+        with self.backend.backend:
+            path = self.backend.join("/", self.name, "db.yaml")
+            return self.backend.owner(path, self.version)
 
     @functools.cached_property
     def repository(self) -> str:
@@ -419,16 +421,10 @@ class _Dataset:
         )
         return props
 
-    def _load_backend(self) -> audbackend.Backend:
-        r"""Load backend containing dataset."""
-        backend = audbackend.access(
-            name=self.repository_object.backend,
-            host=self.repository_object.host,
-            repository=self.repository,
-        )
-        if isinstance(backend, audbackend.Artifactory):
-            backend._use_legacy_file_structure()
-        return backend
+    def _load_backend(self) -> typing.Type[audbackend.interface.Base]:
+        r"""Load backend object containing dataset."""
+        backend_interface = self.repository_object.create_backend_interface()
+        return backend_interface
 
     def _load_dependencies(self) -> audb.Dependencies:
         r"""Load dataset dependencies."""
