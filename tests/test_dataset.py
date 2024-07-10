@@ -184,6 +184,10 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     ]
     assert dataset.schemes_table == expected_schemes_table
 
+    # segment_durations
+    expected_segment_durations = [0.5, 0.5, 150, 151]
+    assert dataset.segment_durations == expected_segment_durations
+
     # segments
     expected_segments = str(len(db.segments))
     assert dataset.segments == expected_segments
