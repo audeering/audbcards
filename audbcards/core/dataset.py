@@ -363,6 +363,18 @@ class _Dataset:
         return scheme_data
 
     @functools.cached_property
+    def segments(self) -> str:
+        r"""Number of segments in dataset."""
+        index = audformat.utils.union(
+            [
+                audb.load_table(self.name, table_id, version=self.version).index
+                for table_id, table in self.header.tables.items()
+                if table.is_segmented
+            ]
+        )
+        return str(len(index))
+
+    @functools.cached_property
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
