@@ -566,13 +566,17 @@ class _Dataset:
     @functools.cached_property
     def _segments(self) -> pd.MultiIndex:
         """Segments of dataset as combined index."""
-        return audformat.utils.union(
-            [
-                audb.load_table(self.name, table_id, version=self.version).index
-                for table_id, table in self.header.tables.items()
-                if table.is_segmented
-            ]
-        )
+        index = audformat.segmented_index()
+        for table in self.header.tables:
+            if self.header.tables[table].is_segmented:
+                df = audb.load_table(
+                    self.name,
+                    table,
+                    version=self.version,
+                    verbose=False,
+                )
+                index = audformat.utils.union([index, df.index])
+        return index
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
