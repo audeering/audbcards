@@ -365,14 +365,20 @@ class _Dataset:
     @functools.cached_property
     def segments(self) -> str:
         r"""Number of segments in dataset."""
-        index = audformat.utils.union(
-            [
-                audb.load_table(self.name, table_id, version=self.version).index
-                for table_id, table in self.header.tables.items()
-                if table.is_segmented
+        return str(len(self._segments))
+
+    @functools.cached_property
+    def segment_durations(self) -> typing.List[float]:
+        r"""Segment durations in dataset."""
+        if len(self._segments) == 0:
+            durations = []
+        else:
+            starts = self._segments.get_level_values("start")
+            ends = self._segments.get_level_values("end")
+            durations = [
+                (end - start).total_seconds() for start, end in zip(starts, ends)
             ]
-        )
-        return str(len(index))
+        return durations
 
     @functools.cached_property
     def short_description(self) -> str:
@@ -556,6 +562,17 @@ class _Dataset:
             data_dict["Mappings"] = mappings
 
         return data_dict
+
+    @functools.cached_property
+    def _segments(self) -> pd.MultiIndex:
+        """Segments of dataset as combined index."""
+        return audformat.utils.union(
+            [
+                audb.load_table(self.name, table_id, version=self.version).index
+                for table_id, table in self.header.tables.items()
+                if table.is_segmented
+            ]
+        )
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
