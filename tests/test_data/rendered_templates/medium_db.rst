@@ -1,4 +1,5 @@
 .. |medium_db-1.0.0-file-duration-distribution| image:: ./medium_db/medium_db-1.0.0-file-duration-distribution.png
+.. |medium_db-1.0.0-segment-duration-distribution| image:: ./medium_db/medium_db-1.0.0-segment-duration-distribution.png
 
 .. _datasets-medium_db:
 
