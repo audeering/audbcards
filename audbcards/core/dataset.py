@@ -199,6 +199,9 @@ class _Dataset:
         from all files in the dataset
         with a duration
         between 0.5 s and 300 s.
+        In addition,
+        the media file needs to be stored in an archive
+        with less than 100 media files.
         If no media file meets this criterium,
         ``None`` is returned instead.
 
