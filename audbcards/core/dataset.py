@@ -221,7 +221,16 @@ class _Dataset:
             range(len(durations)),
             key=lambda n: abs(durations[n] - selected_duration),
         )
-        return self.deps.media[index]
+        # Ensure we don't have too many other files
+        # in the archive containing the selected file
+        selected_archive = self.deps.archives[index]
+        number_of_files = len(
+            [archive for archive in self.deps.archives if archive == selected_archive]
+        )
+        selected_media = None
+        if number_of_files < 100:
+            selected_media = self.deps.media[index]
+        return selected_media
 
     @functools.cached_property
     def files(self) -> int:
