@@ -227,7 +227,7 @@ class _Dataset:
         # Ensure we don't have too many other files in the archive
         # containing the selected file
         archives = self.deps().archive
-        selected_archive = archives[index]
+        selected_archive = archives.iloc[index]
         number_of_files = len(
             [archive for archive in archives if archive == selected_archive]
         )
