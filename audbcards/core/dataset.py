@@ -199,6 +199,9 @@ class _Dataset:
         from all files in the dataset
         with a duration
         between 0.5 s and 300 s.
+        In addition,
+        the media file needs to be stored in an archive
+        with less than 100 media files.
         If no media file meets this criterium,
         ``None`` is returned instead.
 
@@ -221,7 +224,17 @@ class _Dataset:
             range(len(durations)),
             key=lambda n: abs(durations[n] - selected_duration),
         )
-        return self.deps.media[index]
+        # Ensure we don't have too many other files in the archive
+        # containing the selected file
+        archives = self.deps().archive
+        selected_archive = archives.iloc[index]
+        number_of_files = len(
+            [archive for archive in archives if archive == selected_archive]
+        )
+        selected_media = None
+        if number_of_files < 100:
+            selected_media = self.deps.media[index]
+        return selected_media
 
     @functools.cached_property
     def files(self) -> int:
