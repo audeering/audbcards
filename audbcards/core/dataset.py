@@ -223,9 +223,10 @@ class _Dataset:
         )
         # Ensure we don't have too many other files
         # in the archive containing the selected file
-        selected_archive = self.deps.archives[index]
+        archives = self.deps().archive
+        selected_archive = archives[index]
         number_of_files = len(
-            [archive for archive in self.deps.archives if archive == selected_archive]
+            [archive for archive in archives if archive == selected_archive]
         )
         selected_media = None
         if number_of_files < 100:
