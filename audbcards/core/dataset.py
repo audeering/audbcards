@@ -221,8 +221,8 @@ class _Dataset:
             range(len(durations)),
             key=lambda n: abs(durations[n] - selected_duration),
         )
-        # Ensure we don't have too many other files
-        # in the archive containing the selected file
+        # Ensure we don't have too many other files in the archive
+        # containing the selected file
         archives = self.deps().archive
         selected_archive = archives[index]
         number_of_files = len(
