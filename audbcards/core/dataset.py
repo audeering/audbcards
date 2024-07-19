@@ -24,15 +24,19 @@ class _Dataset:
 
     Most of the cached properties
     rely on the dependency table,
-    and the header of a dataset.
-    Some might also need to load tables
+    the header of a dataset,
+    and misc tables used as scheme labels.
+    Some might also need to load filewise or segmented tables,
     to gather more information.
     As this process can be slow,
     or crash,
     when tables do not fit into memory,
-    we collect them here,
-    in order to switch loading of tables off
-    in `audbcards.Dataset`.
+    we provide the ``load_tables`` argument in ``audbcards.Dataset``
+    to avoid loading of the tables.
+
+    To make ``load_tables`` work,
+    ``_table_properties`` has to list all cached properties,
+    that will load filewise or segmented tables.
 
     """
 
