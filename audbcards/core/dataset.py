@@ -53,7 +53,7 @@ class _Dataset:
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
             # `load_tables` is not stored in cache
-            obj.load_tables = load_tables
+            obj._load_tables = load_tables
             # Load table properties,
             # if requested,
             # and store them in cache,
@@ -89,8 +89,8 @@ class _Dataset:
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
 
-        self.load_tables = load_tables
-        r"""If ``True`` cache only information extracted from header."""
+        # Private attribute used in ``self._cached_properties()``
+        self._load_tables = load_tables
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
@@ -481,7 +481,7 @@ class _Dataset:
 
         """
         exclude = []
-        if not self.load_tables:
+        if not self._load_tables:
             exclude = self._table_properties
         class_items = self.__class__.__dict__.items()
         props = dict(
@@ -711,9 +711,6 @@ class Dataset(object):
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
-
-        self.load_tables = load_tables
-        r"""If ``True``, dataset tables have been loaded."""
 
     # Copy attributes and methods
     # to include in documentation
