@@ -63,7 +63,7 @@ class _Dataset:
             # if they haven't been cached before.
             if load_tables:
                 cache_again = False
-                for cached_property in cls._table_properties:
+                for cached_property in cls._table_related_cached_properties:
                     # Check if property has been cached,
                     # see https://stackoverflow.com/a/59740750
                     if cached_property not in obj.__dict__:
