@@ -19,6 +19,23 @@ from audbcards.core.utils import limit_presented_samples
 
 
 class _Dataset:
+    _table_properties = ["segment_durations", "segments"]
+    """Cached properties relying on table data.
+
+    Most of the cached properties
+    rely on the dependency table,
+    and the header of a dataset.
+    Some might also need to load tables
+    to gather more information.
+    As this process can be slow,
+    or crash,
+    when tables do not fit into memory,
+    we collect them here,
+    in order to switch loading of tables off
+    in `audbcards.Dataset`.
+
+    """
+
     @classmethod
     def create(
         cls,
@@ -26,6 +43,7 @@ class _Dataset:
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         r"""Instantiate Dataset Object."""
         if cache_root is None:
@@ -34,11 +52,29 @@ class _Dataset:
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
+            # `load_tables` is not stored in cache
+            obj.load_tables = load_tables
+            # Load table properties,
+            # if requested,
+            # and store them in cache,
+            # if not cached before
+            if load_tables:
+                cache_again = False
+                for table_property in cls._table_properties:
+                    # Check if property has been cached,
+                    # see https://stackoverflow.com/a/59740750
+                    if table_property not in obj.__dict__:
+                        cache_again = True
+                        # Request property to fill their cached value
+                        getattr(obj, table_property)
+                if cache_again:
+                    cls._save_pickled(obj, dataset_cache_filename)
 
             return obj
 
-        obj = cls(name, version, cache_root)
-        _ = obj._cached_properties()
+        obj = cls(name, version, cache_root, load_tables)
+        # Visit cached properties to fill their cache values
+        obj._cached_properties()
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -48,9 +84,13 @@ class _Dataset:
         name: str,
         version: str,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
+
+        self.load_tables = load_tables
+        r"""If ``True`` cache only information extracted from header."""
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
@@ -429,13 +469,29 @@ class _Dataset:
         r"""Version of dataset."""
         return self._version
 
-    def _cached_properties(self):
-        """Get list of cached properties of the object."""
+    def _cached_properties(self) -> typing.Dict[str, typing.Any]:
+        """Get list of cached properties of the object.
+
+        When collecting the cached properties,
+        it also executes their code
+        in order to generate the associated values.
+
+        Returns:
+            dictionary with property name and value
+
+        """
+        exclude = []
+        if not self.load_tables:
+            exclude = self._table_properties
         class_items = self.__class__.__dict__.items()
         props = dict(
             (k, getattr(self, k))
             for k, v in class_items
-            if isinstance(v, functools.cached_property)
+            if (
+                isinstance(v, functools.cached_property)
+                and k not in exclude
+                and not k.startswith("_")
+            )
         )
         return props
 
@@ -618,6 +674,11 @@ class Dataset(object):
             the environmental variable ``AUDBCARDS_CACHE_ROOT``,
             or :attr:`audbcards.config.CACHE_ROOT`
             is used
+        load_tables: if ``True``,
+            it caches values extracted from tables.
+            Set this to ``False``,
+            if loading the tables takes too long,
+            or will not fit into memory
 
     """
 
@@ -627,9 +688,15 @@ class Dataset(object):
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         r"""Create Dataset Instance."""
-        instance = _Dataset.create(name, version, cache_root=cache_root)
+        instance = _Dataset.create(
+            name,
+            version,
+            cache_root=cache_root,
+            load_tables=load_tables,
+        )
         return instance
 
     # Add an __init__() function,
@@ -640,9 +707,13 @@ class Dataset(object):
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
+
+        self.load_tables = load_tables
+        r"""If ``True``, dataset tables have been loaded."""
 
     # Copy attributes and methods
     # to include in documentation
