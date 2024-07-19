@@ -19,7 +19,7 @@ from audbcards.core.utils import limit_presented_samples
 
 
 class _Dataset:
-    _table_properties = ["segment_durations", "segments"]
+    _table_related_cached_properties = ["segment_durations", "segments"]
     """Cached properties relying on table data.
 
     Most of the cached properties
@@ -35,7 +35,7 @@ class _Dataset:
     to avoid loading of the tables.
 
     To make ``load_tables`` work,
-    ``_table_properties`` has to list all cached properties,
+    ``_table_related_cached_properties`` has to list all cached properties,
     that will load filewise or segmented tables.
 
     """
@@ -58,20 +58,20 @@ class _Dataset:
             obj = cls._load_pickled(dataset_cache_filename)
             # `load_tables` is not stored in cache
             obj._load_tables = load_tables
-            # Load table properties,
-            # if requested,
-            # and store them in cache,
-            # if not cached before
+            # Load cached properties,
+            # that require to load filewise or segmented tables,
+            # if they haven't been cached before.
             if load_tables:
                 cache_again = False
-                for table_property in cls._table_properties:
+                for cached_property in cls._table_properties:
                     # Check if property has been cached,
                     # see https://stackoverflow.com/a/59740750
-                    if table_property not in obj.__dict__:
+                    if cached_property not in obj.__dict__:
                         cache_again = True
                         # Request property to fill their cached value
-                        getattr(obj, table_property)
+                        getattr(obj, cached_property)
                 if cache_again:
+                    # Update cache to store the table related cached properties
                     cls._save_pickled(obj, dataset_cache_filename)
 
             return obj
@@ -486,7 +486,7 @@ class _Dataset:
         """
         exclude = []
         if not self._load_tables:
-            exclude = self._table_properties
+            exclude = self._table_related_cached_properties
         class_items = self.__class__.__dict__.items()
         props = dict(
             (k, getattr(self, k))
