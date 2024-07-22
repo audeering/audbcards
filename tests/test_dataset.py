@@ -450,3 +450,88 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         # to compare it.
         assert str(dataset.header) == str(header)
         assert dataset.repository_object == repository
+
+
+class TestDatasetLoadTables:
+    r"""Test load_tables argument of audbcards.Dataset."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, cache, medium_db):
+        r"""Provide test class with cache and database.
+
+        Args:
+            cache: cache fixture
+            medium_db: medium_db fixture
+
+        """
+        self.name = medium_db.name
+        self.version = pytest.VERSION
+        self.cache_root = cache
+
+    def assert_has_table_properties(self, expected: bool):
+        r"""Assert dataset holds table related cached properties.
+
+        Args:
+            expected: if ``True``,
+                ``dataset`` is expected to contain table related properties
+
+        """
+        table_related_properties = [
+            "segment_durations",
+            "segments",
+        ]
+        for table_related_property in table_related_properties:
+            if expected:
+                assert table_related_property in self.dataset.__dict__
+            else:
+                assert table_related_property not in self.dataset.__dict__
+
+    def load_dataset(self, *, load_tables: bool):
+        r"""Load dataset.
+
+        Args:
+            load_tables: if ``True``,
+                it caches properties,
+                that need to load filewise/segmented tables
+
+        """
+        self.dataset = audbcards.Dataset(
+            self.name,
+            self.version,
+            cache_root=self.cache_root,
+            load_tables=load_tables,
+        )
+
+    def test_load_tables_first(self):
+        r"""Load and dataset with table related properties.
+
+        This instantiates the dataset
+        the first time with ``load_tables=True``,
+        which should cache table related properties.
+        When loading the dataset
+        afterwards with ``load_tables=False``,
+        the table related properties
+        should still be loaded.
+
+        """
+        self.load_dataset(load_tables=True)
+        self.assert_has_table_properties(True)
+        self.load_dataset(load_tables=False)
+        self.assert_has_table_properties(True)
+
+    def test_load_tables_second(self):
+        r"""Load and dataset without table related properties.
+
+        This instantiates the dataset
+        the first time with ``load_tables=False``,
+        which should not cache table related properties.
+        When loading the dataset
+        afterwards with ``load_tables=True``,
+        the table related properties
+        should then be loaded.
+
+        """
+        self.load_dataset(load_tables=False)
+        self.assert_has_table_properties(False)
+        self.load_dataset(load_tables=True)
+        self.assert_has_table_properties(True)
