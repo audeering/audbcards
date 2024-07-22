@@ -502,36 +502,35 @@ class TestDatasetLoadTables:
             load_tables=load_tables,
         )
 
-    def test_load_tables_first(self):
-        r"""Load and dataset with table related properties.
+    @pytest.mark.parametrize("load_tables_first", [True, False])
+    def test_load_tables(self, load_tables_first):
+        r"""Load dataset with/without table related properties.
 
-        This instantiates the dataset
-        the first time with ``load_tables=True``,
-        which should cache table related properties.
-        When loading the dataset
-        afterwards with ``load_tables=False``,
-        the table related properties
-        should still be loaded.
+        This tests if the table related arguments
+        are stored or omitted in cache,
+        dependent of the ``load_tables`` argument.
 
-        """
-        self.load_dataset(load_tables=True)
-        self.assert_has_table_properties(True)
-        self.load_dataset(load_tables=False)
-        self.assert_has_table_properties(True)
+        It also loads the dataset another two times from cache,
+        with changing ``load_tables``
+        arguments,
+        which should always result
+        in existing table related properties,
+        as a cache stord first with ``load_tables=False``,
+        should be updated when loading again with ``load_tables=True``.
 
-    def test_load_tables_second(self):
-        r"""Load and dataset without table related properties.
-
-        This instantiates the dataset
-        the first time with ``load_tables=False``,
-        which should not cache table related properties.
-        When loading the dataset
-        afterwards with ``load_tables=True``,
-        the table related properties
-        should then be loaded.
+        Args:
+            load_tables_first: if ``True``,
+                it calls ``audbcards.Dataset``
+                with ``load_tables=True``
+                during it first call
+                and with ``load_tables=False``
+                during its second call;
+                and vice versa if ``False``
 
         """
-        self.load_dataset(load_tables=False)
-        self.assert_has_table_properties(False)
-        self.load_dataset(load_tables=True)
+        self.load_dataset(load_tables=load_tables_first)
+        self.assert_has_table_properties(load_tables_first)
+        self.load_dataset(load_tables=not load_tables_first)
+        self.assert_has_table_properties(True)
+        self.load_dataset(load_tables=load_tables_first)
         self.assert_has_table_properties(True)
