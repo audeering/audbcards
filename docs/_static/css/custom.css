@@ -4,12 +4,36 @@ tr {
     justify-content: flex-start;
 }
 */
+table.clickable {
+    width: 100%;
+}
 tr.clickable {
     cursor: pointer;
+    display: grid;
+    grid-template-columns: 20% 15% 65%;
+    /*grid-template-columns: repeat(auto-fit, minmax(max-content, 1fr));*/
+    /*grid-template-columns: minmax(max-content, 0.33fr) minmax(max-content, 0.33fr) minmax(50%, 0.33fr);*/
+    justify-content: flex-start;
+}
+tr.header {
+    display: grid;
+    /*grid-template-columns: repeat(auto-fit, minmax(max-content, 1fr));*/
+    grid-template-columns: 20% 15% 65%;
+    /*grid-template-columns: minmax(max-content, 0.33fr) minmax(max-content, 0.33fr) minmax(50%, 0.33fr);*/
+    justify-content: flex-start;
+}
+.rst-content table.docutils thead th.head {
+    border-top: none;
+    border-left: none;
+    border-right: none;
 }
 tr.clickable:hover {
-    background-color: #d6d6d6 !important;
-}   
+    background-color: #e3e3e3;
+}
+.rst-content table.docutils:not(.field-list) tr.clickable:hover:nth-child(2n-1) td {
+    /* background-color: #d6d6d6; */
+    background-color: #e3e3e3;
+}
 .expanded-row-content {
     border-top: none;
     display: grid;

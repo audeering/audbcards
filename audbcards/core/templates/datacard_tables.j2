@@ -15,14 +15,9 @@ Another table
 
 .. raw:: html
 
-    <table class="colwidths-given docutils align-default">
-    <colgroup>
-    <col style="width: 20%" />
-    <col style="width: 10%" />
-    <col style="width: 70%" />
-    </colgroup>
+    <table class="clickable docutils align-default">
     <thead>
-    <tr class="row-odd"><th class="head"><p>ID</p></th>
+    <tr class="row-odd header"><th class="head"><p>ID</p></th>
     <th class="head"><p>Type</p></th>
     <th class="head"><p>Columns</p></th>
     </tr>
@@ -32,13 +27,13 @@ Another table
     <tr onClick="toggleRow(this)" class="row-{{ loop.cycle('odd', 'even') }} clickable">
     {% for column in row %}
     <td><p>{{ column }}</p></td>
+    {% endfor %}
     <td class='expanded-row-content hide-row'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
     galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also
     the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
     release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software
     like Aldus PageMaker including versions of Lorem Ipsum.</td>
-    {% endfor %}
     </tr>
     {% endfor %}
     </tbody>
