@@ -682,7 +682,7 @@ class Dataset(object):
             it caches values extracted from tables.
             Set this to ``False``,
             if loading the tables takes too long,
-            or will not fit into memory
+            or does not fit into memory
 
     """
 
