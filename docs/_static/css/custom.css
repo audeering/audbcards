@@ -1,26 +1,15 @@
-/*
-tr {
-    display: grid;
-    justify-content: flex-start;
-}
-*/
 table.clickable {
     width: 100%;
 }
 tr.clickable {
     cursor: pointer;
     display: grid;
-    grid-template-columns: 20% 15% 65%;
-    /*grid-template-columns: repeat(auto-fit, minmax(max-content, 1fr));*/
-    /*grid-template-columns: minmax(max-content, 0.33fr) minmax(max-content, 0.33fr) minmax(50%, 0.33fr);*/
+    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
     justify-content: flex-start;
 }
 tr.header {
     display: grid;
-    /*grid-template-columns: repeat(auto-fit, minmax(max-content, 1fr));*/
-    grid-template-columns: 20% 15% 65%;
-    /*grid-template-columns: minmax(max-content, 0.33fr) minmax(max-content, 0.33fr) minmax(50%, 0.33fr);*/
-    justify-content: flex-start;
+    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
 }
 .rst-content table.docutils thead th.head {
     border-top: none;
@@ -31,7 +20,6 @@ tr.clickable:hover {
     background-color: #e3e3e3;
 }
 .rst-content table.docutils:not(.field-list) tr.clickable:hover:nth-child(2n-1) td {
-    /* background-color: #d6d6d6; */
     background-color: #e3e3e3;
 }
 .expanded-row-content {
