@@ -508,14 +508,14 @@ class TestDatasetLoadTables:
 
         This tests if the table related arguments
         are stored or omitted in cache,
-        dependent of the ``load_tables`` argument.
+        dependent on the ``load_tables`` argument.
 
         It also loads the dataset another two times from cache,
         with changing ``load_tables``
         arguments,
         which should always result
         in existing table related properties,
-        as a cache stord first with ``load_tables=False``,
+        as a cache stored first with ``load_tables=False``,
         should be updated when loading again with ``load_tables=True``.
 
         Args:
@@ -523,9 +523,6 @@ class TestDatasetLoadTables:
                 it calls ``audbcards.Dataset``
                 with ``load_tables=True``
                 during it first call
-                and with ``load_tables=False``
-                during its second call;
-                and vice versa if ``False``
 
         """
         self.load_dataset(load_tables=load_tables_first)
