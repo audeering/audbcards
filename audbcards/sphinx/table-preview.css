@@ -18,7 +18,6 @@ table.clickable tr.grid {
     /* Fixed grid of 3 columns */
     display: grid;
     grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
-    margin: 0;
 }
 table.clickable tr.clickable {
     /* Show pointer as cursor to highlight the row can be clicked */
