@@ -27,7 +27,7 @@ table.clickable tr.clickable {
 }
 table.nested {
     /* Padding around table preview */
-    padding: 7em;
+    padding: 10px;
 }
 table.nested td {
     /* Ensure minimal distance between columns */
