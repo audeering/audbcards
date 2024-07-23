@@ -35,4 +35,4 @@ jobs:
 
     - name: Tests
       run: |
-        python -m sphinx docs/ build/html -b html -D html_theme=alabaster -D html_theme_options={} -D html_context={}
+        python -m sphinx docs/ build/html -b html -D html_theme=alabaster
