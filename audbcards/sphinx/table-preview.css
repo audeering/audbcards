@@ -14,6 +14,29 @@
 .hide-row {
     display: None;
 }
+table.clickable {
+    /* Ensure we don't get double border lines */
+    border-bottom: none;
+    border-right: none;
+    /* Force to use full width */
+    width: 100%;
+}
+table.clickable td, table.clickable th {
+    /* Ensure we don't get double border lines */
+    border-left: none;
+    border-top: none;
+}
+table.clickable td:not(.expanded-row-content) {
+    /* Allow to center cell copntent with `margin: auto` */
+    display: flex;
+}
+table.clickable td:not(.expanded-row-content) p, table.clickable th p {
+    /* Verrtically center cell content */
+    margin: auto 0;
+}
+table.clickable td.expanded-row-content td, table.clickable td.expanded-row-content th {
+    display: table-cell;
+}
 table.clickable tr.grid {
     /* Fixed grid of 3 columns */
     display: grid;
@@ -36,15 +59,6 @@ table.nested td {
 table.nested th {
     /* Use normal font in header row of preview table */
     font-weight: normal;
-}
-/* Ensure we don't get double bordfer lines */
-table.clickable {
-    border-bottom: none;
-    border-right: none;
-}
-table.clickable td, table.clickable th {
-    border-left: none;
-    border-top: none;
 }
 /* Not needed?
 table.clickable {
