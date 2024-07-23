@@ -5,7 +5,7 @@
 .expanded-row-content {
     font-size: 13px;
     /* Add scroll bar if table preview is too big */
-    overflow: auto;
+    overflow: auto !important;
     /* Let column appear as additional row in next line */
     display: grid;
     grid-column: 1/-1;
@@ -33,6 +33,10 @@ table.clickable td:not(.expanded-row-content) {
 table.clickable td:not(.expanded-row-content) p, table.clickable th p {
     /* Verrtically center cell content */
     margin: auto 0;
+}
+table.clickable td:not(.expanded-row-content) p:last-child, table.clickable th p:last-child {
+    /* Verrtically center cell content for ReadTheDocs based themes*/
+    margin: auto 0 !important;
 }
 table.clickable td.expanded-row-content td, table.clickable td.expanded-row-content th {
     display: table-cell;
