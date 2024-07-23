@@ -3,7 +3,6 @@
 /* Implementation based on https://github.com/chhikaradi1993/Expandable-table-row
 */
 .expanded-row-content {
-    /*border-top: none;*/
     font-size: 13px;
     /* Add scroll bar if table preview is too big */
     overflow: auto;
@@ -28,12 +27,15 @@ table.clickable tr.clickable {
     justify-content: flex-start;
 }
 table.nested {
+    /* Padding around table preview */
     padding: 7em;
 }
 table.nested td {
+    /* Ensure minimal distance between columns */
     padding-right: 0.3em;
 }
 table.nested th {
+    /* Use normal font in header row of preview table */
     font-weight: normal;
 }
 /* Ensure we don't get double bordfer lines */
