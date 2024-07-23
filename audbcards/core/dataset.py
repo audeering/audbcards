@@ -480,6 +480,18 @@ class _Dataset:
         return tables
 
     @functools.cached_property
+    def tables_preview(self) -> typing.List[str]:
+        """Tables preview of the dataset."""
+        return [
+            ["file", "room", "mode"],
+            ["data/air_phone_BT_corridor_hhp.wav", "corridor", "hand-held"],
+            ["data/air_phone_BT_office_hhp.wav", "office", "hand-held"],
+            ["data/air_phone_BT_stairway_hhp.wav", "stairway", "hand-held"],
+            ["data/air_phone_bathroom_hfrp.wav", "bathroom", "hands-free"],
+            ["data/air_phone_bathroom_hhp.wav", "bathroom", "hand-held"],
+        ]
+
+    @functools.cached_property
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
         table_list = [["ID", "Type", "Columns"]]

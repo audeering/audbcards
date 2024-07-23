@@ -31,9 +31,7 @@ tr.clickable:hover {
     display: grid;
     grid-column: 1/-1;
     justify-content: flex-start;
-    color: #AEB1B3;
     font-size: 13px;
-    background-color: #fff;
 }
 .hide-row {
     display: None;
