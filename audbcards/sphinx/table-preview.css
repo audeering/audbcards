@@ -2,17 +2,6 @@
 /*
 /* Implementation based on https://github.com/chhikaradi1993/Expandable-table-row
 */
-table.clickable tr.grid {
-    /* Fixed grid of 3 columns */
-    display: grid;
-    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
-}
-table.clickable tr.clickable {
-    /* Show pointer as cursor to highlight the row can be clicked */
-    cursor: pointer;
-    /* Overflow of table preview column */
-    justify-content: flex-start;
-}
 .expanded-row-content {
     /*border-top: none;*/
     font-size: 13px;
@@ -25,6 +14,36 @@ table.clickable tr.clickable {
 }
 .hide-row {
     display: None;
+}
+table.clickable tr.grid {
+    /* Fixed grid of 3 columns */
+    display: grid;
+    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
+    margin: 0;
+}
+table.clickable tr.clickable {
+    /* Show pointer as cursor to highlight the row can be clicked */
+    cursor: pointer;
+    /* Overflow of table preview column */
+    justify-content: flex-start;
+}
+table.nested {
+    padding: 7em;
+}
+table.nested td {
+    padding-right: 0.3em;
+}
+table.nested th {
+    font-weight: normal;
+}
+/* Ensure we don't get double bordfer lines */
+table.clickable {
+    border-bottom: none;
+    border-right: none;
+}
+table.clickable td, table.clickable th {
+    border-left: none;
+    border-top: none;
 }
 /* Not needed?
 table.clickable {
