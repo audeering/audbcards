@@ -20,7 +20,7 @@ Another table
     {# Table header is given by first row #}
     {######################################}
     <thead>
-    <tr class="row-odd header">
+    <tr class="row-odd grid header">
     {% for column in tables_table[0] %}
     <th class="head"><p>{{ column }}</p></th>
     {% endfor %}
@@ -32,13 +32,12 @@ Another table
     <tbody>
     {% for row in tables_table %}
     {% if not loop.first %}
-    <tr onClick="toggleRow(this)" class="row-{{ loop.cycle('odd', 'even') }} clickable">
+    <tr onClick="toggleRow(this)" class="row-{{ loop.cycle('odd', 'even') }} clickable grid">
     {% for column in row %}
     <td><p>{{ column }}</p></td>
     {% endfor %}
     <td class="expanded-row-content hide-row">
     <p>
-    <!-- <object type="text/plain" data="../_tables/air/phone.txt"></object> -->
 
     {##### START TABLE PREVIEW #####}
 

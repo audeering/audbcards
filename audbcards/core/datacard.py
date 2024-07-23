@@ -4,8 +4,6 @@ import shutil
 import typing
 
 import jinja2
-import jinja2.ext
-import markupsafe
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -461,7 +459,6 @@ class Datacard(object):
         environment = jinja2.Environment(
             loader=jinja2.FileSystemLoader(template_dir),
             trim_blocks=True,
-            extensions=[IncludeRawExtension],
         )
         template = environment.get_template("datacard.j2")
 
@@ -478,22 +475,3 @@ class Datacard(object):
             content = self.rst_preamble + "\n" + content
 
         return content
-
-
-class IncludeRawExtension(jinja2.ext.Extension):
-    r"""Jinja2 extension to include raw files."""
-
-    tags = {"include_raw"}
-
-    def parse(self, parser):
-        """Parse Jinja2 template."""
-        lineno = parser.stream.expect("name:include_raw").lineno
-        template = parser.parse_expression()
-        result = self.call_method("_render", [template], lineno=lineno)
-        return jinja2.nodes.Output([result], lineno=lineno)
-
-    def _render(self, filename: str):
-        """Render Jinja2 markup."""
-        return markupsafe.Markup(
-            self.environment.loader.get_source(self.environment, filename)[0]
-        )

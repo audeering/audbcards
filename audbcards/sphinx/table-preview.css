@@ -2,22 +2,16 @@
 /*
 /* Implementation based on https://github.com/chhikaradi1993/Expandable-table-row
 */
-tr.clickable {
+table.clickable tr.grid {
+    /* Fixed grid of 3 columns */
+    display: grid;
+    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
+}
+table.clickable tr.clickable {
     /* Show pointer as cursor to highlight the row can be clicked */
     cursor: pointer;
-    /* Fixed grid of 3 columns to allow overflow of table preview column */
-    display: grid;
-    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
+    /* Overflow of table preview column */
     justify-content: flex-start;
-}
-tr.header {
-    display: grid;
-    grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
-}
-.rst-content table.docutils thead th.head {
-    border-top: none;
-    border-left: none;
-    border-right: none;
 }
 .expanded-row-content {
     /*border-top: none;*/
@@ -54,5 +48,10 @@ Maybe this as well:
 
 .rst-content table.docutils tbody>tr:last-child td:not(.hide-row) {
     border-bottom-width: 1px;
-}*/
-
+}
+.rst-content table.docutils thead th.head {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+*/
