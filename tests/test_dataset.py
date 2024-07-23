@@ -456,7 +456,8 @@ class TestDatasetLoadTables:
     r"""Test load_tables argument of audbcards.Dataset."""
 
     @pytest.fixture(autouse=True)
-    def setup(self, cache, medium_db):
+    @classmethod
+    def setup(cls, cache, medium_db):
         r"""Provide test class with cache and database.
 
         Args:
@@ -464,9 +465,9 @@ class TestDatasetLoadTables:
             medium_db: medium_db fixture
 
         """
-        self.name = medium_db.name
-        self.version = pytest.VERSION
-        self.cache_root = cache
+        cls.name = medium_db.name
+        cls.version = pytest.VERSION
+        cls.cache_root = cache
 
     def assert_has_table_properties(self, expected: bool):
         r"""Assert dataset holds table related cached properties.
