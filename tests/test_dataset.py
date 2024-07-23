@@ -455,8 +455,8 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
 class TestDatasetLoadTables:
     r"""Test load_tables argument of audbcards.Dataset."""
 
-    @pytest.fixture(autouse=True)
     @classmethod
+    @pytest.fixture(autouse=True)
     def setup(cls, cache, medium_db):
         r"""Provide test class with cache and database.
 
