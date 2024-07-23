@@ -16,14 +16,22 @@ Another table
 .. raw:: html
 
     <table class="clickable docutils align-default">
+    {######################################}
+    {# Table header is given by first row #}
+    {######################################}
     <thead>
-    <tr class="row-odd header"><th class="head"><p>ID</p></th>
-    <th class="head"><p>Type</p></th>
-    <th class="head"><p>Columns</p></th>
+    <tr class="row-odd header">
+    {% for column in tables_table[0] %}
+    <th class="head"><p>{{ column }}</p></th>
+    {% endfor %}
     </tr>
     </thead>
+    {#########################################}
+    {# Table body by remaining rows ##########}
+    {#########################################}
     <tbody>
     {% for row in tables_table %}
+    {% if not loop.first %}
     <tr onClick="toggleRow(this)" class="row-{{ loop.cycle('odd', 'even') }} clickable">
     {% for column in row %}
     <td><p>{{ column }}</p></td>
@@ -35,6 +43,7 @@ Another table
     releonase of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software
     like Aldus PageMaker including versions of Lorem Ipsum.</p></td>
     </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
     </table>
