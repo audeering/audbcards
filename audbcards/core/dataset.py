@@ -480,16 +480,50 @@ class _Dataset:
         return tables
 
     @functools.cached_property
-    def tables_preview(self) -> typing.List[str]:
-        """Tables preview of the dataset."""
-        return [
-            ["file", "room", "mode"],
-            ["data/air_phone_BT_corridor_hhp.wav", "corridor", "hand-held"],
-            ["data/air_phone_BT_office_hhp.wav", "office", "hand-held"],
-            ["data/air_phone_BT_stairway_hhp.wav", "stairway", "hand-held"],
-            ["data/air_phone_bathroom_hfrp.wav", "bathroom", "hands-free"],
-            ["data/air_phone_bathroom_hhp.wav", "bathroom", "hand-held"],
-        ]
+    def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
+        """Tables preview of the dataset.
+
+        Shows the header
+        and the first 5 lines for each table
+        as a list of lists.
+
+        Returns:
+            dictionary with table IDs as keys
+            and table previes as values
+
+        Examples:
+            >>> from tabulate import tabulate
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> preview = ds.tables_preview["speaker"]
+            >>> preview
+            [['speaker', 'age', 'gender', 'language'],
+             [3, 31, 'male', 'deu'],
+             [8, 34, 'female', 'deu'],
+             [9, 21, 'female', 'deu'],
+             [10, 32, 'male', 'deu'],
+             [11, 26, 'male', 'deu']]
+
+            >>> print(tabulate(preview, headers="firstrow", tablefmt="github"))
+            |   speaker |   age | gender   | language   |
+            |-----------|-------|----------|------------|
+            |         3 |    31 | male     | deu        |
+            |         8 |    34 | female   | deu        |
+            |         9 |    21 | female   | deu        |
+            |        10 |    32 | male     | deu        |
+            |        11 |    26 | male     | deu        |
+
+        """
+        preview = {}
+        for table in list(self.header):
+            df = audb.load_table(
+                self.name,
+                table,
+                version=self.version,
+                verbose=False,
+            )
+            df = df.reset_index()
+            preview[table] = [df.columns.tolist()] + df.head().values.tolist()
+        return preview
 
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:

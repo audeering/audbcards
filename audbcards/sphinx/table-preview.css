@@ -2,11 +2,10 @@
 /*
 /* Implementation based on https://github.com/chhikaradi1993/Expandable-table-row
 */
-table.clickable {
-    width: 100%;
-}
 tr.clickable {
+    /* Show pointer as cursor to highlight the row can be clicked */
     cursor: pointer;
+    /* Fixed grid of 3 columns to allow overflow of table preview column */
     display: grid;
     grid-template-columns: repeat(1, 1.1fr) 15% repeat(1, 1fr);
     justify-content: flex-start;
@@ -20,19 +19,40 @@ tr.header {
     border-left: none;
     border-right: none;
 }
-tr.clickable:hover {
-    background-color: #e3e3e3;
-}
-.rst-content table.docutils:not(.field-list) tr.clickable:hover:nth-child(2n-1) td {
-    background-color: #e3e3e3;
-}
 .expanded-row-content {
-    border-top: none;
+    /*border-top: none;*/
+    font-size: 13px;
+    /* Add scroll bar if table preview is too big */
+    overflow: auto;
+    /* Let column appear as additional row in next line */
     display: grid;
     grid-column: 1/-1;
     justify-content: flex-start;
-    font-size: 13px;
 }
 .hide-row {
     display: None;
 }
+/* Not needed?
+table.clickable {
+    width: 100%;
+}
+*/
+
+/* To be added to the audEERING theme
+ *
+.rst-content table.docutils:not(.field-list) tr.clickable:hover:nth-child(2n-1) td {
+    background-color: #e3e3e3;
+}
+.rst-content table.docutils:not(.field-list) tr.clickable table.nested tr:nth-child(2n-1) td {
+    background-color: red;
+}
+tr.clickable:hover {
+    background-color: #e3e3e3;
+}
+
+Maybe this as well:
+
+.rst-content table.docutils tbody>tr:last-child td:not(.hide-row) {
+    border-bottom-width: 1px;
+}*/
+

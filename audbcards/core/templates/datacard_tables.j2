@@ -42,16 +42,16 @@ Another table
 
     {##### START TABLE PREVIEW #####}
 
-    <table class="docutils align-default">
+    <table class="docutils field-list align-default nested">
     <thead>
     <tr>
-    {% for column in tables_preview[0] %}
+    {% for column in tables_preview[row[0]][0] %}
     <th class="head"><p>{{ column }}</p></th>
     {% endfor %}
     </tr>
     </thead>
     <tbody>
-    {% for row in tables_preview %}
+    {% for row in tables_preview[row[0]] %}
     {% if not loop.first %}
     <tr>
     {% for column in row %}
