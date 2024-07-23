@@ -1,3 +1,7 @@
+/* Expand row in Tables table to show preview of table content.
+/*
+/* Implementation based on https://github.com/chhikaradi1993/Expandable-table-row
+*/
 table.clickable {
     width: 100%;
 }
