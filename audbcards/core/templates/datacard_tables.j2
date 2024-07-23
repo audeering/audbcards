@@ -3,16 +3,6 @@
 Tables
 ^^^^^^
 
-.. csv-table::
-    :header-rows: 1
-    :widths: 20, 10, 70
-
-{% for row in tables_table %}
-    "{{ row|join('", "') }}"
-{% endfor %}
-
-Another table
-
 .. raw:: html
 
     <table class="clickable docutils align-default">
