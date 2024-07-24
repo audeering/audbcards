@@ -62,7 +62,7 @@ table.nested td {
 }
 table.nested th {
     /* Use normal font in header row of preview table */
-    font-weight: normal;
+    font-weight: normal !important;
 }
 /* Not needed?
 table.clickable {
