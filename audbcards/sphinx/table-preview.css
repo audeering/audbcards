@@ -52,44 +52,15 @@ table.clickable tr.clickable {
     /* Overflow of table preview column */
     justify-content: flex-start;
 }
-table.nested {
+table.preview {
     /* Padding around table preview */
     padding: 10px;
 }
-table.nested td {
+table.preview td {
     /* Ensure minimal distance between columns */
     padding-right: 0.3em;
 }
-table.nested th {
+table.preview th {
     /* Use normal font in header row of preview table */
     font-weight: normal !important;
 }
-/* Not needed?
-table.clickable {
-    width: 100%;
-}
-*/
-
-/* To be added to the audEERING theme
- *
-.rst-content table.docutils:not(.field-list) tr.clickable:hover:nth-child(2n-1) td {
-    background-color: #e3e3e3;
-}
-.rst-content table.docutils:not(.field-list) tr.clickable table.nested tr:nth-child(2n-1) td {
-    background-color: red;
-}
-tr.clickable:hover {
-    background-color: #e3e3e3;
-}
-
-Maybe this as well:
-
-.rst-content table.docutils tbody>tr:last-child td:not(.hide-row) {
-    border-bottom-width: 1px;
-}
-.rst-content table.docutils thead th.head {
-    border-top: none;
-    border-left: none;
-    border-right: none;
-}
-*/
