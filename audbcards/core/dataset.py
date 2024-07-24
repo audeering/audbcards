@@ -19,6 +19,38 @@ from audbcards.core.utils import limit_presented_samples
 
 
 class _Dataset:
+    _table_related_cached_properties = ["segment_durations", "segments"]
+    """Cached properties relying on table data.
+
+    Most of the cached properties
+    rely on the dependency table,
+    the header of a dataset,
+    and misc tables used as scheme labels.
+    Some might also need to load filewise or segmented tables,
+    to gather more information.
+
+    Persistence of table related cached properties
+    depends on the ``load_tables`` argument
+    of :class:`audbcards.Dataset`.
+    If ``load_tables`` is ``True``,
+    :meth:`audbcards.Dataset._cached_properties`
+    is asked to cache table related cached properties as well.
+    If ``load_tables`` is ``False``,
+    :meth:`audbcards.Dataset._cached_properties`
+    is asked to exclude all cached properties,
+    listed in ``_table_related_cached_properties``.
+    Which means,
+    ``_table_related_cached_properties`` has to list all cached properties,
+    that will load filewise or segmented tables.
+
+    If a dataset exists in cache,
+    but does not store table related cached properties,
+    a call to :class:`audbcards.Dataset`
+    with ``load_tables`` is ``True``,
+    will update the cache.
+
+    """
+
     @classmethod
     def create(
         cls,
@@ -26,6 +58,7 @@ class _Dataset:
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         r"""Instantiate Dataset Object."""
         if cache_root is None:
@@ -34,11 +67,31 @@ class _Dataset:
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
+            # Load cached properties,
+            # that require to load filewise or segmented tables,
+            # if they haven't been cached before.
+            if load_tables:
+                cache_again = False
+                for cached_property in cls._table_related_cached_properties:
+                    # Check if property has been cached,
+                    # see https://stackoverflow.com/a/59740750
+                    if cached_property not in obj.__dict__:
+                        cache_again = True
+                        # Request property to fill their cached value
+                        getattr(obj, cached_property)
+                if cache_again:
+                    # Update cache to store the table related cached properties
+                    cls._save_pickled(obj, dataset_cache_filename)
 
             return obj
 
-        obj = cls(name, version, cache_root)
-        _ = obj._cached_properties()
+        obj = cls(name, version, cache_root, load_tables)
+        # Visit cached properties to fill their cache values
+        if load_tables:
+            exclude = []
+        else:
+            exclude = cls._table_related_cached_properties
+        obj._cached_properties(exclude=exclude)
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -48,9 +101,23 @@ class _Dataset:
         name: str,
         version: str,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
+
+        # Define `__getstate__()` method,
+        # which selects the cached attributes
+        # to include in the pickled cache file
+        if load_tables:
+            exclude = []
+        else:
+            exclude = self._table_related_cached_properties
+
+        def getstate():
+            return self._cached_properties(exclude=exclude)
+
+        self.__getstate__ = getstate
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
@@ -75,10 +142,6 @@ class _Dataset:
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(cache_root, name, other_version)
-
-    def __getstate__(self):
-        r"""Returns attributes to be pickled."""
-        return self._cached_properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
@@ -376,6 +439,24 @@ class _Dataset:
         return scheme_data
 
     @functools.cached_property
+    def segments(self) -> str:
+        r"""Number of segments in dataset."""
+        return str(len(self._segments))
+
+    @functools.cached_property
+    def segment_durations(self) -> typing.List[float]:
+        r"""Segment durations in dataset."""
+        if len(self._segments) == 0:
+            durations = []
+        else:
+            starts = self._segments.get_level_values("start")
+            ends = self._segments.get_level_values("end")
+            durations = [
+                (end - start).total_seconds() for start, end in zip(starts, ends)
+            ]
+        return durations
+
+    @functools.cached_property
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
@@ -424,13 +505,34 @@ class _Dataset:
         r"""Version of dataset."""
         return self._version
 
-    def _cached_properties(self):
-        """Get list of cached properties of the object."""
+    def _cached_properties(
+        self,
+        *,
+        exclude: typing.Sequence = [],
+    ) -> typing.Dict[str, typing.Any]:
+        """Get list of cached properties of the object.
+
+        When collecting the cached properties,
+        it also executes their code
+        in order to generate the associated values.
+
+        Args:
+            exclude: list of cached properties,
+                that should not be cached
+
+        Returns:
+            dictionary with property name and value
+
+        """
         class_items = self.__class__.__dict__.items()
         props = dict(
             (k, getattr(self, k))
             for k, v in class_items
-            if isinstance(v, functools.cached_property)
+            if (
+                isinstance(v, functools.cached_property)
+                and k not in exclude
+                and not k.startswith("_")
+            )
         )
         return props
 
@@ -558,6 +660,21 @@ class _Dataset:
 
         return data_dict
 
+    @functools.cached_property
+    def _segments(self) -> pd.MultiIndex:
+        """Segments of dataset as combined index."""
+        index = audformat.segmented_index()
+        for table in self.header.tables:
+            if self.header.tables[table].is_segmented:
+                df = audb.load_table(
+                    self.name,
+                    table,
+                    version=self.version,
+                    verbose=False,
+                )
+                index = audformat.utils.union([index, df.index])
+        return index
+
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
         r"""Calculate ISO languages for a list of languages.
@@ -598,6 +715,11 @@ class Dataset(object):
             the environmental variable ``AUDBCARDS_CACHE_ROOT``,
             or :attr:`audbcards.config.CACHE_ROOT`
             is used
+        load_tables: if ``True``,
+            it caches values extracted from tables.
+            Set this to ``False``,
+            if loading the tables takes too long,
+            or does not fit into memory
 
     """
 
@@ -607,9 +729,15 @@ class Dataset(object):
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         r"""Create Dataset Instance."""
-        instance = _Dataset.create(name, version, cache_root=cache_root)
+        instance = _Dataset.create(
+            name,
+            version,
+            cache_root=cache_root,
+            load_tables=load_tables,
+        )
         return instance
 
     # Add an __init__() function,
@@ -620,6 +748,7 @@ class Dataset(object):
         version: str,
         *,
         cache_root: str = None,
+        load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""

@@ -184,6 +184,14 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     ]
     assert dataset.schemes_table == expected_schemes_table
 
+    # segment_durations
+    expected_segment_durations = [0.5, 0.5, 150, 151]
+    assert dataset.segment_durations == expected_segment_durations
+
+    # segments
+    expected_segments = str(len(db.segments))
+    assert dataset.segments == expected_segments
+
     # short_description
     max_desc_length = 150
     expected_description = (
@@ -442,3 +450,87 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         # to compare it.
         assert str(dataset.header) == str(header)
         assert dataset.repository_object == repository
+
+
+class TestDatasetLoadTables:
+    r"""Test load_tables argument of audbcards.Dataset."""
+
+    @classmethod
+    @pytest.fixture(autouse=True)
+    def prepare(cls, cache, medium_db):
+        r"""Provide test class with cache, database name and database version.
+
+        Args:
+            cache: cache fixture
+            medium_db: medium_db fixture
+
+        """
+        cls.name = medium_db.name
+        cls.version = pytest.VERSION
+        cls.cache_root = cache
+
+    def assert_has_table_properties(self, expected: bool):
+        r"""Assert dataset holds table related cached properties.
+
+        Args:
+            expected: if ``True``,
+                ``dataset`` is expected to contain table related properties
+
+        """
+        table_related_properties = [
+            "segment_durations",
+            "segments",
+        ]
+        for table_related_property in table_related_properties:
+            if expected:
+                assert table_related_property in self.dataset.__dict__
+            else:
+                assert table_related_property not in self.dataset.__dict__
+
+    def load_dataset(self, *, load_tables: bool):
+        r"""Load dataset.
+
+        Call ``audbcards.Dataset`` and assign result to ``self.dataset``.
+
+        Args:
+            load_tables: if ``True``,
+                it caches properties,
+                that need to load filewise/segmented tables
+
+        """
+        self.dataset = audbcards.Dataset(
+            self.name,
+            self.version,
+            cache_root=self.cache_root,
+            load_tables=load_tables,
+        )
+
+    @pytest.mark.parametrize("load_tables_first", [True, False])
+    def test_load_tables(self, load_tables_first):
+        r"""Load dataset with/without table related properties.
+
+        This tests if the table related arguments
+        are stored or omitted in cache,
+        dependent on the ``load_tables`` argument.
+
+        It also loads the dataset another two times from cache,
+        with changing ``load_tables``
+        arguments,
+        which should always result
+        in existing table related properties,
+        as a cache stored first with ``load_tables=False``,
+        should be updated when loading again with ``load_tables=True``.
+
+        Args:
+            load_tables_first: if ``True``,
+                it calls ``audbcards.Dataset``
+                with ``load_tables=True``
+                during it first call
+
+        """
+        self.load_dataset(load_tables=load_tables_first)
+        self.assert_has_table_properties(load_tables_first)
+        self.load_dataset(load_tables=not load_tables_first)
+        self.assert_has_table_properties(True)
+        self.load_dataset(load_tables=load_tables_first)
+        self.assert_has_table_properties(True)
