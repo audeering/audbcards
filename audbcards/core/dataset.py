@@ -496,13 +496,6 @@ class _Dataset:
             >>> from tabulate import tabulate
             >>> ds = Dataset("emodb", "1.4.1")
             >>> preview = ds.tables_preview["speaker"]
-            >>> preview
-            [['speaker', 'age', 'gender', 'language'],
-             ['3', '31', 'male', 'deu'],
-             ['8', '34', 'female', 'deu'],
-             ['9', '21', 'female', 'deu'],
-             ['10', '32', 'male', 'deu'],
-             ['11', '26', 'male', 'deu']]
             >>> print(tabulate(preview, headers="firstrow", tablefmt="github"))
             |   speaker |   age | gender   | language   |
             |-----------|-------|----------|------------|
