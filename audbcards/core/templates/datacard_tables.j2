@@ -6,9 +6,7 @@ Tables
 .. raw:: html
 
     <table class="clickable docutils align-default">
-    {######################################}
     {# Table header is given by first row #}
-    {######################################}
     <thead>
     <tr class="row-odd grid header">
     {% for column in tables_table[0] %}
@@ -16,9 +14,7 @@ Tables
     {% endfor %}
     </tr>
     </thead>
-    {#########################################}
-    {# Table body by remaining rows ##########}
-    {#########################################}
+    {# Table body by remaining rows #}
     <tbody>
     {% for row in tables_table %}
     {% if not loop.first %}
