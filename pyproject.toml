@@ -73,6 +73,7 @@ cache_dir = '.cache/pytest'
 xfail_strict = true
 addopts = '''
     --doctest-modules
+    --ignore=audbcards/sphinx/
 '''
 
 
