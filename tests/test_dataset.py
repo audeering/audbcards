@@ -457,7 +457,7 @@ class TestDatasetLoadTables:
 
     @classmethod
     @pytest.fixture(autouse=True)
-    def setup(cls, cache, medium_db):
+    def prepare(cls, cache, medium_db):
         r"""Provide test class with cache, database name and database version.
 
         Args:
