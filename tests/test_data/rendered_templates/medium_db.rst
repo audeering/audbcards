@@ -45,14 +45,14 @@ Tables
 .. raw:: html
 
     <table class="clickable docutils align-default">
-                <thead>
+        <thead>
     <tr class="row-odd grid header">
         <th class="head"><p>ID</p></th>
         <th class="head"><p>Type</p></th>
         <th class="head"><p>Columns</p></th>
         </tr>
     </thead>
-                <tbody>
+        <tbody>
                     <tr onClick="toggleRow(this)" class="row-even clickable grid">
         <td><p>files</p></td>
         <td><p>filewise</p></td>
