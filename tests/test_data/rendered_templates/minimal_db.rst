@@ -29,9 +29,40 @@ Minimal database.
 Tables
 ^^^^^^
 
-.. csv-table::
-    :header-rows: 1
-    :widths: 20, 10, 70
+.. raw:: html
 
-    "ID", "Type", "Columns"
-    "files", "filewise", "speaker"
+    <table class="clickable docutils align-default">
+                <thead>
+    <tr class="row-odd grid header">
+        <th class="head"><p>ID</p></th>
+        <th class="head"><p>Type</p></th>
+        <th class="head"><p>Columns</p></th>
+        </tr>
+    </thead>
+                <tbody>
+                    <tr onClick="toggleRow(this)" class="row-even clickable grid">
+        <td><p>files</p></td>
+        <td><p>filewise</p></td>
+        <td><p>speaker</p></td>
+        <td class="expanded-row-content hide-row">
+
+    
+    <table class="docutils field-list align-default preview">
+    <thead>
+    <tr>
+        <th class="head"><p>file</p></th>
+        <th class="head"><p>speaker</p></th>
+        </tr>
+    </thead>
+    <tbody>
+                    <tr>
+        <td><p>f0.wav</p></td>
+        <td><p>0</p></td>
+                </tbody>
+    </table>
+
+    
+    </td>
+    </tr>
+            </tbody>
+    </table>
