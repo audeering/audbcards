@@ -458,7 +458,7 @@ class TestDatasetLoadTables:
     @classmethod
     @pytest.fixture(autouse=True)
     def setup(cls, cache, medium_db):
-        r"""Provide test class with cache and database.
+        r"""Provide test class with cache, database name and database version.
 
         Args:
             cache: cache fixture
@@ -489,6 +489,8 @@ class TestDatasetLoadTables:
 
     def load_dataset(self, *, load_tables: bool):
         r"""Load dataset.
+
+        Call ``audbcards.Dataset`` and assign result to ``self.dataset``.
 
         Args:
             load_tables: if ``True``,
