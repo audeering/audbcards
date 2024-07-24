@@ -32,11 +32,13 @@ class _Dataset:
     Persistence of table related cached properties
     depends on the ``load_tables`` argument
     of :class:`audbcards.Dataset`.
-    When ``load_tables`` is ``True``
+    If ``load_tables`` is ``True``,
     :meth:`audbcards.Dataset._cached_properties`
     is asked to cache table related cached properties as well.
-    It infers the table related properties
-    from ``_table_related_cached_properties``.
+    If ``load_tables`` is ``False``,
+    :meth:`audbcards.Dataset._cached_properties`
+    is asked to exclude all cached properties,
+    listed in ``_table_related_cached_properties``.
     Which means,
     ``_table_related_cached_properties`` has to list all cached properties,
     that will load filewise or segmented tables.
@@ -65,8 +67,6 @@ class _Dataset:
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
-            # `load_tables` is not stored in cache
-            obj._load_tables = load_tables
             # Load cached properties,
             # that require to load filewise or segmented tables,
             # if they haven't been cached before.
@@ -87,7 +87,11 @@ class _Dataset:
 
         obj = cls(name, version, cache_root, load_tables)
         # Visit cached properties to fill their cache values
-        obj._cached_properties()
+        if load_tables:
+            exclude = []
+        else:
+            exclude = cls._table_related_cached_properties
+        obj._cached_properties(exclude=exclude)
 
         cls._save_pickled(obj, dataset_cache_filename)
         return obj
@@ -102,8 +106,18 @@ class _Dataset:
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
 
-        # Private attribute used in ``self._cached_properties()``
-        self._load_tables = load_tables
+        # Define `__getstate__()` method,
+        # which selects the cached attributes
+        # to include in the pickled cache file
+        if load_tables:
+            exclude = []
+        else:
+            exclude = self._table_related_cached_properties
+
+        def getstate():
+            return self._cached_properties(exclude=exclude)
+
+        self.__getstate__ = getstate
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
@@ -128,10 +142,6 @@ class _Dataset:
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(cache_root, name, other_version)
-
-    def __getstate__(self):
-        r"""Returns attributes to be pickled."""
-        return self._cached_properties()
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
@@ -482,20 +492,25 @@ class _Dataset:
         r"""Version of dataset."""
         return self._version
 
-    def _cached_properties(self) -> typing.Dict[str, typing.Any]:
+    def _cached_properties(
+        self,
+        *,
+        exclude: typing.Sequence = [],
+    ) -> typing.Dict[str, typing.Any]:
         """Get list of cached properties of the object.
 
         When collecting the cached properties,
         it also executes their code
         in order to generate the associated values.
 
+        Args:
+            exclude: list of cached properties,
+                that should not be cached
+
         Returns:
             dictionary with property name and value
 
         """
-        exclude = []
-        if not self._load_tables:
-            exclude = self._table_related_cached_properties
         class_items = self.__class__.__dict__.items()
         props = dict(
             (k, getattr(self, k))
