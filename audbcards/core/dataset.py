@@ -481,15 +481,16 @@ class _Dataset:
 
     @functools.cached_property
     def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
-        """Tables preview of the dataset.
+        """Table preview for each table of the dataset.
 
         Shows the header
         and the first 5 lines for each table
         as a list of lists.
+        All table values are converted to strings.
 
         Returns:
             dictionary with table IDs as keys
-            and table previes as values
+            and table previews as values
 
         Examples:
             >>> from tabulate import tabulate
@@ -497,12 +498,11 @@ class _Dataset:
             >>> preview = ds.tables_preview["speaker"]
             >>> preview
             [['speaker', 'age', 'gender', 'language'],
-             [3, 31, 'male', 'deu'],
-             [8, 34, 'female', 'deu'],
-             [9, 21, 'female', 'deu'],
-             [10, 32, 'male', 'deu'],
-             [11, 26, 'male', 'deu']]
-
+             ['3', '31', 'male', 'deu'],
+             ['8', '34', 'female', 'deu'],
+             ['9', '21', 'female', 'deu'],
+             ['10', '32', 'male', 'deu'],
+             ['11', '26', 'male', 'deu']]
             >>> print(tabulate(preview, headers="firstrow", tablefmt="github"))
             |   speaker |   age | gender   | language   |
             |-----------|-------|----------|------------|
@@ -522,7 +522,9 @@ class _Dataset:
                 verbose=False,
             )
             df = df.reset_index()
-            preview[table] = [df.columns.tolist()] + df.head().values.tolist()
+            preview[table] = [df.columns.tolist()] + df.head(5).astype(
+                "string"
+            ).values.tolist()
         return preview
 
     @functools.cached_property
