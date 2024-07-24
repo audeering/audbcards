@@ -28,15 +28,24 @@ class _Dataset:
     and misc tables used as scheme labels.
     Some might also need to load filewise or segmented tables,
     to gather more information.
-    As this process can be slow,
-    or crash,
-    when tables do not fit into memory,
-    we provide the ``load_tables`` argument in ``audbcards.Dataset``
-    to avoid loading of the tables.
 
-    To make ``load_tables`` work,
+    Persistence of table related cached properties
+    depends on the ``load_tables`` argument
+    of :class:`audbcards.Dataset`.
+    When ``load_tables`` is ``True``
+    :meth:`audbcards.Dataset._cached_properties`
+    is asked to cache table related cached properties as well.
+    It infers the table related properties
+    from ``_table_related_cached_properties``.
+    Which means,
     ``_table_related_cached_properties`` has to list all cached properties,
     that will load filewise or segmented tables.
+
+    If a dataset exists in cache,
+    but does not store table related cached properties,
+    a call to :class:`audbcards.Dataset`
+    with ``load_tables`` is ``True``,
+    will update the cache.
 
     """
 
