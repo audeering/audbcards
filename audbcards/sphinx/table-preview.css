@@ -10,6 +10,7 @@
     display: grid;
     grid-column: 1/-1;
     justify-content: flex-start;
+    border-left: none;
 }
 .hide-row {
     display: None;
@@ -21,24 +22,35 @@ table.clickable {
     /* Force to use full width */
     width: 100%;
 }
-table.clickable td, table.clickable th {
+table.clickable td,
+table.clickable th {
     /* Ensure we don't get double border lines */
     border-left: none;
     border-top: none;
 }
-table.clickable td:not(.expanded-row-content) {
+table.preview td {
+    /* Remove all borders inside preview table cells */
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+}
+table.clickable td:not(.expanded-row-content),
+table.clickable th {
     /* Allow to center cell copntent with `margin: auto` */
     display: flex;
 }
-table.clickable td:not(.expanded-row-content) p, table.clickable th p {
+table.clickable td:not(.expanded-row-content) p,
+table.clickable th p {
     /* Verrtically center cell content */
     margin: auto 0;
 }
-table.clickable td:not(.expanded-row-content) p:last-child, table.clickable th p:last-child {
+table.clickable td:not(.expanded-row-content) p:last-child,
+table.clickable th p:last-child {
     /* Verrtically center cell content for ReadTheDocs based themes*/
     margin: auto 0 !important;
 }
-table.clickable td.expanded-row-content td, table.clickable td.expanded-row-content th {
+table.clickable td.expanded-row-content td,
+table.clickable td.expanded-row-content th {
     display: table-cell;
 }
 table.clickable tr.grid {
@@ -51,6 +63,10 @@ table.clickable tr.clickable {
     cursor: pointer;
     /* Overflow of table preview column */
     justify-content: flex-start;
+}
+table.clickable tr.clicked td:not(.expanded-row-content) {
+    /* Remove bottom border on clicked row when preview is shown */
+    border-bottom: none;
 }
 table.preview {
     /* Padding around table preview */
