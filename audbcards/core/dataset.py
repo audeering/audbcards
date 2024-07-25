@@ -13,9 +13,8 @@ import audbackend
 import audeer
 import audformat
 
+from audbcards.core import utils
 from audbcards.core.config import config
-from audbcards.core.utils import format_schemes
-from audbcards.core.utils import limit_presented_samples
 
 
 class _Dataset:
@@ -413,7 +412,7 @@ class _Dataset:
         e.g. ``'speaker: [age, gender, language]'``.
 
         """
-        return format_schemes(self.header.schemes)
+        return utils.format_schemes(self.header.schemes)
 
     @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
@@ -486,7 +485,9 @@ class _Dataset:
         Shows the header
         and the first 5 lines for each table
         as a list of lists.
-        All table values are converted to strings.
+        All table values are converted to strings,
+        stripped from HTML tags or newlines,
+        and limited to a maximum length of 100 characters.
 
         Returns:
             dictionary with table IDs as keys
@@ -515,9 +516,11 @@ class _Dataset:
                 verbose=False,
             )
             df = df.reset_index()
-            preview[table] = [df.columns.tolist()] + df.head(5).astype(
-                "string"
-            ).values.tolist()
+            header = [df.columns.tolist()]
+            body = df.head(5).astype("string").values.tolist()
+            # Remove unwanted chars and limit length of each entry
+            body = [[utils.parse_text(column) for column in row] for row in body]
+            preview[table] = header + body
         return preview
 
     @functools.cached_property
@@ -664,7 +667,7 @@ class _Dataset:
                     label[:-1] + r"\_" if label.endswith("_") else label
                     for label in labels
                 ]
-                labels = limit_presented_samples(
+                labels = utils.limit_presented_samples(
                     labels,
                     15,
                     replacement_text="[...]",

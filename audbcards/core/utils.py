@@ -1,6 +1,8 @@
+import re
 import typing
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import audeer
 import audformat
@@ -97,6 +99,30 @@ def limit_presented_samples(
     if len(samples) >= limit:
         samples = samples[: limit // 2] + [replacement_text] + samples[-limit // 2 :]
     return samples
+
+
+def parse_text(text: str) -> str:
+    """Remove unsupported characters and restrict length.
+
+    Args:
+        text: input text
+
+    Returns:
+        parsed text
+
+    """
+    # Missing text
+    if pd.isna(text):
+        return text
+    # Remove newlines
+    text = text.replace("\n", "\\n")
+    # Remove HTML tags
+    text = re.sub("<[^<]+?>", "", text)
+    # Limit length
+    max_characters_per_entry = 100
+    if len(text) > max_characters_per_entry:
+        text = text[: max_characters_per_entry - 3] + "..."
+    return text
 
 
 def set_plot_margins(
