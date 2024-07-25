@@ -80,4 +80,5 @@ def test_limit_presented_samples(sample, limit, replacement_text, expected):
     ],
 )
 def test_parse_text(text, expected):
+    """Test parsing of text."""
     assert audbcards.core.utils.parse_text(text) == expected
