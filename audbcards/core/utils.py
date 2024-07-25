@@ -104,6 +104,9 @@ def limit_presented_samples(
 def parse_text(text: str) -> str:
     """Remove unsupported characters and restrict length.
 
+    The text is stripped from HTML tags or newlines,
+    and limited to a maximum length of 100 characters.
+
     Args:
         text: input text
 
