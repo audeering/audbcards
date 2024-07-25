@@ -18,7 +18,11 @@ from audbcards.core.config import config
 
 
 class _Dataset:
-    _table_related_cached_properties = ["segment_durations", "segments"]
+    _table_related_cached_properties = [
+        "segment_durations",
+        "segments",
+        "tables_preview",
+    ]
     """Cached properties relying on table data.
 
     Most of the cached properties
