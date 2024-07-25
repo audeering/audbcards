@@ -1,3 +1,4 @@
 audb >=1.6.5  # for audb.Dependencies.__eq__()
 audeer >=1.21.0
 pytest
+tabulate

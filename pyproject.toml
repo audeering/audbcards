@@ -34,6 +34,7 @@ classifiers = [
 requires-python = '>=3.9'
 dependencies = [
     'audb >=1.7.0',
+    'audeer >=2.2.0',
     'audplot >=1.4.6',
     'jinja2',
     'pandas >=2.1.0',
@@ -70,6 +71,10 @@ skip = './audbcards.egg-info,./build'
 [tool.pytest.ini_options]
 cache_dir = '.cache/pytest'
 xfail_strict = true
+addopts = '''
+    --doctest-modules
+    --ignore=audbcards/sphinx/
+'''
 
 
 # ----- ruff --------------------------------------------------------------

@@ -12,6 +12,8 @@ from audbcards.core.dataset import create_datasets_page
 
 
 __version__ = "0.1.0"
+table_preview_css_file = audeer.path(audeer.script_dir(), "table-preview.css")
+table_preview_js_file = audeer.path(audeer.script_dir(), "table-preview.js")
 
 
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
@@ -53,6 +55,10 @@ def builder_inited(app: sphinx.application.Sphinx):
     """
     # Read config values
     sections = app.config.audbcards_datasets
+
+    # Add CSS and JS files for table preview feature
+    app.add_css_file(table_preview_css_file)
+    app.add_js_file(table_preview_js_file)
 
     # Gather and build data cards for each requested section
     for path, header, repositories, example in sections:

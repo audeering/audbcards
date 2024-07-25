@@ -65,7 +65,7 @@ def test_format_schemes(scheme_names, scheme_dtypes, labels, expected):
     ],
 )
 def test_limit_presented_samples(sample, limit, replacement_text, expected):
-    limited_sample = audbcards.core.dataset.limit_presented_samples(
+    limited_sample = audbcards.core.utils.limit_presented_samples(
         sample, limit, replacement_text
     )
     assert limited_sample == expected

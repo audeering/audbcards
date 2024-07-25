@@ -42,14 +42,120 @@ Example
 Tables
 ^^^^^^
 
-.. csv-table::
-    :header-rows: 1
-    :widths: 20, 10, 70
+.. raw:: html
 
-    "ID", "Type", "Columns"
-    "files", "filewise", "speaker"
-    "segments", "segmented", "emotion"
-    "speaker", "misc", "age, gender"
+    <table class="clickable docutils align-default">
+        <thead>
+    <tr class="row-odd grid header">
+        <th class="head"><p>ID</p></th>
+        <th class="head"><p>Type</p></th>
+        <th class="head"><p>Columns</p></th>
+        </tr>
+    </thead>
+        <tbody>
+                    <tr onClick="toggleRow(this)" class="row-even clickable grid">
+        <td><p>files</p></td>
+        <td><p>filewise</p></td>
+        <td><p>speaker</p></td>
+        <td class="expanded-row-content hide-row">
+
+    
+    <table class="docutils field-list align-default preview">
+    <thead>
+    <tr>
+        <th class="head"><p>file</p></th>
+        <th class="head"><p>speaker</p></th>
+        </tr>
+    </thead>
+    <tbody>
+                    <tr>
+        <td><p>data/f0.wav</p></td>
+        <td><p>0</p></td>
+                    <tr>
+        <td><p>data/f1.wav</p></td>
+        <td><p>1</p></td>
+                </tbody>
+    </table>
+
+    
+    </td>
+    </tr>
+                <tr onClick="toggleRow(this)" class="row-odd clickable grid">
+        <td><p>segments</p></td>
+        <td><p>segmented</p></td>
+        <td><p>emotion</p></td>
+        <td class="expanded-row-content hide-row">
+
+    
+    <table class="docutils field-list align-default preview">
+    <thead>
+    <tr>
+        <th class="head"><p>file</p></th>
+        <th class="head"><p>start</p></th>
+        <th class="head"><p>end</p></th>
+        <th class="head"><p>emotion</p></th>
+        </tr>
+    </thead>
+    <tbody>
+                    <tr>
+        <td><p>data/f0.wav</p></td>
+        <td><p>0 days 00:00:00</p></td>
+        <td><p>0 days 00:00:00.500000</p></td>
+        <td><p>neutral</p></td>
+                    <tr>
+        <td><p>data/f0.wav</p></td>
+        <td><p>0 days 00:00:00.500000</p></td>
+        <td><p>0 days 00:00:01</p></td>
+        <td><p>neutral</p></td>
+                    <tr>
+        <td><p>data/f1.wav</p></td>
+        <td><p>0 days 00:00:00</p></td>
+        <td><p>0 days 00:02:30</p></td>
+        <td><p>happy</p></td>
+                    <tr>
+        <td><p>data/f1.wav</p></td>
+        <td><p>0 days 00:02:30</p></td>
+        <td><p>0 days 00:05:01</p></td>
+        <td><p>angry</p></td>
+                </tbody>
+    </table>
+
+    
+    </td>
+    </tr>
+                <tr onClick="toggleRow(this)" class="row-even clickable grid">
+        <td><p>speaker</p></td>
+        <td><p>misc</p></td>
+        <td><p>age, gender</p></td>
+        <td class="expanded-row-content hide-row">
+
+    
+    <table class="docutils field-list align-default preview">
+    <thead>
+    <tr>
+        <th class="head"><p>speaker</p></th>
+        <th class="head"><p>age</p></th>
+        <th class="head"><p>gender</p></th>
+        </tr>
+    </thead>
+    <tbody>
+                    <tr>
+        <td><p>0</p></td>
+        <td><p>23</p></td>
+        <td><p>female</p></td>
+                    <tr>
+        <td><p>1</p></td>
+        <td><p>49</p></td>
+        <td><p>male</p></td>
+                </tbody>
+    </table>
+
+    
+    </td>
+    </tr>
+            </tbody>
+    </table>
+
 
 Schemes
 ^^^^^^^

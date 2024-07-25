@@ -2,6 +2,7 @@ import functools
 import inspect
 import os
 import pickle
+import re
 import typing
 
 import jinja2
@@ -13,13 +14,16 @@ import audbackend
 import audeer
 import audformat
 
+from audbcards.core import utils
 from audbcards.core.config import config
-from audbcards.core.utils import format_schemes
-from audbcards.core.utils import limit_presented_samples
 
 
 class _Dataset:
-    _table_related_cached_properties = ["segment_durations", "segments"]
+    _table_related_cached_properties = [
+        "segment_durations",
+        "segments",
+        "tables_preview",
+    ]
     """Cached properties relying on table data.
 
     Most of the cached properties
@@ -162,6 +166,33 @@ class _Dataset:
 
         with open(path, "rb") as f:
             return pickle.load(f)
+
+    @staticmethod
+    def _parse_text(text: str) -> str:
+        """Remove unsupported characters and restrict length.
+
+        The text is stripped from HTML tags or newlines,
+        and limited to a maximum length of 100 characters.
+
+        Args:
+            text: input text
+
+        Returns:
+            parsed text
+
+        """
+        # Missing text
+        if pd.isna(text):
+            return ""
+        # Remove newlines
+        text = text.replace("\n", "\\n")
+        # Remove HTML tags
+        text = re.sub("<[^<]+?>", "", text)
+        # Limit length
+        max_characters_per_entry = 100
+        if len(text) > max_characters_per_entry:
+            text = text[: max_characters_per_entry - 3] + "..."
+        return text
 
     @staticmethod
     def _save_pickled(obj, path: str):
@@ -413,7 +444,7 @@ class _Dataset:
         e.g. ``'speaker: [age, gender, language]'``.
 
         """
-        return format_schemes(self.header.schemes)
+        return utils.format_schemes(self.header.schemes)
 
     @functools.cached_property
     def schemes_table(self) -> typing.List[typing.List[str]]:
@@ -478,6 +509,51 @@ class _Dataset:
         db = self.header
         tables = list(db)
         return tables
+
+    @functools.cached_property
+    def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
+        """Table preview for each table of the dataset.
+
+        Shows the header
+        and the first 5 lines for each table
+        as a list of lists.
+        All table values are converted to strings,
+        stripped from HTML tags or newlines,
+        and limited to a maximum length of 100 characters.
+
+        Returns:
+            dictionary with table IDs as keys
+            and table previews as values
+
+        Examples:
+            >>> from tabulate import tabulate
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> preview = ds.tables_preview["speaker"]
+            >>> print(tabulate(preview, headers="firstrow", tablefmt="github"))
+            |   speaker |   age | gender   | language   |
+            |-----------|-------|----------|------------|
+            |         3 |    31 | male     | deu        |
+            |         8 |    34 | female   | deu        |
+            |         9 |    21 | female   | deu        |
+            |        10 |    32 | male     | deu        |
+            |        11 |    26 | male     | deu        |
+
+        """
+        preview = {}
+        for table in list(self.header):
+            df = audb.load_table(
+                self.name,
+                table,
+                version=self.version,
+                verbose=False,
+            )
+            df = df.reset_index()
+            header = [df.columns.tolist()]
+            body = df.head(5).astype("string").values.tolist()
+            # Remove unwanted chars and limit length of each entry
+            body = [[self._parse_text(column) for column in row] for row in body]
+            preview[table] = header + body
+        return preview
 
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:
@@ -623,7 +699,7 @@ class _Dataset:
                     label[:-1] + r"\_" if label.endswith("_") else label
                     for label in labels
                 ]
-                labels = limit_presented_samples(
+                labels = utils.limit_presented_samples(
                     labels,
                     15,
                     replacement_text="[...]",
@@ -775,6 +851,10 @@ class Dataset(object):
     def _load_pickled(path: str):
         ds = _Dataset._load_pickled(path)
         return ds
+
+    @staticmethod
+    def _parse_text(text: str) -> str:
+        return _Dataset._parse_text(text)
 
     @staticmethod
     def _save_pickled(obj, path: str):
