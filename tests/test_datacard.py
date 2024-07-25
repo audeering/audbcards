@@ -25,7 +25,7 @@ def test_datacard(tmpdir, db, cache, request):
     """Test datacard creation from jinja2 templates."""
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
-    datacard = audbcards.Datacard(dataset)
+    datacard = audbcards.Datacard(dataset, cache_root=cache)
 
     # Set sphinx src and build dir
     build_dir = audeer.mkdir(tmpdir, "build", "html")
@@ -75,7 +75,7 @@ def test_datacard_file_duration_distribution(
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, "datasets")
-    datacard = audbcards.Datacard(dataset, path=datacard_path)
+    datacard = audbcards.Datacard(dataset, path=datacard_path, cache_root=cache)
 
     # Without specifying sphinx src and build dirs,
     # we do not expect a PNG file
@@ -128,7 +128,7 @@ def test_datacard_player(tmpdir, db, cache, request):
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
     datacard_path = audeer.mkdir(tmpdir, "datasets")
-    datacard = audbcards.Datacard(dataset, path=datacard_path)
+    datacard = audbcards.Datacard(dataset, path=datacard_path, cache_root=cache)
 
     # Execute player
     # without specifying sphinx src and build dirs
