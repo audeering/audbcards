@@ -77,6 +77,8 @@ def test_limit_presented_samples(sample, limit, replacement_text, expected):
         ("abc\ndef", "abc\\ndef"),
         ("a" * 101, "a" * 97 + "..."),
         ('<a href="http://www.google.de">text link</a>', "text link"),
+        (None, ""),
+        (pd.NA, ""),
     ],
 )
 def test_parse_text(text, expected):

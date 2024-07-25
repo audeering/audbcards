@@ -116,7 +116,7 @@ def parse_text(text: str) -> str:
     """
     # Missing text
     if pd.isna(text):
-        return text
+        return ""
     # Remove newlines
     text = text.replace("\n", "\\n")
     # Remove HTML tags
