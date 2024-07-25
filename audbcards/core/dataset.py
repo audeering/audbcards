@@ -2,6 +2,7 @@ import functools
 import inspect
 import os
 import pickle
+import re
 import typing
 
 import jinja2
@@ -165,6 +166,33 @@ class _Dataset:
 
         with open(path, "rb") as f:
             return pickle.load(f)
+
+    @staticmethod
+    def _parse_text(text: str) -> str:
+        """Remove unsupported characters and restrict length.
+
+        The text is stripped from HTML tags or newlines,
+        and limited to a maximum length of 100 characters.
+
+        Args:
+            text: input text
+
+        Returns:
+            parsed text
+
+        """
+        # Missing text
+        if pd.isna(text):
+            return ""
+        # Remove newlines
+        text = text.replace("\n", "\\n")
+        # Remove HTML tags
+        text = re.sub("<[^<]+?>", "", text)
+        # Limit length
+        max_characters_per_entry = 100
+        if len(text) > max_characters_per_entry:
+            text = text[: max_characters_per_entry - 3] + "..."
+        return text
 
     @staticmethod
     def _save_pickled(obj, path: str):
@@ -523,7 +551,7 @@ class _Dataset:
             header = [df.columns.tolist()]
             body = df.head(5).astype("string").values.tolist()
             # Remove unwanted chars and limit length of each entry
-            body = [[utils.parse_text(column) for column in row] for row in body]
+            body = [[self._parse_text(column) for column in row] for row in body]
             preview[table] = header + body
         return preview
 
@@ -823,6 +851,10 @@ class Dataset(object):
     def _load_pickled(path: str):
         ds = _Dataset._load_pickled(path)
         return ds
+
+    @staticmethod
+    def _parse_text(text: str) -> str:
+        return _Dataset._parse_text(text)
 
     @staticmethod
     def _save_pickled(obj, path: str):

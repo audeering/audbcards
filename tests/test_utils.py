@@ -69,18 +69,3 @@ def test_limit_presented_samples(sample, limit, replacement_text, expected):
         sample, limit, replacement_text
     )
     assert limited_sample == expected
-
-
-@pytest.mark.parametrize(
-    "text, expected",
-    [
-        ("abc\ndef", "abc\\ndef"),
-        ("a" * 101, "a" * 97 + "..."),
-        ('<a href="http://www.google.de">text link</a>', "text link"),
-        (None, ""),
-        (pd.NA, ""),
-    ],
-)
-def test_parse_text(text, expected):
-    """Test parsing of text."""
-    assert audbcards.core.utils.parse_text(text) == expected

@@ -452,6 +452,21 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         assert dataset.repository_object == repository
 
 
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("abc\ndef", "abc\\ndef"),
+        ("a" * 101, "a" * 97 + "..."),
+        ('<a href="http://www.google.de">text link</a>', "text link"),
+        (None, ""),
+        (pd.NA, ""),
+    ],
+)
+def test_dataset_parse_text(text, expected):
+    """Test parsing of text."""
+    assert audbcards.Dataset._parse_text(text) == expected
+
+
 class TestDatasetLoadTables:
     r"""Test load_tables argument of audbcards.Dataset."""
 
