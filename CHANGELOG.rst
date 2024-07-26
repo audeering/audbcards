@@ -7,6 +7,25 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.0 (2024-07-26)
+--------------------------
+
+* Added: table preview for each table of a dataset
+  on the datacard
+* Added: ``audbcards.Dataset.segments``
+  which returns the number of unique segments of a dataset
+* Added: ``audbcards.Datasets.segment_durations``,
+  which returns a list of all segment durations
+* Added: ``audbcards.Datacard.segment_duration_distribution``
+* Changed: don't show media examples
+  for datasets that store,
+  on average,
+  more than 100 files per archive
+* Changed: show video examples as video instead of audio
+* Changed: depend on ``audeer>=2.2.0``
+* Changed: depend on ``audiofile>=1.5.0``
+
+
 Version 0.2.0 (2024-05-15)
 --------------------------
 
