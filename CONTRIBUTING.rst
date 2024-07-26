@@ -88,20 +88,20 @@ You can install it and a few other necessary packages with::
 
 To create the HTML pages, use::
 
-    python -m sphinx docs/ build/sphinx/html -b html
+    python -m sphinx docs/ build/html -b html
 
 To ensure that anonymous access is used
 when communicating with Artifactory,
 you can call instead::
 
-    ARTIFACTORY_USERNAME=anonymous ARTIFACTORY_API_KEY="" python -m sphinx docs/ build/sphinx/html -b html
+    ARTIFACTORY_USERNAME=anonymous ARTIFACTORY_API_KEY="" python -m sphinx docs/ build/html -b html
 
 The generated files will be available
-in the directory :file:`build/sphinx/html/`.
+in the directory :file:`build/html/`.
 
 It is also possible to automatically check if all links are still valid::
 
-    python -m sphinx docs/ build/sphinx/html -b linkcheck
+    python -m sphinx docs/ build/html -b linkcheck
 
 .. _Sphinx: http://sphinx-doc.org
 
