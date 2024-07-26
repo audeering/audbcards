@@ -106,6 +106,7 @@ class Datacard(object):
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``
         (e.g. when used in the sphinx extension),
+        and the dataset contains audio or video files,
         an image is stored in the file
         ``<dataset-name>-<dataset-version>-file-duration-distribution.png``,
         which is cached in
@@ -349,6 +350,7 @@ class Datacard(object):
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``
         (e.g. when used in the sphinx extension),
+        and the dataset contains segments,
         an image is stored in the file
         ``<dataset-name>-<dataset-version>-segment-duration-distribution.png``,
         which is cached in
