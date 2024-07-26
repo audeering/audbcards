@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Dataset" href="audbcards.Dataset.html" />
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
             
           
@@ -112,6 +113,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#player">player()</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rst-preamble">rst_preamble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#save">save()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segment-duration-distribution">segment_duration_distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sphinx-build-dir">sphinx_build_dir</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sphinx-src-dir">sphinx_src_dir</a></li>
 </ul>
@@ -181,7 +183,7 @@ using <code class="docutils literal notranslate"><span class="pre">sphinx</span>
 <li><p><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – path to folder
 that store datacard files</p></li>
 <li><p><strong>example</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>,
-include an audio example in the data card
+include an audio or video example in the data card
 showing the waveform of the audio
 and an interactive player</p></li>
 <li><p><strong>sphinx_build_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – build dir of sphinx.
@@ -255,6 +257,7 @@ containing the mininimum and maximum values
 of files durations.</p>
 <p>If <a class="reference internal" href="#audbcards.Datacard.sphinx_src_dir" title="audbcards.Datacard.sphinx_src_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.Datacard.sphinx_src_dir</span></code></a> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>
 (e.g. when used in the sphinx extension),
+and the dataset contains audio or video files,
 an image is stored in the file
 <code class="docutils literal notranslate"><span class="pre">&lt;dataset-name&gt;-&lt;dataset-version&gt;-file-duration-distribution.png</span></code>,
 which is cached in
@@ -283,7 +286,7 @@ no distribution plot is created.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="audbcards.Datacard.player">
 <span class="sig-prename descclassname"><span class="pre">Datacard.</span></span><span class="sig-name descname"><span class="pre">player</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/datacard.html#Datacard.player"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Datacard.player" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an audio player showing the waveform.</p>
+<dd><p>Create an audio/video player showing the waveform.</p>
 <p>If <a class="reference internal" href="#audbcards.Datacard.sphinx_build_dir" title="audbcards.Datacard.sphinx_build_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.Datacard.sphinx_build_dir</span></code></a>
 or <a class="reference internal" href="#audbcards.Datacard.sphinx_src_dir" title="audbcards.Datacard.sphinx_src_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.Datacard.sphinx_src_dir</span></code></a>
 is not <code class="docutils literal notranslate"><span class="pre">None</span></code>,
@@ -353,6 +356,32 @@ as <code class="docutils literal notranslate"><span class="pre">&lt;sphinx_src_d
 </dd></dl>
 
 </div>
+<div class="section" id="segment-duration-distribution">
+<h2>segment_duration_distribution<a class="headerlink" href="#segment-duration-distribution" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Datacard.segment_duration_distribution">
+<span class="sig-prename descclassname"><span class="pre">Datacard.</span></span><span class="sig-name descname"><span class="pre">segment_duration_distribution</span></span><a class="headerlink" href="#audbcards.Datacard.segment_duration_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimum and maximum of segment durations, and plotted distribution.</p>
+<p>This generates a single line
+containing the mininimum and maximum values
+of segment durations.</p>
+<p>If <a class="reference internal" href="#audbcards.Datacard.sphinx_src_dir" title="audbcards.Datacard.sphinx_src_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.Datacard.sphinx_src_dir</span></code></a> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>
+(e.g. when used in the sphinx extension),
+and the dataset contains segments,
+an image is stored in the file
+<code class="docutils literal notranslate"><span class="pre">&lt;dataset-name&gt;-&lt;dataset-version&gt;-segment-duration-distribution.png</span></code>,
+which is cached in
+<code class="docutils literal notranslate"><span class="pre">&lt;cache-root&gt;/&lt;dataset-name&gt;/&lt;dataset-version&gt;/</span></code>
+and copied to the sphinx source folder
+into
+<code class="docutils literal notranslate"><span class="pre">&lt;sphinx-src-dir&gt;/&lt;path&gt;&lt;dataset-name&gt;/</span></code>.
+The image is displayed inline
+between the minimum and maximum values.
+If all duration values are the same,
+no distribution plot is created.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="sphinx-build-dir">
 <h2>sphinx_build_dir<a class="headerlink" href="#sphinx-build-dir" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -396,7 +425,7 @@ as <code class="docutils literal notranslate"><span class="pre">&lt;sphinx_src_d
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/07/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -436,6 +465,7 @@ as <code class="docutils literal notranslate"><span class="pre">&lt;sphinx_src_d
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
+        <script src="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.js"></script>
     
 
   

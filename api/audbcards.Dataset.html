@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Datacard" href="audbcards.Datacard.html" />
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
             
           
@@ -131,9 +132,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes-summary">schemes_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes-table">schemes_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segment-durations">segment_durations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segments">segments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#short-description">short_description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables">tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables-preview">tables_preview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables-table">tables_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version">version</a></li>
@@ -188,10 +192,10 @@
 <h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audbcards.Dataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset representation.</p>
 <p>Dataset object that represents a dataset
-that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.7.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
+that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.8.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -202,6 +206,11 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 the environmental variable <code class="docutils literal notranslate"><span class="pre">AUDBCARDS_CACHE_ROOT</span></code>,
 or <a class="reference internal" href="audbcards.config.html#audbcards.config.CACHE_ROOT" title="audbcards.config.CACHE_ROOT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audbcards.config.CACHE_ROOT</span></code></a>
 is used</p></li>
+<li><p><strong>load_tables</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+it caches values extracted from tables.
+Set this to <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+if loading the tables takes too long,
+or does not fit into memory</p></li>
 </ul>
 </dd>
 </dl>
@@ -299,6 +308,9 @@ by its median duration
 from all files in the dataset
 with a duration
 between 0.5 s and 300 s.
+In addition,
+the media file needs to be stored in an archive
+with less than 100 media files.
 If no media file meets this criterium,
 <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned instead.</p>
 </dd></dl>
@@ -476,6 +488,24 @@ with column names as keys.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="segment-durations">
+<h2>segment_durations<a class="headerlink" href="#segment-durations" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.segment_durations">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">segment_durations</span></span><a class="headerlink" href="#audbcards.Dataset.segment_durations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segment durations in dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="segments">
+<h2>segments<a class="headerlink" href="#segments" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.segments">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">segments</span></span><a class="headerlink" href="#audbcards.Dataset.segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of segments in dataset.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="short-description">
 <h2>short_description<a class="headerlink" href="#short-description" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -500,6 +530,41 @@ with column names as keys.</p>
 <dt class="sig sig-object py" id="audbcards.Dataset.tables">
 <span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#audbcards.Dataset.tables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tables of the dataset.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tables-preview">
+<h2>tables_preview<a class="headerlink" href="#tables-preview" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.tables_preview">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables_preview</span></span><a class="headerlink" href="#audbcards.Dataset.tables_preview" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table preview for each table of the dataset.</p>
+<p>Shows the header
+and the first 5 lines for each table
+as a list of lists.
+All table values are converted to strings,
+stripped from HTML tags or newlines,
+and limited to a maximum length of 100 characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dictionary with table IDs as keys
+and table previews as values</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">preview</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">tables_preview</span><span class="p">[</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">preview</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;firstrow&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;github&quot;</span><span class="p">))</span>
+<span class="go">|   speaker |   age | gender   | language   |</span>
+<span class="go">|-----------|-------|----------|------------|</span>
+<span class="go">|         3 |    31 | male     | deu        |</span>
+<span class="go">|         8 |    34 | female   | deu        |</span>
+<span class="go">|         9 |    21 | female   | deu        |</span>
+<span class="go">|        10 |    32 | male     | deu        |</span>
+<span class="go">|        11 |    26 | male     | deu        |</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -553,7 +618,7 @@ with column names as keys.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/07/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -593,6 +658,7 @@ with column names as keys.</p>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
+        <script src="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.js"></script>
     
 
   

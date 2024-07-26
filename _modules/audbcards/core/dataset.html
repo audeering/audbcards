@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     
@@ -63,7 +64,7 @@
             
             
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
             
           
@@ -146,6 +147,7 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">jinja2</span>
@@ -157,12 +159,47 @@
 <span class="kn">import</span> <span class="nn">audeer</span>
 <span class="kn">import</span> <span class="nn">audformat</span>
 
+<span class="kn">from</span> <span class="nn">audbcards.core</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">audbcards.core.config</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">audbcards.core.utils</span> <span class="kn">import</span> <span class="n">format_schemes</span>
-<span class="kn">from</span> <span class="nn">audbcards.core.utils</span> <span class="kn">import</span> <span class="n">limit_presented_samples</span>
 
 
 <span class="k">class</span> <span class="nc">_Dataset</span><span class="p">:</span>
+    <span class="n">_table_related_cached_properties</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;segment_durations&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;segments&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tables_preview&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cached properties relying on table data.</span>
+
+<span class="sd">    Most of the cached properties</span>
+<span class="sd">    rely on the dependency table,</span>
+<span class="sd">    the header of a dataset,</span>
+<span class="sd">    and misc tables used as scheme labels.</span>
+<span class="sd">    Some might also need to load filewise or segmented tables,</span>
+<span class="sd">    to gather more information.</span>
+
+<span class="sd">    Persistence of table related cached properties</span>
+<span class="sd">    depends on the ``load_tables`` argument</span>
+<span class="sd">    of :class:`audbcards.Dataset`.</span>
+<span class="sd">    If ``load_tables`` is ``True``,</span>
+<span class="sd">    :meth:`audbcards.Dataset._cached_properties`</span>
+<span class="sd">    is asked to cache table related cached properties as well.</span>
+<span class="sd">    If ``load_tables`` is ``False``,</span>
+<span class="sd">    :meth:`audbcards.Dataset._cached_properties`</span>
+<span class="sd">    is asked to exclude all cached properties,</span>
+<span class="sd">    listed in ``_table_related_cached_properties``.</span>
+<span class="sd">    Which means,</span>
+<span class="sd">    ``_table_related_cached_properties`` has to list all cached properties,</span>
+<span class="sd">    that will load filewise or segmented tables.</span>
+
+<span class="sd">    If a dataset exists in cache,</span>
+<span class="sd">    but does not store table related cached properties,</span>
+<span class="sd">    a call to :class:`audbcards.Dataset`</span>
+<span class="sd">    with ``load_tables`` is ``True``,</span>
+<span class="sd">    will update the cache.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -170,6 +207,7 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Instantiate Dataset Object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -178,11 +216,31 @@
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_pickled</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">)</span>
+            <span class="c1"># Load cached properties,</span>
+            <span class="c1"># that require to load filewise or segmented tables,</span>
+            <span class="c1"># if they haven&#39;t been cached before.</span>
+            <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
+                <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span><span class="p">:</span>
+                    <span class="c1"># Check if property has been cached,</span>
+                    <span class="c1"># see https://stackoverflow.com/a/59740750</span>
+                    <span class="k">if</span> <span class="n">cached_property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                        <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="c1"># Request property to fill their cached value</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cache_again</span><span class="p">:</span>
+                    <span class="c1"># Update cache to store the table related cached properties</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">obj</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">load_tables</span><span class="p">)</span>
+        <span class="c1"># Visit cached properties to fill their cache values</span>
+        <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
+            <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exclude</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span>
@@ -192,9 +250,23 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Define `__getstate__()` method,</span>
+        <span class="c1"># which selects the cached attributes</span>
+        <span class="c1"># to include in the pickled cache file</span>
+        <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
+            <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exclude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
+
+        <span class="k">def</span> <span class="nf">getstate</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span> <span class="o">=</span> <span class="n">getstate</span>
 
         <span class="c1"># Store name and version in private attributes here,</span>
         <span class="c1"># ``self.name`` and ``self.version``</span>
@@ -220,10 +292,6 @@
         <span class="k">for</span> <span class="n">other_version</span> <span class="ow">in</span> <span class="n">other_versions</span><span class="p">:</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">other_version</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns attributes to be pickled.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">()</span>
-
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the name of the cache file.&quot;&quot;&quot;</span>
@@ -243,6 +311,33 @@
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove unsupported characters and restrict length.</span>
+
+<span class="sd">        The text is stripped from HTML tags or newlines,</span>
+<span class="sd">        and limited to a maximum length of 100 characters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text: input text</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            parsed text</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Missing text</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># Remove newlines</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">)</span>
+        <span class="c1"># Remove HTML tags</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&lt;[^&lt;]+?&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="c1"># Limit length</span>
+        <span class="n">max_characters_per_entry</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_characters_per_entry</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span> <span class="n">max_characters_per_entry</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+        <span class="k">return</span> <span class="n">text</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -343,6 +438,9 @@
 <span class="sd">        from all files in the dataset</span>
 <span class="sd">        with a duration</span>
 <span class="sd">        between 0.5 s and 300 s.</span>
+<span class="sd">        In addition,</span>
+<span class="sd">        the media file needs to be stored in an archive</span>
+<span class="sd">        with less than 100 media files.</span>
 <span class="sd">        If no media file meets this criterium,</span>
 <span class="sd">        ``None`` is returned instead.</span>
 
@@ -365,7 +463,17 @@
             <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)),</span>
             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">durations</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">selected_duration</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="c1"># Ensure we don&#39;t have too many other files in the archive</span>
+        <span class="c1"># containing the selected file</span>
+        <span class="n">archives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">archive</span>
+        <span class="n">selected_archive</span> <span class="o">=</span> <span class="n">archives</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">number_of_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">archive</span> <span class="k">for</span> <span class="n">archive</span> <span class="ow">in</span> <span class="n">archives</span> <span class="k">if</span> <span class="n">archive</span> <span class="o">==</span> <span class="n">selected_archive</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">selected_media</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">number_of_files</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">selected_media</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">selected_media</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -481,7 +589,7 @@
 <span class="sd">        e.g. ``&#39;speaker: [age, gender, language]&#39;``.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">format_schemes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">format_schemes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span> <span class="nf">schemes_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
@@ -507,6 +615,24 @@
         <span class="k">return</span> <span class="n">scheme_data</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of segments in dataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Segment durations in dataset.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span>
+            <span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">)</span>
+            <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="n">durations</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span> <span class="nf">short_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Description of dataset shortened to 150 chars.&quot;&quot;&quot;</span>
         <span class="n">length</span> <span class="o">=</span> <span class="mi">150</span>
@@ -528,6 +654,51 @@
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">tables_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Table preview for each table of the dataset.</span>
+
+<span class="sd">        Shows the header</span>
+<span class="sd">        and the first 5 lines for each table</span>
+<span class="sd">        as a list of lists.</span>
+<span class="sd">        All table values are converted to strings,</span>
+<span class="sd">        stripped from HTML tags or newlines,</span>
+<span class="sd">        and limited to a maximum length of 100 characters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary with table IDs as keys</span>
+<span class="sd">            and table previews as values</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from tabulate import tabulate</span>
+<span class="sd">            &gt;&gt;&gt; ds = Dataset(&quot;emodb&quot;, &quot;1.4.1&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; preview = ds.tables_preview[&quot;speaker&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; print(tabulate(preview, headers=&quot;firstrow&quot;, tablefmt=&quot;github&quot;))</span>
+<span class="sd">            |   speaker |   age | gender   | language   |</span>
+<span class="sd">            |-----------|-------|----------|------------|</span>
+<span class="sd">            |         3 |    31 | male     | deu        |</span>
+<span class="sd">            |         8 |    34 | female   | deu        |</span>
+<span class="sd">            |         9 |    21 | female   | deu        |</span>
+<span class="sd">            |        10 |    32 | male     | deu        |</span>
+<span class="sd">            |        11 |    26 | male     | deu        |</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">preview</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">table</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="c1"># Remove unwanted chars and limit length of each entry</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_text</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">body</span><span class="p">]</span>
+            <span class="n">preview</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="n">body</span>
+        <span class="k">return</span> <span class="n">preview</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span> <span class="nf">tables_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -555,13 +726,34 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
 
-    <span class="k">def</span> <span class="nf">_cached_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of cached properties of the object.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_cached_properties</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">exclude</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of cached properties of the object.</span>
+
+<span class="sd">        When collecting the cached properties,</span>
+<span class="sd">        it also executes their code</span>
+<span class="sd">        in order to generate the associated values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exclude: list of cached properties,</span>
+<span class="sd">                that should not be cached</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary with property name and value</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">class_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="n">props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">class_items</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">cached_property</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">cached_property</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">props</span>
 
@@ -652,7 +844,7 @@
                     <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\_&quot;</span> <span class="k">if</span> <span class="n">label</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">label</span>
                     <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span>
                 <span class="p">]</span>
-                <span class="n">labels</span> <span class="o">=</span> <span class="n">limit_presented_samples</span><span class="p">(</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">limit_presented_samples</span><span class="p">(</span>
                     <span class="n">labels</span><span class="p">,</span>
                     <span class="mi">15</span><span class="p">,</span>
                     <span class="n">replacement_text</span><span class="o">=</span><span class="s2">&quot;[...]&quot;</span><span class="p">,</span>
@@ -688,6 +880,21 @@
             <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;Mappings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mappings</span>
 
         <span class="k">return</span> <span class="n">data_dict</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Segments of dataset as combined index.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">table</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">index</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_map_iso_languages</span><span class="p">(</span><span class="n">languages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -729,6 +936,11 @@
 <span class="sd">            the environmental variable ``AUDBCARDS_CACHE_ROOT``,</span>
 <span class="sd">            or :attr:`audbcards.config.CACHE_ROOT`</span>
 <span class="sd">            is used</span>
+<span class="sd">        load_tables: if ``True``,</span>
+<span class="sd">            it caches values extracted from tables.</span>
+<span class="sd">            Set this to ``False``,</span>
+<span class="sd">            if loading the tables takes too long,</span>
+<span class="sd">            or does not fit into memory</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -738,9 +950,15 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create Dataset Instance.&quot;&quot;&quot;</span>
-        <span class="n">instance</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">)</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
+            <span class="n">load_tables</span><span class="o">=</span><span class="n">load_tables</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span>
 
     <span class="c1"># Add an __init__() function,</span>
@@ -751,6 +969,7 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
@@ -777,6 +996,10 @@
     <span class="k">def</span> <span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ds</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -878,7 +1101,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/07/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -918,6 +1141,7 @@
         <script src="../../../_static/sphinx_highlight.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
+        <script src="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.js"></script>
     
 
   

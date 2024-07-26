@@ -118,6 +118,14 @@ schemes\_table
 --------------
 .. autoattribute:: Dataset.schemes_table
     
+segment\_durations
+------------------
+.. autoattribute:: Dataset.segment_durations
+    
+segments
+--------
+.. autoattribute:: Dataset.segments
+    
 short\_description
 ------------------
 .. autoattribute:: Dataset.short_description
@@ -129,6 +137,10 @@ source
 tables
 ------
 .. autoattribute:: Dataset.tables
+    
+tables\_preview
+---------------
+.. autoattribute:: Dataset.tables_preview
     
 tables\_table
 -------------

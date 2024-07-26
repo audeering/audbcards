@@ -42,12 +42,62 @@ Example
 Tables
 ^^^^^^
 
-.. csv-table::
-    :header-rows: 1
-    :widths: 20, 10, 70
+.. raw:: html
 
-    "ID", "Type", "Columns"
-    "files", "filewise", "category, duration"
+    <table class="clickable docutils align-default">
+        <thead>
+    <tr class="row-odd grid header">
+        <th class="head"><p>ID</p></th>
+        <th class="head"><p>Type</p></th>
+        <th class="head"><p>Columns</p></th>
+        </tr>
+    </thead>
+        <tbody>
+                    <tr onClick="toggleRow(this)" class="row-even clickable grid">
+        <td><p>files</p></td>
+        <td><p>filewise</p></td>
+        <td><p>category, duration</p></td>
+        <td class="expanded-row-content hide-row">
+
+    
+    <table class="docutils field-list align-default preview">
+    <thead>
+    <tr>
+        <th class="head"><p>file</p></th>
+        <th class="head"><p>category</p></th>
+        <th class="head"><p>duration</p></th>
+        </tr>
+    </thead>
+    <tbody>
+                    <tr>
+        <td><p>coughing/sqei2xjfnpk_262.51-263.43.wav</p></td>
+        <td><p>coughing</p></td>
+        <td><p>0 days 00:00:00.920022676</p></td>
+                    <tr>
+        <td><p>coughing/3id3zrrzbvm_139.88-140.83.wav</p></td>
+        <td><p>coughing</p></td>
+        <td><p>0 days 00:00:00.950022676</p></td>
+                    <tr>
+        <td><p>coughing/kopzxumj430_40.94-41.8.wav</p></td>
+        <td><p>coughing</p></td>
+        <td><p>0 days 00:00:00.860000</p></td>
+                    <tr>
+        <td><p>coughing/kopzxumj430_37.98-39.18.wav</p></td>
+        <td><p>coughing</p></td>
+        <td><p>0 days 00:00:01.200045351</p></td>
+                    <tr>
+        <td><p>coughing/ta_ihseeuyk_118.7-119.84.wav</p></td>
+        <td><p>coughing</p></td>
+        <td><p>0 days 00:00:01.140022676</p></td>
+                </tbody>
+    </table>
+
+    
+    </td>
+    </tr>
+            </tbody>
+    </table>
+
 
 Schemes
 ^^^^^^^

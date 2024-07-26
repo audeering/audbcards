@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="micirp" href="micirp.html" />
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
             
           
@@ -220,42 +221,239 @@
 <p><audio controls src="./emodb/wav/13b09La.wav"></audio></p></div>
 <div class="section" id="tables">
 <h2>Tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
+<table class="clickable docutils align-default">
+    <thead>
+<tr class="row-odd grid header">
+    <th class="head"><p>ID</p></th>
+    <th class="head"><p>Type</p></th>
+    <th class="head"><p>Columns</p></th>
+    </tr>
+</thead>
+    <tbody>
+                <tr onClick="toggleRow(this)" class="row-even clickable grid">
+    <td><p>emotion</p></td>
+    <td><p>filewise</p></td>
+    <td><p>emotion, emotion.confidence</p></td>
+    <td class="expanded-row-content hide-row">
+
+
+<table class="docutils field-list align-default preview">
 <thead>
-<tr class="row-odd"><th class="head"><p>ID</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Columns</p></th>
-</tr>
+<tr>
+    <th class="head"><p>file</p></th>
+    <th class="head"><p>emotion</p></th>
+    <th class="head"><p>emotion.confidence</p></th>
+    </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>emotion</p></td>
-<td><p>filewise</p></td>
-<td><p>emotion, emotion.confidence</p></td>
-</tr>
-<tr class="row-odd"><td><p>emotion.categories.test.gold_standard</p></td>
-<td><p>filewise</p></td>
-<td><p>emotion, emotion.confidence</p></td>
-</tr>
-<tr class="row-even"><td><p>emotion.categories.train.gold_standard</p></td>
-<td><p>filewise</p></td>
-<td><p>emotion, emotion.confidence</p></td>
-</tr>
-<tr class="row-odd"><td><p>files</p></td>
-<td><p>filewise</p></td>
-<td><p>duration, speaker, transcription</p></td>
-</tr>
-<tr class="row-even"><td><p>speaker</p></td>
-<td><p>misc</p></td>
-<td><p>age, gender, language</p></td>
-</tr>
-</tbody>
+                <tr>
+    <td><p>wav/03a01Fa.wav</p></td>
+    <td><p>happiness</p></td>
+    <td><p>0.9</p></td>
+                <tr>
+    <td><p>wav/03a01Nc.wav</p></td>
+    <td><p>neutral</p></td>
+    <td><p>1.0</p></td>
+                <tr>
+    <td><p>wav/03a01Wa.wav</p></td>
+    <td><p>anger</p></td>
+    <td><p>0.95</p></td>
+                <tr>
+    <td><p>wav/03a02Fc.wav</p></td>
+    <td><p>happiness</p></td>
+    <td><p>0.85</p></td>
+                <tr>
+    <td><p>wav/03a02Nc.wav</p></td>
+    <td><p>neutral</p></td>
+    <td><p>1.0</p></td>
+            </tbody>
 </table>
-</div>
+
+
+</td>
+</tr>
+            <tr onClick="toggleRow(this)" class="row-odd clickable grid">
+    <td><p>emotion.categories.test.gold_standard</p></td>
+    <td><p>filewise</p></td>
+    <td><p>emotion, emotion.confidence</p></td>
+    <td class="expanded-row-content hide-row">
+
+
+<table class="docutils field-list align-default preview">
+<thead>
+<tr>
+    <th class="head"><p>file</p></th>
+    <th class="head"><p>emotion</p></th>
+    <th class="head"><p>emotion.confidence</p></th>
+    </tr>
+</thead>
+<tbody>
+                <tr>
+    <td><p>wav/12a01Fb.wav</p></td>
+    <td><p>happiness</p></td>
+    <td><p>0.95</p></td>
+                <tr>
+    <td><p>wav/12a01Lb.wav</p></td>
+    <td><p>boredom</p></td>
+    <td><p>0.9</p></td>
+                <tr>
+    <td><p>wav/12a01Nb.wav</p></td>
+    <td><p>neutral</p></td>
+    <td><p>0.95</p></td>
+                <tr>
+    <td><p>wav/12a01Wc.wav</p></td>
+    <td><p>anger</p></td>
+    <td><p>0.95</p></td>
+                <tr>
+    <td><p>wav/12a02Ac.wav</p></td>
+    <td><p>fear</p></td>
+    <td><p>0.9</p></td>
+            </tbody>
+</table>
+
+
+</td>
+</tr>
+            <tr onClick="toggleRow(this)" class="row-even clickable grid">
+    <td><p>emotion.categories.train.gold_standard</p></td>
+    <td><p>filewise</p></td>
+    <td><p>emotion, emotion.confidence</p></td>
+    <td class="expanded-row-content hide-row">
+
+
+<table class="docutils field-list align-default preview">
+<thead>
+<tr>
+    <th class="head"><p>file</p></th>
+    <th class="head"><p>emotion</p></th>
+    <th class="head"><p>emotion.confidence</p></th>
+    </tr>
+</thead>
+<tbody>
+                <tr>
+    <td><p>wav/03a01Fa.wav</p></td>
+    <td><p>happiness</p></td>
+    <td><p>0.9</p></td>
+                <tr>
+    <td><p>wav/03a01Nc.wav</p></td>
+    <td><p>neutral</p></td>
+    <td><p>1.0</p></td>
+                <tr>
+    <td><p>wav/03a01Wa.wav</p></td>
+    <td><p>anger</p></td>
+    <td><p>0.95</p></td>
+                <tr>
+    <td><p>wav/03a02Fc.wav</p></td>
+    <td><p>happiness</p></td>
+    <td><p>0.85</p></td>
+                <tr>
+    <td><p>wav/03a02Nc.wav</p></td>
+    <td><p>neutral</p></td>
+    <td><p>1.0</p></td>
+            </tbody>
+</table>
+
+
+</td>
+</tr>
+            <tr onClick="toggleRow(this)" class="row-odd clickable grid">
+    <td><p>files</p></td>
+    <td><p>filewise</p></td>
+    <td><p>duration, speaker, transcription</p></td>
+    <td class="expanded-row-content hide-row">
+
+
+<table class="docutils field-list align-default preview">
+<thead>
+<tr>
+    <th class="head"><p>file</p></th>
+    <th class="head"><p>duration</p></th>
+    <th class="head"><p>speaker</p></th>
+    <th class="head"><p>transcription</p></th>
+    </tr>
+</thead>
+<tbody>
+                <tr>
+    <td><p>wav/03a01Fa.wav</p></td>
+    <td><p>0 days 00:00:01.898250</p></td>
+    <td><p>3</p></td>
+    <td><p>a01</p></td>
+                <tr>
+    <td><p>wav/03a01Nc.wav</p></td>
+    <td><p>0 days 00:00:01.611250</p></td>
+    <td><p>3</p></td>
+    <td><p>a01</p></td>
+                <tr>
+    <td><p>wav/03a01Wa.wav</p></td>
+    <td><p>0 days 00:00:01.877812500</p></td>
+    <td><p>3</p></td>
+    <td><p>a01</p></td>
+                <tr>
+    <td><p>wav/03a02Fc.wav</p></td>
+    <td><p>0 days 00:00:02.006250</p></td>
+    <td><p>3</p></td>
+    <td><p>a02</p></td>
+                <tr>
+    <td><p>wav/03a02Nc.wav</p></td>
+    <td><p>0 days 00:00:01.439812500</p></td>
+    <td><p>3</p></td>
+    <td><p>a02</p></td>
+            </tbody>
+</table>
+
+
+</td>
+</tr>
+            <tr onClick="toggleRow(this)" class="row-even clickable grid">
+    <td><p>speaker</p></td>
+    <td><p>misc</p></td>
+    <td><p>age, gender, language</p></td>
+    <td class="expanded-row-content hide-row">
+
+
+<table class="docutils field-list align-default preview">
+<thead>
+<tr>
+    <th class="head"><p>speaker</p></th>
+    <th class="head"><p>age</p></th>
+    <th class="head"><p>gender</p></th>
+    <th class="head"><p>language</p></th>
+    </tr>
+</thead>
+<tbody>
+                <tr>
+    <td><p>3</p></td>
+    <td><p>31</p></td>
+    <td><p>male</p></td>
+    <td><p>deu</p></td>
+                <tr>
+    <td><p>8</p></td>
+    <td><p>34</p></td>
+    <td><p>female</p></td>
+    <td><p>deu</p></td>
+                <tr>
+    <td><p>9</p></td>
+    <td><p>21</p></td>
+    <td><p>female</p></td>
+    <td><p>deu</p></td>
+                <tr>
+    <td><p>10</p></td>
+    <td><p>32</p></td>
+    <td><p>male</p></td>
+    <td><p>deu</p></td>
+                <tr>
+    <td><p>11</p></td>
+    <td><p>26</p></td>
+    <td><p>male</p></td>
+    <td><p>deu</p></td>
+            </tbody>
+</table>
+
+
+</td>
+</tr>
+        </tbody>
+</table></div>
 <div class="section" id="schemes">
 <h2>Schemes<a class="headerlink" href="#schemes" title="Permalink to this heading">¶</a></h2>
 <table class="docutils align-default">
@@ -361,7 +559,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org/en/master/">Sphinx</a> on 2024/05/15 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/07/26 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -401,6 +599,7 @@
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
+        <script src="/home/runner/work/audbcards/audbcards/audbcards/sphinx/table-preview.js"></script>
     
 
   

@@ -42,6 +42,10 @@ save\(\)
 --------
 .. automethod:: Datacard.save
     
+segment\_duration\_distribution
+-------------------------------
+.. autoattribute:: Datacard.segment_duration_distribution
+    
 sphinx\_build\_dir
 ------------------
 .. autoattribute:: Datacard.sphinx_build_dir
