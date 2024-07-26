@@ -33,7 +33,7 @@ class Datacard(object):
         path: path to folder
             that store datacard files
         example: if ``True``,
-            include an audio example in the data card
+            include an audio or video example in the data card
             showing the waveform of the audio
             and an interactive player
         sphinx_build_dir: build dir of sphinx.
@@ -173,7 +173,7 @@ class Datacard(object):
         return distribution_str
 
     def player(self) -> str:
-        r"""Create an audio player showing the waveform.
+        r"""Create an audio/video player showing the waveform.
 
         If :attr:`audbcards.Datacard.sphinx_build_dir`
         or :attr:`audbcards.Datacard.sphinx_src_dir`
@@ -308,12 +308,15 @@ class Datacard(object):
                 cache_example_media,
                 os.path.join(media_dst_dir, self.dataset.example_media),
             )
-
+            if audiofile.has_video(cache_example_media):
+                media_tag = "video"
+            else:
+                media_tag = "audio"
             player_src = f"./{self.dataset.name}/{self.dataset.example_media}"
             player_str += (
                 ".. raw:: html\n"
                 "\n"
-                f'    <p><audio controls src="{player_src}"></audio></p>'
+                f'    <p><{media_tag} controls src="{player_src}"></{media_tag}></p>'
             )
 
         return player_str
