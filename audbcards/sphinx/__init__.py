@@ -102,7 +102,7 @@ def builder_inited(app: sphinx.application.Sphinx):
             )
             datacard.save(rst_file)
             datasets.append(dataset)
-            out_file = rst_file.replace(app.srcdir, os.path.basename(app.srcdir))
+            out_file = rst_file.replace(str(app.srcdir), os.path.basename(app.srcdir))
             print(f"wrote {out_file}")
 
         # Create datasets overview page
