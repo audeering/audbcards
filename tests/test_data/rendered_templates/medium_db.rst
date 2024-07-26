@@ -1,4 +1,5 @@
 .. |medium_db-1.0.0-file-duration-distribution| image:: ./medium_db/medium_db-1.0.0-file-duration-distribution.png
+.. |medium_db-1.0.0-segment-duration-distribution| image:: ./medium_db/medium_db-1.0.0-segment-duration-distribution.png
 
 .. _datasets-medium_db:
 
@@ -19,6 +20,7 @@ sampling rate 8000
 bit depth     16
 duration      0 days 00:05:02
 files         2, duration distribution: 1.0 s |medium_db-1.0.0-file-duration-distribution| 301.0 s
+segments      4, duration distribution: 0.5 s |medium_db-1.0.0-segment-duration-distribution| 151.0 s
 repository    `data-local <.../data-local/medium_db>`__
 published     2023-04-05 by author
 ============= ======================

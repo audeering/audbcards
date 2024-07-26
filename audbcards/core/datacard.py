@@ -106,6 +106,7 @@ class Datacard(object):
 
         If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``
         (e.g. when used in the sphinx extension),
+        and the dataset contains audio or video files,
         an image is stored in the file
         ``<dataset-name>-<dataset-version>-file-duration-distribution.png``,
         which is cached in
@@ -339,6 +340,83 @@ class Datacard(object):
             with open(file, mode="w", encoding="utf-8") as fp:
                 fp.write(self.content)
 
+    @property
+    def segment_duration_distribution(self) -> str:
+        r"""Minimum and maximum of segment durations, and plotted distribution.
+
+        This generates a single line
+        containing the mininimum and maximum values
+        of segment durations.
+
+        If :attr:`audbcards.Datacard.sphinx_src_dir` is not ``None``
+        (e.g. when used in the sphinx extension),
+        and the dataset contains segments,
+        an image is stored in the file
+        ``<dataset-name>-<dataset-version>-segment-duration-distribution.png``,
+        which is cached in
+        ``<cache-root>/<dataset-name>/<dataset-version>/``
+        and copied to the sphinx source folder
+        into
+        ``<sphinx-src-dir>/<path><dataset-name>/``.
+        The image is displayed inline
+        between the minimum and maximum values.
+        If all duration values are the same,
+        no distribution plot is created.
+
+        """
+        file_name = (
+            f"{self.dataset.name}-{self.dataset.version}"
+            "-segment-duration-distribution.png"
+        )
+        # Cache is organized as `<cache_root>/<name>/<version>/`
+        cache_file = audeer.path(
+            self.cache_root,
+            self.dataset.name,
+            self.dataset.version,
+            file_name,
+        )
+
+        min_ = 0
+        max_ = 0
+        unit = "s"
+        durations = self.dataset.segment_durations
+        if len(durations) > 0:
+            min_ = np.min(durations)
+            max_ = np.max(durations)
+
+        # Skip creating a distribution plot,
+        # if all durations are the same
+        if min_ == max_:
+            return f"each file is {max_:.1f} {unit}"
+
+        distribution_str = f"{min_:.1f} {unit} .. {max_:.1f} {unit}"
+
+        # Save distribution plot
+        if self.sphinx_src_dir is not None:
+            # Plot distribution to cache,
+            # if not found there already.
+            if not os.path.exists(cache_file):
+                audeer.mkdir(os.path.dirname(cache_file))
+                self._plot_distribution(durations)
+                plt.savefig(cache_file, transparent=True)
+                plt.close()
+
+            image_file = audeer.path(
+                self.sphinx_src_dir,
+                self.path,
+                self.dataset.name,
+                file_name,
+            )
+            audeer.mkdir(os.path.dirname(image_file))
+            shutil.copyfile(cache_file, image_file)
+            distribution_str = self._inline_image(
+                f"{min_:.1f} {unit}",
+                f"./{self.dataset.name}/{file_name}",
+                f"{max_:.1f} {unit}",
+            )
+
+        return distribution_str
+
     def _inline_image(
         self,
         text1: str,
@@ -442,6 +520,7 @@ class Datacard(object):
                 player = self.player()
                 dataset["player"] = player
         dataset["file_duration_distribution"] = self.file_duration_distribution
+        dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset
 
     def _render_template(self) -> str:
