@@ -316,7 +316,8 @@ class Datacard(object):
             player_str += (
                 ".. raw:: html\n"
                 "\n"
-                f'    <p><{media_tag} controls src="{player_src}"></{media_tag}></p>'
+                f'    <p><{media_tag} controls src="{player_src}" '
+                f'style="max-width: 100%;"></{media_tag}></p>'
             )
 
         return player_str
