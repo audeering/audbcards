@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import sphinx
 import sphinx.application
@@ -12,8 +13,8 @@ from audbcards.core.dataset import create_datasets_page
 
 
 __version__ = "0.1.0"
-table_preview_css_file = audeer.path(audeer.script_dir(), "table-preview.css")
-table_preview_js_file = audeer.path(audeer.script_dir(), "table-preview.js")
+table_preview_css_file = "table-preview.css"
+table_preview_js_file = "table-preview.js"
 
 
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
@@ -57,6 +58,10 @@ def builder_inited(app: sphinx.application.Sphinx):
     sections = app.config.audbcards_datasets
 
     # Add CSS and JS files for table preview feature
+    static_dir = audeer.mkdir(app.builder.outdir, "_static")
+    current_dir = audeer.script_dir()
+    for file in [table_preview_css_file, table_preview_js_file]:
+        shutil.copyfile(audeer.path(current_dir, file), audeer.path(static_dir, file))
     app.add_css_file(table_preview_css_file)
     app.add_js_file(table_preview_js_file)
 
