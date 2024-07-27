@@ -58,7 +58,7 @@ def builder_inited(app: sphinx.application.Sphinx):
     sections = app.config.audbcards_datasets
 
     # Add CSS and JS files for table preview feature
-    static_dir = audeer.path(app.builder.outdir, "_static")
+    static_dir = audeer.mkdir(app.builder.outdir, "_static")
     current_dir = audeer.script_dir()
     for file in [table_preview_css_file, table_preview_js_file]:
         shutil.copyfile(audeer.path(current_dir, file), audeer.path(static_dir, file))
