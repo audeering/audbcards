@@ -12,7 +12,7 @@ from audbcards.core.dataset import Dataset
 from audbcards.core.dataset import create_datasets_page
 
 
-__version__ = "0.1.0"
+__version__ = "0.3.1"
 table_preview_css_file = "table-preview.css"
 table_preview_js_file = "table-preview.js"
 
