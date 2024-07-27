@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.1 (2024-07-27)
+--------------------------
+
+* Fixed: inclusion of custom CSS and JS file
+  of the sphinx extension
+
+
 Version 0.3.0 (2024-07-26)
 --------------------------
 
