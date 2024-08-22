@@ -746,6 +746,7 @@ class _Dataset:
                     self.name,
                     table,
                     version=self.version,
+                    pickle_tables=False,
                     verbose=False,
                 )
                 index = audformat.utils.union([index, df.index])
