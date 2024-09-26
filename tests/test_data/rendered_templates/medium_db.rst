@@ -73,10 +73,13 @@ Tables
                     <tr>
         <td><p>data/f0.wav</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>data/f1.wav</p></td>
         <td><p>1</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p>2 rows</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -104,22 +107,27 @@ Tables
         <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:00.500000</p></td>
         <td><p>neutral</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>data/f0.wav</p></td>
         <td><p>0 days 00:00:00.500000</p></td>
         <td><p>0 days 00:00:01</p></td>
         <td><p>neutral</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>data/f1.wav</p></td>
         <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:02:30</p></td>
         <td><p>happy</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>data/f1.wav</p></td>
         <td><p>0 days 00:02:30</p></td>
         <td><p>0 days 00:05:01</p></td>
         <td><p>angry</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p>4 rows</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -145,11 +153,14 @@ Tables
         <td><p>0</p></td>
         <td><p>23</p></td>
         <td><p>female</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1</p></td>
         <td><p>49</p></td>
         <td><p>male</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p>2 rows</p></td></tr>
+    </tbody>
     </table>
 
     
