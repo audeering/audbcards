@@ -541,12 +541,7 @@ class _Dataset:
         """
         preview = {}
         for table in list(self.header):
-            df = audb.load_table(
-                self.name,
-                table,
-                version=self.version,
-                verbose=False,
-            )
+            df = self._tables[table]
             df = df.reset_index()
             header = [df.columns.tolist()]
             body = df.head(5).astype("string").values.tolist()
@@ -554,6 +549,26 @@ class _Dataset:
             body = [[self._parse_text(column) for column in row] for row in body]
             preview[table] = header + body
         return preview
+
+    @functools.cached_property
+    def tables_rows(self) -> typing.Dict[str, int]:
+        """Number of rows for each table of the dataset.
+
+        Returns:
+            dictionary with table IDs as keys
+            and number of rows as values
+
+        Examples:
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> ds.tables_rows["speaker"]
+            10
+
+        """
+        rows = {}
+        for table in list(self.header):
+            df = self._tables[table]
+            rows[table] = len(df)
+        return rows
 
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:
@@ -750,6 +765,20 @@ class _Dataset:
                 )
                 index = audformat.utils.union([index, df.index])
         return index
+
+    @functools.cached_property
+    def _tables(self) -> typing.Dict[str, pd.DataFrame]:
+        """Dataframes of tables in the dataset."""
+        tables = {}
+        for table in list(self.header):
+            df = audb.load_table(
+                self.name,
+                table,
+                version=self.version,
+                verbose=False,
+            )
+            tables[table] = df
+        return tables
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
