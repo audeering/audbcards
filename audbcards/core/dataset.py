@@ -524,11 +524,7 @@ class _Dataset:
             3
 
         """
-        columns = {}
-        for table in list(self.header):
-            df = self._tables[table]
-            columns[table] = len(df.columns)
-        return columns
+        return {table: stats["columns"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
     def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
@@ -559,16 +555,7 @@ class _Dataset:
             |        11 |    26 | male     | deu        |
 
         """
-        preview = {}
-        for table in list(self.header):
-            df = self._tables[table]
-            df = df.reset_index()
-            header = [df.columns.tolist()]
-            body = df.head(5).astype("string").values.tolist()
-            # Remove unwanted chars and limit length of each entry
-            body = [[self._parse_text(column) for column in row] for row in body]
-            preview[table] = header + body
-        return preview
+        return {table: stats["preview"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
     def tables_rows(self) -> typing.Dict[str, int]:
@@ -584,11 +571,7 @@ class _Dataset:
             10
 
         """
-        rows = {}
-        for table in list(self.header):
-            df = self._tables[table]
-            rows[table] = len(df)
-        return rows
+        return {table: stats["rows"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:
@@ -787,9 +770,17 @@ class _Dataset:
         return index
 
     @functools.cached_property
-    def _tables(self) -> typing.Dict[str, pd.DataFrame]:
-        """Dataframes of tables in the dataset."""
-        tables = {}
+    def _tables_stats(self) -> typing.Dict[str, dict]:
+        """Table information of tables in the dataset.
+
+        It returns a dict per table, containing:
+
+        * ``"columns"``: number of table columns
+        * ``"rows"``: number of table rows
+        * ``"preview"``: preview of table
+
+        """
+        stats = {}
         for table in list(self.header):
             df = audb.load_table(
                 self.name,
@@ -797,8 +788,26 @@ class _Dataset:
                 version=self.version,
                 verbose=False,
             )
-            tables[table] = df
-        return tables
+
+            columns = len(df.columns)
+
+            rows = len(df)
+
+            # Table preview
+            df = df.reset_index()
+            header = [df.columns.tolist()]
+            body = df.head(5).astype("string").values.tolist()
+            # Remove unwanted chars and limit length of each entry
+            body = [[self._parse_text(column) for column in row] for row in body]
+            preview = header + body
+
+            stats[table] = {
+                "columns": columns,
+                "rows": rows,
+                "preview": preview,
+            }
+
+        return stats
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
