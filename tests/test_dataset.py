@@ -205,6 +205,12 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     expected_tables = list(db)
     assert dataset.tables == expected_tables
 
+    # tables_columns
+    expected_tables_columns = {}
+    for table_id in list(db):
+        expected_tables_columns[table_id] = len(db[table_id].columns)
+    assert dataset.tables_columns == expected_tables_columns
+
     # tables_rows
     expected_tables_rows = {}
     for table_id in list(db):

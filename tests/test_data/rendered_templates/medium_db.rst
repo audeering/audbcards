@@ -78,7 +78,7 @@ Tables
         <td><p>data/f1.wav</p></td>
         <td><p>1</p></td>
         </tr>
-            <tr><td><p>2 rows</p></td></tr>
+            <tr><td><p>2 rows x 1 column</p></td></tr>
     </tbody>
     </table>
 
@@ -126,7 +126,7 @@ Tables
         <td><p>0 days 00:05:01</p></td>
         <td><p>angry</p></td>
         </tr>
-            <tr><td><p>4 rows</p></td></tr>
+            <tr><td><p>4 rows x 1 column</p></td></tr>
     </tbody>
     </table>
 
@@ -159,7 +159,7 @@ Tables
         <td><p>49</p></td>
         <td><p>male</p></td>
         </tr>
-            <tr><td><p>2 rows</p></td></tr>
+            <tr><td><p>2 rows x 2 columns</p></td></tr>
     </tbody>
     </table>
 

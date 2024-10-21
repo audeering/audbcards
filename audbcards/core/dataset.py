@@ -511,6 +511,26 @@ class _Dataset:
         return tables
 
     @functools.cached_property
+    def tables_columns(self) -> typing.Dict[str, int]:
+        """Number of columns for each table of the dataset.
+
+        Returns:
+            dictionary with table IDs as keys
+            and number of columns as values
+
+        Examples:
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> ds.tables_columns["speaker"]
+            3
+
+        """
+        columns = {}
+        for table in list(self.header):
+            df = self._tables[table]
+            columns[table] = len(df.columns)
+        return columns
+
+    @functools.cached_property
     def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
         """Table preview for each table of the dataset.
 
