@@ -22,7 +22,9 @@ class _Dataset:
     _table_related_cached_properties = [
         "segment_durations",
         "segments",
+        "tables_columns",
         "tables_preview",
+        "tables_rows",
     ]
     """Cached properties relying on table data.
 
