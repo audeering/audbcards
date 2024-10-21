@@ -234,15 +234,15 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
                 "Egyptian Arabic",
                 "Libyan Arabic",
                 "Moroccan Arabic",
-                "North Levantine Arabic",
+                "Levantine Arabic",
             ],
-            ["arz", "ary", "apc", "ayl", "arq"],
+            ["arq", "arz", "ayl", "ary", "apc"],
         ),
         (["Algerian Arabic"], ["arq"]),
         (["Egyptian Arabic"], ["arz"]),
         (["Libyan Arabic"], ["ayl"]),
-        (["North Levantine Arabic"], ["apc"]),
         (["Moroccan Arabic"], ["ary"]),
+        (["Levantine Arabic"], ["apc"]),
     ],
 )
 def test_iso_language_mappings(languages, iso_languages_expected):
