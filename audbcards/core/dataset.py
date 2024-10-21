@@ -557,7 +557,16 @@ class _Dataset:
             |        11 |    26 | male     | deu        |
 
         """
-        return {table: stats["preview"] for table, stats in self._tables_stats.items()}
+        preview = {}
+        for table, stats in self._tables_stats.items():
+            df = stats["preview"]
+            df = df.reset_index()
+            header = [df.columns.tolist()]
+            body = df.astype("string").values.tolist()
+            # Remove unwanted chars and limit length of each entry
+            body = [[self._parse_text(column) for column in row] for row in body]
+            preview[table] = header + body
+        return preview
 
     @functools.cached_property
     def tables_rows(self) -> typing.Dict[str, int]:
@@ -786,7 +795,7 @@ class _Dataset:
             A dictionary with table names as keys and dictionaries containing:
             - "columns": number of columns
             - "rows": number of rows
-            - "preview": table preview (header + first 5 rows)
+            - "preview": dataframe preview (first 5 rows)
 
         """
         stats = {}
@@ -797,25 +806,11 @@ class _Dataset:
                 version=self.version,
                 verbose=False,
             )
-
-            columns = len(df.columns)
-
-            rows = len(df)
-
-            # Table preview
-            df = df.reset_index()
-            header = [df.columns.tolist()]
-            body = df.head(5).astype("string").values.tolist()
-            # Remove unwanted chars and limit length of each entry
-            body = [[self._parse_text(column) for column in row] for row in body]
-            preview = header + body
-
             stats[table] = {
-                "columns": columns,
-                "rows": rows,
-                "preview": preview,
+                "columns": len(df.columns),
+                "rows": len(df),
+                "preview": df.head(5),
             }
-
         return stats
 
     @staticmethod
