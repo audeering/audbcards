@@ -49,12 +49,17 @@ def test_dataset_property_scope(tmpdir, db, request):
 
 
 @pytest.mark.parametrize(
-    "db, expected_schemes_table, expected_tables_table, "
-    "expected_tables_columns, expected_tables_rows, "
+    "db, "
+    "expected_description, "
+    "expected_schemes_table, "
+    "expected_tables_table, "
+    "expected_tables_columns, "
+    "expected_tables_rows, "
     "expected_segment_durations",
     [
         (
             "bare_db",
+            "",
             [[]],
             [["ID", "Type", "Columns"]],
             {},
@@ -63,6 +68,7 @@ def test_dataset_property_scope(tmpdir, db, request):
         ),
         (
             "minimal_db",
+            "Minimal database.",
             [[]],
             [["ID", "Type", "Columns"], ["files", "filewise", "speaker"]],
             {"files": 1},
@@ -71,6 +77,7 @@ def test_dataset_property_scope(tmpdir, db, request):
         ),
         (
             "medium_db",
+            "Medium database. | Some description |.",
             [
                 ["ID", "Dtype", "Min", "Labels", "Mappings"],
                 ["age", "int", 0, "", ""],
@@ -96,6 +103,7 @@ def test_dataset(
     repository,
     request,
     db,
+    expected_description,
     expected_schemes_table,
     expected_tables_table,
     expected_tables_columns,
@@ -231,15 +239,6 @@ def test_dataset(
     assert dataset.segments == expected_segments
 
     # short_description
-    max_desc_length = 150
-    if db.description is None:
-        expected_description = ""
-    else:
-        expected_description = (
-            db.description
-            if (len(db.description) < max_desc_length)
-            else f"{db.description[:max_desc_length - 3]}..."
-        )
     assert dataset.short_description == expected_description
 
     # tables
