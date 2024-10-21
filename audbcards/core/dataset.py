@@ -775,11 +775,18 @@ class _Dataset:
     def _tables_stats(self) -> typing.Dict[str, dict]:
         """Table information of tables in the dataset.
 
-        It returns a dict per table, containing:
+        Caches table information to improve performance
+        of multiple table-related properties.
+        This property computes and stores statistics for all tables,
+        reducing repeated computations.
+        It significantly improves performance
+        when accessing multiple table properties frequently.
 
-        * ``"columns"``: number of table columns
-        * ``"rows"``: number of table rows
-        * ``"preview"``: preview of table
+        Returns:
+            A dictionary with table names as keys and dictionaries containing:
+            - "columns": number of columns
+            - "rows": number of rows
+            - "preview": table preview (header + first 5 rows)
 
         """
         stats = {}
