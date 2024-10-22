@@ -34,6 +34,10 @@ table.preview td {
     border-top: none;
     border-bottom: none;
 }
+table.preview td p.table-statistic {
+    /* Make "N rows x M columns" smaller */
+    font-size: 90%;
+}
 table.clickable td:not(.expanded-row-content),
 table.clickable th {
     /* Allow to center cell copntent with `margin: auto` */

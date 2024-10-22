@@ -58,7 +58,9 @@ Tables
                     <tr>
         <td><p>f0.wav</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1 row x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     

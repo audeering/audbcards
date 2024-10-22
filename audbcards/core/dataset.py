@@ -22,7 +22,9 @@ class _Dataset:
     _table_related_cached_properties = [
         "segment_durations",
         "segments",
+        "tables_columns",
         "tables_preview",
+        "tables_rows",
     ]
     """Cached properties relying on table data.
 
@@ -511,6 +513,22 @@ class _Dataset:
         return tables
 
     @functools.cached_property
+    def tables_columns(self) -> typing.Dict[str, int]:
+        """Number of columns for each table of the dataset.
+
+        Returns:
+            dictionary with table IDs as keys
+            and number of columns as values
+
+        Examples:
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> ds.tables_columns["speaker"]
+            3
+
+        """
+        return {table: stats["columns"] for table, stats in self._tables_stats.items()}
+
+    @functools.cached_property
     def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
         """Table preview for each table of the dataset.
 
@@ -540,20 +558,31 @@ class _Dataset:
 
         """
         preview = {}
-        for table in list(self.header):
-            df = audb.load_table(
-                self.name,
-                table,
-                version=self.version,
-                verbose=False,
-            )
+        for table, stats in self._tables_stats.items():
+            df = stats["preview"]
             df = df.reset_index()
             header = [df.columns.tolist()]
-            body = df.head(5).astype("string").values.tolist()
+            body = df.astype("string").values.tolist()
             # Remove unwanted chars and limit length of each entry
             body = [[self._parse_text(column) for column in row] for row in body]
             preview[table] = header + body
         return preview
+
+    @functools.cached_property
+    def tables_rows(self) -> typing.Dict[str, int]:
+        """Number of rows for each table of the dataset.
+
+        Returns:
+            dictionary with table IDs as keys
+            and number of rows as values
+
+        Examples:
+            >>> ds = Dataset("emodb", "1.4.1")
+            >>> ds.tables_rows["speaker"]
+            10
+
+        """
+        return {table: stats["rows"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
     def tables_table(self) -> typing.List[str]:
@@ -750,6 +779,39 @@ class _Dataset:
                 )
                 index = audformat.utils.union([index, df.index])
         return index
+
+    @functools.cached_property
+    def _tables_stats(self) -> typing.Dict[str, dict]:
+        """Table information of tables in the dataset.
+
+        Caches table information to improve performance
+        of multiple table-related properties.
+        This property computes and stores statistics for all tables,
+        reducing repeated computations.
+        It significantly improves performance
+        when accessing multiple table properties frequently.
+
+        Returns:
+            A dictionary with table names as keys and dictionaries containing:
+            - "columns": number of columns
+            - "rows": number of rows
+            - "preview": dataframe preview (first 5 rows)
+
+        """
+        stats = {}
+        for table in list(self.header):
+            df = audb.load_table(
+                self.name,
+                table,
+                version=self.version,
+                verbose=False,
+            )
+            stats[table] = {
+                "columns": len(df.columns),
+                "rows": len(df),
+                "preview": df.head(5),
+            }
+        return stats
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:

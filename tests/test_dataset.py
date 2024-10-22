@@ -7,7 +7,6 @@ import pytest
 
 import audb
 import audeer
-import audformat
 import audiofile
 
 import audbcards
@@ -50,12 +49,67 @@ def test_dataset_property_scope(tmpdir, db, request):
 
 
 @pytest.mark.parametrize(
-    "db",
+    "db, "
+    "expected_description, "
+    "expected_schemes_table, "
+    "expected_tables_table, "
+    "expected_tables_columns, "
+    "expected_tables_rows, "
+    "expected_segment_durations",
     [
-        "medium_db",
+        (
+            "bare_db",
+            "",
+            [[]],
+            [["ID", "Type", "Columns"]],
+            {},
+            {},
+            [],
+        ),
+        (
+            "minimal_db",
+            "Minimal database.",
+            [[]],
+            [["ID", "Type", "Columns"], ["files", "filewise", "speaker"]],
+            {"files": 1},
+            {"files": 1},
+            [],
+        ),
+        (
+            "medium_db",
+            "Medium database. | Some description |.",
+            [
+                ["ID", "Dtype", "Min", "Labels", "Mappings"],
+                ["age", "int", 0, "", ""],
+                ["emotion", "str", "", "angry, happy, neutral", ""],
+                ["gender", "str", "", "female, male", ""],
+                ["speaker", "int", "", "0, 1", "age, gender"],
+            ],
+            [
+                ["ID", "Type", "Columns"],
+                ["files", "filewise", "speaker"],
+                ["segments", "segmented", "emotion"],
+                ["speaker", "misc", "age, gender"],
+            ],
+            {"files": 1, "segments": 1, "speaker": 2},
+            {"files": 2, "segments": 4, "speaker": 2},
+            [0.5, 0.5, 150, 151],
+        ),
     ],
 )
-def test_dataset(audb_cache, tmpdir, repository, db, request):
+def test_dataset(
+    audb_cache,
+    tmpdir,
+    repository,
+    request,
+    db,
+    expected_description,
+    expected_schemes_table,
+    expected_tables_table,
+    expected_tables_columns,
+    expected_tables_rows,
+    expected_segment_durations,
+):
     r"""Test audbcards.Dataset object and all its properties."""
     db = request.getfixturevalue(db)
 
@@ -115,7 +169,7 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
 
     # duration
     expected_duration = db.files_duration(db.files).sum()
-    assert dataset.duration == expected_duration
+    assert dataset.duration == pd.to_timedelta(expected_duration)
 
     # files
     expected_files = len(db.files)
@@ -175,17 +229,9 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     assert dataset.schemes == expected_schemes
 
     # schemes_table
-    expected_schemes_table = [
-        ["ID", "Dtype", "Min", "Labels", "Mappings"],
-        ["age", "int", 0, "", ""],
-        ["emotion", "str", "", "angry, happy, neutral", ""],
-        ["gender", "str", "", "female, male", ""],
-        ["speaker", "int", "", "0, 1", "age, gender"],
-    ]
     assert dataset.schemes_table == expected_schemes_table
 
     # segment_durations
-    expected_segment_durations = [0.5, 0.5, 150, 151]
     assert dataset.segment_durations == expected_segment_durations
 
     # segments
@@ -193,28 +239,19 @@ def test_dataset(audb_cache, tmpdir, repository, db, request):
     assert dataset.segments == expected_segments
 
     # short_description
-    max_desc_length = 150
-    expected_description = (
-        db.description
-        if (len(db.description) < max_desc_length)
-        else f"{db.description[:max_desc_length - 3]}..."
-    )
     assert dataset.short_description == expected_description
 
     # tables
     expected_tables = list(db)
     assert dataset.tables == expected_tables
 
+    # tables_columns
+    assert dataset.tables_columns == expected_tables_columns
+
+    # tables_rows
+    assert dataset.tables_rows == expected_tables_rows
+
     # tables_table
-    expected_tables_table = [["ID", "Type", "Columns"]]
-    for table_id in list(db):
-        table = db[table_id]
-        if isinstance(table, audformat.MiscTable):
-            table_type = "misc"
-        else:
-            table_type = table.type
-        columns = ", ".join(list(table.columns))
-        expected_tables_table.append([table_id, table_type, columns])
     assert dataset.tables_table == expected_tables_table
 
     # version

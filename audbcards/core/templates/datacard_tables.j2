@@ -41,8 +41,10 @@ Tables
     {% for column in row %}
     <td><p>{{ column }}</p></td>
     {% endfor %}
+    </tr>
     {% endif %}
     {% endfor %}
+    <tr><td><p class="table-statistic">{{ tables_rows[row[0]] }} {% if tables_rows[row[0]] == 1 %}row{% else %}rows{% endif %} x {{ tables_columns[row[0]] }} {% if tables_columns[row[0]] == 1 %}column{% else %}columns{% endif %}</p></td></tr>
     </tbody>
     </table>
 
