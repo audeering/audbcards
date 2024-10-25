@@ -125,11 +125,8 @@ class _Dataset:
 
         self.__getstate__ = getstate
 
-        # Store name and version in private attributes here,
-        # ``self.name`` and ``self.version``
-        # are implemented as cached properties below
-        self._name = name
-        self._version = version
+        self.name = name
+        self.version = version
 
         # Private attributes,
         # used inside corresponding properties.
@@ -219,72 +216,41 @@ class _Dataset:
         return self._deps
 
     @property
-    def header(self) -> audformat.Database:
-        r"""Dataset header."""
-        if not hasattr(self, "_header"):  # when loaded from cache
-            self._header = self._load_header()
-        return self._header
-
-    @property
     def repository_object(self) -> audb.Repository:
         r"""Repository object containing dataset."""
         if not hasattr(self, "_repository_object"):  # when loaded from cache
             self._repository_object = self._load_repository_object()
         return self._repository_object
 
-    @functools.cached_property
+    @property
     def archives(self) -> int:
         r"""Number of archives of media files in dataset."""
-        return len(set([self.deps.archive(file) for file in self.deps.media]))
+        return self._deps_cache["archives"]
 
-    @functools.cached_property
-    def author(self) -> typing.List[str]:
+    @property
+    def author(self) -> str:
         r"""Authors of the database."""
-        return self.header.author
+        return self._header_cache["author"]
 
-    @functools.cached_property
+    @property
     def bit_depths(self) -> typing.List[int]:
         r"""Bit depths of media files in dataset."""
-        return sorted(
-            list(
-                set(
-                    [
-                        self.deps.bit_depth(file)
-                        for file in self.deps.media
-                        if self.deps.bit_depth(file)
-                    ]
-                )
-            )
-        )
+        return self._deps_cache["bit_depths"]
 
-    @functools.cached_property
+    @property
     def channels(self) -> typing.List[int]:
         r"""Channels of media files in dataset."""
-        return sorted(
-            list(
-                set(
-                    [
-                        self.deps.channels(file)
-                        for file in self.deps.media
-                        if self.deps.channels(file)
-                    ]
-                )
-            )
-        )
+        return self._deps_cache["channels"]
 
-    @functools.cached_property
+    @property
     def description(self) -> str:
-        r"""Source of the database."""
-        return self.header.description
+        r"""Desription of the database."""
+        return self._header_cache["description"]
 
-    @functools.cached_property
+    @property
     def duration(self) -> pd.Timedelta:
         r"""Total duration of media files in dataset."""
-        durations = [self.deps.duration(file) for file in self.deps.media]
-        return pd.to_timedelta(
-            sum([d for d in durations if d is not None]),
-            unit="s",
-        )
+        return self._deps_cache["duration"]
 
     @functools.cached_property
     def example_media(self) -> typing.Optional[str]:
@@ -305,7 +271,7 @@ class _Dataset:
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
-        durations = self.file_durations
+        durations = self._deps_cache["file_durations"]
         selected_durations = [d for d in durations if d >= min_dur and d <= max_dur]
 
         if len(selected_durations) == 0:
@@ -332,32 +298,32 @@ class _Dataset:
             selected_media = self.deps.media[index]
         return selected_media
 
-    @functools.cached_property
+    @property
     def files(self) -> int:
         r"""Number of media files in dataset."""
-        return len(self.deps.media)
+        return self._deps_cache["files"]
 
-    @functools.cached_property
+    @property
     def file_durations(self) -> typing.List:
         r"""File durations in dataset in seconds."""
-        return [self.deps.duration(file) for file in self.deps.media]
+        return self._deps_cache["file_durations"]
 
-    @functools.cached_property
+    @property
     def formats(self) -> typing.List[str]:
         r"""File formats of media files in dataset."""
-        return sorted(list(set([self.deps.format(file) for file in self.deps.media])))
+        return self._deps_cache["formats"]
 
-    @functools.cached_property
+    @property
     def languages(self) -> typing.List[str]:
         r"""Languages of the database."""
-        return self.header.languages
+        return self._header_cache["languages"]
 
-    @functools.cached_property
+    @property
     def iso_languages(self) -> typing.List[str]:
         r"""Languages of the database as ISO 639-3 if possible."""
         return self._map_iso_languages(self.languages)
 
-    @functools.cached_property
+    @property
     def license(self) -> str:
         r"""License of dataset.
 
@@ -365,9 +331,9 @@ class _Dataset:
         ``'Unknown'`` is returned.
 
         """
-        return self.header.license or "Unknown"
+        return self._header_cache["license"] or "Unknown"
 
-    @functools.cached_property
+    @property
     def license_link(self) -> typing.Optional[str]:
         r"""Link to license of dataset.
 
@@ -375,15 +341,11 @@ class _Dataset:
         ``None`` is returned.
 
         """
-        if self.header.license_url is None or len(self.header.license_url) == 0:
+        url = self._header_cache["license_url"]
+        if url is None or len(url) == 0:
             return None
         else:
-            return self.header.license_url
-
-    @functools.cached_property
-    def name(self) -> str:
-        r"""Name of dataset."""
-        return self._name
+            return url
 
     @functools.cached_property
     def publication_date(self) -> str:
@@ -416,27 +378,17 @@ class _Dataset:
             f"{self.name}"
         )
 
-    @functools.cached_property
+    @property
     def sampling_rates(self) -> typing.List[int]:
         r"""Sampling rates of media files in dataset."""
-        return sorted(
-            list(
-                set(
-                    [
-                        self.deps.sampling_rate(file)
-                        for file in self.deps.media
-                        if self.deps.sampling_rate(file)
-                    ]
-                )
-            )
-        )
+        return self._deps_cache["sampling_rates"]
 
-    @functools.cached_property
+    @property
     def schemes(self) -> typing.List[str]:
         r"""Schemes of dataset."""
-        return list(self.header.schemes)
+        return list(self._header_cache["schemes"])
 
-    @functools.cached_property
+    @property
     def schemes_summary(self) -> str:
         r"""Summary of dataset schemes.
 
@@ -446,9 +398,10 @@ class _Dataset:
         e.g. ``'speaker: [age, gender, language]'``.
 
         """
-        return utils.format_schemes(self.header.schemes)
+        # TODO: check if this is too slow
+        return utils.format_schemes(self._header_cache["schemes"])
 
-    @functools.cached_property
+    @property
     def schemes_table(self) -> typing.List[typing.List[str]]:
         """Schemes table with name, type, min, max, labels, mappings.
 
@@ -456,63 +409,75 @@ class _Dataset:
         with column names as keys.
 
         """
-        db = self.header
-        dataset_schemes = []
-        for scheme_id in db.schemes:
-            dataset_scheme = self._scheme_to_list(scheme_id)
-            dataset_schemes.append(dataset_scheme)
+        schemes = self._header_cache["schemes"]
 
-        cols = self._scheme_table_columns
-        data = pd.DataFrame.from_dict(dataset_schemes)[cols]
-        filter = data.map(lambda d: d == [])
-        data.mask(filter, other="", inplace=True)
-        scheme_data = data.values.tolist()
-        # Add column names
-        scheme_data.insert(0, list(data))
-        return scheme_data
+        if len(schemes) == 0:
+            return [[]]
 
-    @functools.cached_property
+        scheme_labels = self._header_cache["scheme_labels"]
+        scheme_mappins = self._header_cache["scheme_mappings"]
+
+        columns = ["ID", "Dtype", "Min", "Max", "Labels", "Mappings"]
+        data = [
+            [
+                scheme_id,
+                schemes[scheme_id].dtype,
+                schemes[scheme_id].minimum or "",
+                schemes[scheme_id].maximum or "",
+                scheme_labels[scheme_id],
+                scheme_mappings[scheme_id],
+            ]
+            for scheme_id in schemes
+        ]
+
+        # TODO: remove columns, that don't contain any entry
+        # if any(len(minimum) > 0 for minimum in scheme_minima]):
+        #     columns.append("Min")
+        # if any([schemes[s].maximum is not None for s in schemes]):
+        #     columns.append("Max")
+        # if any([schemes[s].labels is not None for s in schemes]):
+        #     columns.append("Labels")
+        # if any([isinstance(schemes[s].labels, (str, dict)) for s in schemes]):
+        #     columns.append("Mappings")
+        # cols = self._scheme_table_columns
+        # data = pd.DataFrame.from_dict(dataset_schemes)[cols]
+        # filter = data.map(lambda d: d == [])
+        # data.mask(filter, other="", inplace=True)
+        # scheme_data = data.values.tolist()
+        # # Add column names
+        # scheme_data.insert(0, list(data))
+        return [columns] + data
+
+    @property
     def segments(self) -> str:
         r"""Number of segments in dataset."""
-        return str(len(self._segments))
+        return self._tables_stats["segments"]
 
-    @functools.cached_property
+    @property
     def segment_durations(self) -> typing.List[float]:
         r"""Segment durations in dataset."""
-        if len(self._segments) == 0:
-            durations = []
-        else:
-            starts = self._segments.get_level_values("start")
-            ends = self._segments.get_level_values("end")
-            durations = [
-                (end - start).total_seconds() for start, end in zip(starts, ends)
-            ]
-        return durations
+        return self._tables_stats["segment_durations"]
 
-    @functools.cached_property
+    @property
     def short_description(self) -> str:
         r"""Description of dataset shortened to 150 chars."""
         length = 150
-        description = self.header.description or ""
-        # Fix RST used signs
-        description = description.replace("`", "'")
+        description = self._header_cache["description"]
         if len(description) > length:
             description = f"{description[:length - 3]}..."
         return description
 
-    @functools.cached_property
+    @property
     def source(self) -> str:
         r"""Source of the database."""
-        return self.header.source
+        return self._header_cache["source"]
 
     @functools.cached_property
     def tables(self) -> typing.List[str]:
         """Tables of the dataset."""
-        db = self.header
-        tables = list(db)
-        return tables
+        return list(self._header_cache["columns"].values())
 
-    @functools.cached_property
+    @property
     def tables_columns(self) -> typing.Dict[str, int]:
         """Number of columns for each table of the dataset.
 
@@ -526,9 +491,9 @@ class _Dataset:
             3
 
         """
-        return {table: stats["columns"] for table, stats in self._tables_stats.items()}
+        return self._tables_stats["columns"]
 
-    @functools.cached_property
+    @property
     def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
         """Table preview for each table of the dataset.
 
@@ -558,9 +523,7 @@ class _Dataset:
 
         """
         preview = {}
-        for table, stats in self._tables_stats.items():
-            df = stats["preview"]
-            df = df.reset_index()
+        for table, df in self._tables_stats["dataframes"].items():
             header = [df.columns.tolist()]
             body = df.astype("string").values.tolist()
             # Remove unwanted chars and limit length of each entry
@@ -568,7 +531,7 @@ class _Dataset:
             preview[table] = header + body
         return preview
 
-    @functools.cached_property
+    @property
     def tables_rows(self) -> typing.Dict[str, int]:
         """Number of rows for each table of the dataset.
 
@@ -582,33 +545,25 @@ class _Dataset:
             10
 
         """
-        return {table: stats["rows"] for table, stats in self._tables_stats.items()}
+        return self._tables_stats["rows"]
 
-    @functools.cached_property
+    @property
     def tables_table(self) -> typing.List[str]:
         """Tables of the dataset."""
         table_list = [["ID", "Type", "Columns"]]
-        db = self.header
-        for table_id in self.tables:
-            table = db[table_id]
-            if isinstance(table, audformat.MiscTable):
-                table_type = "misc"
-            else:
-                table_type = table.type
-            columns = ", ".join(list(table.columns))
-            table_list.append([table_id, table_type, columns])
-
+        table_list += [
+            [table_id, table_type, columns]
+            for (table_id, table_type), columns in zip(
+                self._tables_stats["type"].items(),
+                self._tables_stats["columns"].values(),
+            )
+        ]
         return table_list
 
-    @functools.cached_property
+    @property
     def usage(self) -> str:
         r"""Usage of the database."""
-        return self.header.usage
-
-    @functools.cached_property
-    def version(self) -> str:
-        r"""Version of dataset."""
-        return self._version
+        return self._header_cache["usage"]
 
     def _cached_properties(
         self,
@@ -620,6 +575,7 @@ class _Dataset:
         When collecting the cached properties,
         it also executes their code
         in order to generate the associated values.
+        Hidden cached properties are included.
 
         Args:
             exclude: list of cached properties,
@@ -636,6 +592,27 @@ class _Dataset:
             if (
                 isinstance(v, functools.cached_property)
                 and k not in exclude
+            )
+        )
+        return props
+
+    def _properties(
+        self,
+    ) -> typing.Dict[str, typing.Any]:
+        """Get list of properties of the object.
+
+        Hidden properties are excluded,
+        cached properties included.
+
+        Returns:
+            dictionary with property name and value
+
+        """
+        props = dict(
+            (k, getattr(self, k))
+            for k in self.__class__.__dict__.keys()
+            if (
+                not callable(getattr(self, k))
                 and not k.startswith("_")
             )
         )
@@ -647,81 +624,69 @@ class _Dataset:
         return backend_interface
 
     def _load_dependencies(self) -> audb.Dependencies:
-        r"""Load dataset dependencies."""
+        r"""Load dependency table of dataset."""
         return audb.dependencies(self.name, version=self.version, verbose=False)
-
-    def _load_header(self) -> audformat.Database:
-        r"""Load dataset header."""
-        # Ensure misc tables are loaded
-        return audb.info.header(self.name, version=self.version, load_tables=True)
 
     def _load_repository_object(self) -> audb.Repository:
         r"""Load repository object containing dataset."""
         return audb.repository(self.name, self.version)
 
     @functools.cached_property
-    def _scheme_table_columns(self) -> typing.List[str]:
-        """Column names for the scheme table.
+    def _deps_cache(self): -> typing.Dict[str, typing.Any]:
+        """Depenency table cache.
 
-        Column names always include ``'ID'`` and ``'Dtype'``,
-        and if defined in any scheme
-        ``'Min'``,
-        ``'Max'``,
-        ``'Labels'``,
-        ``'Mappings'``.
+        Returns:
+            dictionary, containing dependency table related statistics
 
         """
-        schemes = self.header.schemes
+        deps = self.deps
+        durations = [deps.duration(file) for file in deps.media]
 
-        if len(schemes) == 0:
-            return []
+        def unique_list(values):
+            return sorted(list(set(values).remove(None)))
 
-        columns = ["ID", "Dtype"]
-
-        if len(schemes) > 0:
-            if any([schemes[s].minimum is not None for s in schemes]):
-                columns.append("Min")
-            if any([schemes[s].maximum is not None for s in schemes]):
-                columns.append("Max")
-            if any([schemes[s].labels is not None for s in schemes]):
-                columns.append("Labels")
-            if any([isinstance(schemes[s].labels, (str, dict)) for s in schemes]):
-                columns.append("Mappings")
-
-        return columns
-
-    def _scheme_to_list(self, scheme_id):
-        db = self.header
-        scheme_info = self._scheme_table_columns
-
-        scheme = db.schemes[scheme_id]
-
-        data_dict = {
-            "ID": scheme_id,
-            "Dtype": scheme.dtype,
+        return {
+            "archives": len(set([deps.archive(file) for file in deps.media])),
+            "bit_depths": unique_list(deps.bit_depth(file) for file in deps.media))
+            "channels": unique_list(deps.channels(file) for file in deps.media))
+            "duration": pd.to_timedelta(
+                sum([duration or 0 for duration in durations]),
+                unit="s",
+            )
+            "format": unique_list([deps.format(file) for file in deps.media]),
+            "files_duration": durations,
+            "files": len(deps.media),
+            "sampling_rates": unique_list(
+                deps.sampling_rate(file) for file in deps.media
+            ),
         }
-        data = [scheme_id, scheme.dtype]
-        #  minimum, maximum, labels, mappings = "", "", "", ""
 
-        minimum, maximum = None, None
-        labels = None
 
-        if "Min" in scheme_info:
-            minimum = scheme.minimum
-            if minimum is None:
-                minimum = ""
-            data_dict["Min"] = minimum
-        if "Max" in scheme_info:
-            maximum = scheme.maximum
-            if maximum is None:
-                maximum = ""
-            data_dict["Max"] = maximum
-        if "Labels" in scheme_info:
+    @functools.cached_property
+    def _header_cache(self) -> typing.Dict[str, typing.Any]:
+        """Header information.
+
+        Returns:
+            dictionary, containing header statistics
+
+        """
+        # `load_tables` ensures that misc tables are loaded,
+        # which contain scheme labels
+        header = audb.info.header(self.name, version=self.version, load_tables=True)
+
+        description = header.description or ""
+        description = description.replace("`", "'")  # remove RST chars
+
+        scheme_labels = {}
+        scheme_mapings = {}
+        for scheme_id in header.schemes:
+            scheme = header.schemes[scheme_id]
+
+            # Scheme labels
             if scheme.labels is None:
                 labels = []
             else:
-                labels = sorted(scheme._labels_to_list())
-                labels = [str(label) for label in labels]
+                labels = [str(label) for label in sorted(scheme._labels_to_list())]
                 # Avoid `_` at end of label,
                 # as this has special meaning in RST (link)
                 labels = [
@@ -734,16 +699,13 @@ class _Dataset:
                     replacement_text="[...]",
                 )
                 labels = ", ".join(labels)
-            data_dict["Labels"] = labels
+            scheme_labels[scheme_id] = labels
 
-        data.append(minimum)
-        data.append(maximum)
-        data.append(labels)
-        if "Mappings" in scheme_info:
+            # Scheme mappings
             if not isinstance(scheme.labels, (str, dict)):
                 mappings = ""
             else:
-                labels = scheme._labels_to_dict()
+                mappings = list(scheme._labels_to_dict().values())
                 # Mappings can contain a single mapping
                 # or a deeper nestings.
                 # In the first case we just present ✓,
@@ -751,7 +713,6 @@ class _Dataset:
                 # {'f': 'female', 'm': 'male'}
                 # or
                 # {'s1': {'gender': 'male', 'age': 21}}
-                mappings = list(labels.values())
                 if isinstance(mappings[0], dict):
                     # e.g. {'s1': {'gender': 'male', 'age': 21}}
                     mappings = sorted(list(mappings[0].keys()))
@@ -759,29 +720,23 @@ class _Dataset:
                 else:
                     # e.g. {'f': 'female', 'm': 'male'}
                     mappings = "✓"
+            scheme_mappings[scheme_id] = mappings
 
-            data.append(mappings)
-            data_dict["Mappings"] = mappings
-
-        return data_dict
-
-    @functools.cached_property
-    def _segments(self) -> pd.MultiIndex:
-        """Segments of dataset as combined index."""
-        index = audformat.segmented_index()
-        for table in self.header.tables:
-            if self.header.tables[table].is_segmented:
-                df = audb.load_table(
-                    self.name,
-                    table,
-                    version=self.version,
-                    verbose=False,
-                )
-                index = audformat.utils.union([index, df.index])
-        return index
+        return {
+            "author": header.author,
+            "description": description,
+            "languages": header.languages,
+            "license": header.license,
+            "license_url": header.license_url,
+            "schemes": header.schemes,
+            "scheme_labels": scheme_labels,
+            "scheme_mappings": scheme_mappings,
+            "source": header.source,
+            "usage": header.usage,
+        }
 
     @functools.cached_property
-    def _tables_stats(self) -> typing.Dict[str, dict]:
+    def _tables_stats(self) -> typing.Dict[str, typing.Any]:
         """Table information of tables in the dataset.
 
         Caches table information to improve performance
@@ -798,20 +753,45 @@ class _Dataset:
             - "preview": dataframe preview (first 5 rows)
 
         """
-        stats = {}
-        for table in list(self.header):
+        # Collect stats per table and combine index
+        columns = {}
+        rows = {}
+        dataframes = {}
+        table_type = {}
+        index = audformat.segmented_index()
+        for table in self.header.tables:
             df = audb.load_table(
                 self.name,
                 table,
                 version=self.version,
                 verbose=False,
             )
-            stats[table] = {
-                "columns": len(df.columns),
-                "rows": len(df),
-                "preview": df.head(5),
-            }
-        return stats
+            if self.header.tables[table].is_segmented:
+                index = audformat.utils.union([index, df.index])
+            if isinstance(self.header.tables[table], audformat.MiscTable):
+                table_type[table] = "misc"
+            else:
+                table_type[table] = table.type
+            columns[table] = len(df.columns)
+            rows[table] = len(df)
+            dataframes[table] = df.head(5).reset_index()
+
+        if len(index) == 0:
+            durations = []
+        else:
+            starts = index.get_level_values("start")
+            ends = index.get_level_values("end")
+            durations = [
+                (end - start).total_seconds() for start, end in zip(starts, ends)
+            ]
+        return {
+            "columns": columns,
+            "rows": rows,
+            "dataframes": dataframes,
+            "segments": str(len(index)),
+            "segment_durations": durations,
+            "type": table_type,
+        }
 
     @staticmethod
     def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:

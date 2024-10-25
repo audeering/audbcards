@@ -545,7 +545,7 @@ class Datacard(object):
         template = environment.get_template("datacard.j2")
 
         # Convert dataset object to dictionary
-        dataset = self.dataset._cached_properties()
+        dataset = self.dataset._properties()
 
         # Add additional datacard only properties
         dataset = self._expand_dataset(dataset)
