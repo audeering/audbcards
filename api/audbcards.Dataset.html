@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                v0.3.1
+                v0.3.2
               </div>
             
           
@@ -137,7 +137,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#short-description">short_description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables">tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables-columns">tables_columns</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables-preview">tables_preview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables-rows">tables_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables-table">tables_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version">version</a></li>
@@ -195,7 +197,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset representation.</p>
 <p>Dataset object that represents a dataset
-that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.8.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
+that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb vv1.9.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -533,6 +535,27 @@ with column names as keys.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="tables-columns">
+<h2>tables_columns<a class="headerlink" href="#tables-columns" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.tables_columns">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables_columns</span></span><a class="headerlink" href="#audbcards.Dataset.tables_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of columns for each table of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dictionary with table IDs as keys
+and number of columns as values</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tables_columns</span><span class="p">[</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
 <div class="section" id="tables-preview">
 <h2>tables_preview<a class="headerlink" href="#tables-preview" title="Permalink to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -563,6 +586,27 @@ and table previews as values</p>
 <span class="go">|         9 |    21 | female   | deu        |</span>
 <span class="go">|        10 |    32 | male     | deu        |</span>
 <span class="go">|        11 |    26 | male     | deu        |</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="tables-rows">
+<h2>tables_rows<a class="headerlink" href="#tables-rows" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Dataset.tables_rows">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">tables_rows</span></span><a class="headerlink" href="#audbcards.Dataset.tables_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of rows for each table of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dictionary with table IDs as keys
+and number of rows as values</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;1.4.1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tables_rows</span><span class="p">[</span><span class="s2">&quot;speaker&quot;</span><span class="p">]</span>
+<span class="go">10</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -618,7 +662,7 @@ and table previews as values</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/07/27 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

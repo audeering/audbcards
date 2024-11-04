@@ -71,19 +71,25 @@ Tables
                     <tr>
         <td><p>1004/1004_TAI_FEA_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_ITS_NEU_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_IOM_DIS_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_MTI_NEU_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_TAI_HAP_XX.wav</p></td>
         <td><p>1004</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">360 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -107,19 +113,25 @@ Tables
                     <tr>
         <td><p>1004/1004_TIE_HAP_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_IEO_ANG_LO.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_MTI_DIS_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_IWW_ANG_XX.wav</p></td>
         <td><p>1004</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1004/1004_IEO_ANG_HI.wav</p></td>
         <td><p>1004</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">360 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -143,19 +155,25 @@ Tables
                     <tr>
         <td><p>1006/1006_IEO_ANG_HI.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_ITH_ANG_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_ITS_ANG_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_IOM_FEA_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_IWW_SAD_XX.wav</p></td>
         <td><p>1006</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">380 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -179,19 +197,25 @@ Tables
                     <tr>
         <td><p>1001/1001_TSI_HAP_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_WSI_FEA_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_TIE_DIS_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_TAI_SAD_XX.wav</p></td>
         <td><p>1001</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1080 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -215,19 +239,25 @@ Tables
                     <tr>
         <td><p>1006/1006_MTI_NEU_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_IEO_SAD_LO.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_IEO_NEU_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_WSI_DIS_XX.wav</p></td>
         <td><p>1006</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1006/1006_IOM_NEU_XX.wav</p></td>
         <td><p>1006</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">380 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -251,19 +281,25 @@ Tables
                     <tr>
         <td><p>1001/1001_IWW_NEU_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_TIE_NEU_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IWW_HAP_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_MTI_NEU_XX.wav</p></td>
         <td><p>1001</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_DFA_SAD_XX.wav</p></td>
         <td><p>1001</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1080 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -289,23 +325,29 @@ Tables
         <td><p>1049/1049_IEO_NEU_XX.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>unspecified</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>low</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>mid</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>high</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>sadness</p></td>
         <td><p>low</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 2 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -331,23 +373,29 @@ Tables
         <td><p>1048/1048_IEO_NEU_XX.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>unspecified</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>low</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>mid</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>high</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>sadness</p></td>
         <td><p>low</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 2 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -373,23 +421,29 @@ Tables
         <td><p>1001/1001_IEO_NEU_XX.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>unspecified</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>low</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>mid</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>high</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>sadness</p></td>
         <td><p>low</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 2 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -431,7 +485,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>47.0</p></td>
@@ -443,7 +498,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>78.62</p></td>
@@ -455,7 +511,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>anger</p></td>
         <td><p>43.5</p></td>
@@ -467,7 +524,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>70.2</p></td>
@@ -479,7 +537,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -507,27 +567,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>67.86</p></td>
         <td><p>0.7777777777777779</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>47.0</p></td>
         <td><p>0.33333333333333304</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>78.62</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>no_agreement</p></td>
         <td><p></p></td>
         <td><p>0.28571428571428603</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>70.2</p></td>
         <td><p>0.555555555555556</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -561,7 +627,8 @@ Tables
         <td><p>1</p></td>
         <td><p>7</p></td>
         <td><p>1</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>1</p></td>
         <td><p>1</p></td>
@@ -569,7 +636,8 @@ Tables
         <td><p>2</p></td>
         <td><p>3</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -577,7 +645,8 @@ Tables
         <td><p>8</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>2</p></td>
         <td><p>1</p></td>
@@ -585,7 +654,8 @@ Tables
         <td><p>2</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>1</p></td>
@@ -593,7 +663,9 @@ Tables
         <td><p>0</p></td>
         <td><p>5</p></td>
         <td><p>2</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -635,7 +707,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>77.89</p></td>
@@ -647,7 +720,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>84.86</p></td>
@@ -659,7 +733,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>76.9</p></td>
@@ -671,7 +746,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>78.6</p></td>
@@ -683,7 +759,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -711,27 +789,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>65.44</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>77.89</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>84.86</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>76.9</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>78.6</p></td>
         <td><p>1.0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -765,7 +849,8 @@ Tables
         <td><p>1</p></td>
         <td><p>9</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -773,7 +858,8 @@ Tables
         <td><p>9</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -781,7 +867,8 @@ Tables
         <td><p>7</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -789,7 +876,8 @@ Tables
         <td><p>10</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -797,7 +885,9 @@ Tables
         <td><p>0</p></td>
         <td><p>10</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -839,7 +929,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>51.0</p></td>
@@ -851,7 +942,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>70.56</p></td>
@@ -863,7 +955,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>69.0</p></td>
@@ -875,7 +968,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>disgust</p></td>
         <td><p>56.71</p></td>
@@ -887,7 +981,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -915,27 +1011,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>67.38</p></td>
         <td><p>0.8</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>51.0</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>70.56</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>69.0</p></td>
         <td><p>0.8</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>disgust</p></td>
         <td><p>56.71</p></td>
         <td><p>0.7777777777777779</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -969,7 +1071,8 @@ Tables
         <td><p>1</p></td>
         <td><p>8</p></td>
         <td><p>1</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -977,7 +1080,8 @@ Tables
         <td><p>10</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -985,7 +1089,8 @@ Tables
         <td><p>9</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>1</p></td>
@@ -993,7 +1098,8 @@ Tables
         <td><p>8</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>7</p></td>
@@ -1001,7 +1107,9 @@ Tables
         <td><p>0</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1043,7 +1151,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>57.0</p></td>
@@ -1055,7 +1164,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>62.62</p></td>
@@ -1067,7 +1177,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>68.25</p></td>
@@ -1079,7 +1190,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>73.5</p></td>
@@ -1091,7 +1203,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1119,27 +1233,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>92.22</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>57.0</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>62.62</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>68.25</p></td>
         <td><p>0.8</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>73.5</p></td>
         <td><p>0.8888888888888891</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1173,7 +1293,8 @@ Tables
         <td><p>0</p></td>
         <td><p>9</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1181,7 +1302,8 @@ Tables
         <td><p>9</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
@@ -1189,7 +1311,8 @@ Tables
         <td><p>8</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1197,7 +1320,8 @@ Tables
         <td><p>8</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>1</p></td>
@@ -1205,7 +1329,9 @@ Tables
         <td><p>0</p></td>
         <td><p>8</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1243,7 +1369,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>77.5</p></td>
@@ -1253,7 +1380,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>90.88</p></td>
@@ -1263,7 +1391,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>88.3</p></td>
@@ -1273,7 +1402,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>75.25</p></td>
@@ -1283,7 +1413,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 8 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1311,27 +1443,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>94.22</p></td>
         <td><p>0.818181818181818</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>77.5</p></td>
         <td><p>0.666666666666667</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>90.88</p></td>
         <td><p>0.8</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>88.3</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>no_agreement</p></td>
         <td><p></p></td>
         <td><p>0.4</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1365,7 +1503,8 @@ Tables
         <td><p>2</p></td>
         <td><p>9</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1373,7 +1512,8 @@ Tables
         <td><p>6</p></td>
         <td><p>3</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1381,7 +1521,8 @@ Tables
         <td><p>8</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1389,7 +1530,8 @@ Tables
         <td><p>10</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1049/1049_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>2</p></td>
@@ -1397,7 +1539,9 @@ Tables
         <td><p>0</p></td>
         <td><p>4</p></td>
         <td><p>4</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1476 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1435,7 +1579,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>34.0</p></td>
@@ -1445,7 +1590,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>73.0</p></td>
@@ -1455,7 +1601,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>53.75</p></td>
@@ -1465,7 +1612,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>64.83</p></td>
@@ -1475,7 +1623,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 8 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1503,27 +1653,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>81.56</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>34.0</p></td>
         <td><p>0.8</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>73.0</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>53.75</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>64.83</p></td>
         <td><p>0.666666666666667</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1557,7 +1713,8 @@ Tables
         <td><p>0</p></td>
         <td><p>9</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1565,7 +1722,8 @@ Tables
         <td><p>8</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1573,7 +1731,8 @@ Tables
         <td><p>10</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1581,7 +1740,8 @@ Tables
         <td><p>8</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>3</p></td>
@@ -1589,7 +1749,9 @@ Tables
         <td><p>0</p></td>
         <td><p>6</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1627,7 +1789,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>57.38</p></td>
@@ -1637,7 +1800,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>56.56</p></td>
@@ -1647,7 +1811,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>73.2</p></td>
@@ -1657,7 +1822,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>74.8</p></td>
@@ -1667,7 +1833,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 8 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1695,27 +1863,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>64.78</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>57.38</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>56.56</p></td>
         <td><p>0.9</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>73.2</p></td>
         <td><p>1.0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>74.8</p></td>
         <td><p>0.555555555555556</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1749,7 +1923,8 @@ Tables
         <td><p>0</p></td>
         <td><p>9</p></td>
         <td><p>1</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1757,7 +1932,8 @@ Tables
         <td><p>8</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1765,7 +1941,8 @@ Tables
         <td><p>9</p></td>
         <td><p>1</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1773,7 +1950,8 @@ Tables
         <td><p>10</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>2</p></td>
@@ -1781,7 +1959,9 @@ Tables
         <td><p>1</p></td>
         <td><p>5</p></td>
         <td><p>1</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1823,7 +2003,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>70.5</p></td>
@@ -1835,7 +2016,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>59.14</p></td>
@@ -1847,7 +2029,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>75.0</p></td>
@@ -1859,7 +2042,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>51.1</p></td>
@@ -1871,7 +2055,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1899,27 +2085,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>63.71</p></td>
         <td><p>0.7</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>70.5</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>59.14</p></td>
         <td><p>0.7</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>75.0</p></td>
         <td><p>0.8888888888888891</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>51.1</p></td>
         <td><p>1.0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -1953,7 +2145,8 @@ Tables
         <td><p>1</p></td>
         <td><p>7</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>1</p></td>
@@ -1961,7 +2154,8 @@ Tables
         <td><p>0</p></td>
         <td><p>8</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1969,7 +2163,8 @@ Tables
         <td><p>0</p></td>
         <td><p>7</p></td>
         <td><p>3</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_HAP_HI.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1977,7 +2172,8 @@ Tables
         <td><p>0</p></td>
         <td><p>8</p></td>
         <td><p>1</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1048/1048_IEO_SAD_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -1985,7 +2181,9 @@ Tables
         <td><p>0</p></td>
         <td><p>10</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">1392 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -2027,7 +2225,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>71.67</p></td>
@@ -2039,7 +2238,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>67.71</p></td>
@@ -2051,7 +2251,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>63.5</p></td>
@@ -2063,7 +2264,8 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>73.71</p></td>
@@ -2075,7 +2277,9 @@ Tables
         <td><p></p></td>
         <td><p></p></td>
         <td><p></p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 10 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -2103,27 +2307,33 @@ Tables
         <td><p>neutral</p></td>
         <td><p>69.1</p></td>
         <td><p>0.9090909090909091</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>71.67</p></td>
         <td><p>0.666666666666667</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>67.71</p></td>
         <td><p>0.6363636363636359</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>happiness</p></td>
         <td><p>63.5</p></td>
         <td><p>0.6</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>neutral</p></td>
         <td><p>73.71</p></td>
         <td><p>0.7</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 3 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -2157,7 +2367,8 @@ Tables
         <td><p>1</p></td>
         <td><p>10</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -2165,7 +2376,8 @@ Tables
         <td><p>3</p></td>
         <td><p>6</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>0</p></td>
         <td><p>0</p></td>
@@ -2173,7 +2385,8 @@ Tables
         <td><p>4</p></td>
         <td><p>7</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
@@ -2181,7 +2394,8 @@ Tables
         <td><p>6</p></td>
         <td><p>2</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>1</p></td>
         <td><p>1</p></td>
@@ -2189,7 +2403,9 @@ Tables
         <td><p>0</p></td>
         <td><p>7</p></td>
         <td><p>1</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">4572 rows x 6 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -2215,23 +2431,29 @@ Tables
         <td><p>1001/1001_IEO_NEU_XX.wav</p></td>
         <td><p>1001</p></td>
         <td><p>False</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>1001</p></td>
         <td><p>False</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>1001</p></td>
         <td><p>False</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>1001</p></td>
         <td><p>False</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>1001</p></td>
         <td><p>False</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">7441 rows x 2 columns</p></td></tr>
+    </tbody>
     </table>
 
     
@@ -2255,19 +2477,25 @@ Tables
                     <tr>
         <td><p>1001/1001_IEO_NEU_XX.wav</p></td>
         <td><p>IEO</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_LO.wav</p></td>
         <td><p>IEO</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_MD.wav</p></td>
         <td><p>IEO</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_HAP_HI.wav</p></td>
         <td><p>IEO</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>1001/1001_IEO_SAD_LO.wav</p></td>
         <td><p>IEO</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">7441 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     

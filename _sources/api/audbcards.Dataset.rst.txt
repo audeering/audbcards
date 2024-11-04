@@ -138,9 +138,17 @@ tables
 ------
 .. autoattribute:: Dataset.tables
     
+tables\_columns
+---------------
+.. autoattribute:: Dataset.tables_columns
+    
 tables\_preview
 ---------------
 .. autoattribute:: Dataset.tables_preview
+    
+tables\_rows
+------------
+.. autoattribute:: Dataset.tables_rows
     
 tables\_table
 -------------

@@ -66,27 +66,33 @@ Tables
         <td><p>0 days 00:00:02.173875</p></td>
         <td><p>0 days 00:00:03.775937</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>bus_stop.wav</p></td>
         <td><p>0 days 00:00:05.641875</p></td>
         <td><p>0 days 00:00:07.691937</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>bus_stop.wav</p></td>
         <td><p>0 days 00:00:08.876875</p></td>
         <td><p>0 days 00:00:11.498937</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>bus_stop.wav</p></td>
         <td><p>0 days 00:00:12.468875</p></td>
         <td><p>0 days 00:00:13.644937</p></td>
         <td><p>0</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>bus_stop.wav</p></td>
         <td><p>0 days 00:00:14.182875</p></td>
         <td><p>0 days 00:00:16.498937</p></td>
         <td><p>0</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">588 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     

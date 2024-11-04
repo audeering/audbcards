@@ -71,19 +71,25 @@ Tables
                     <tr>
         <td><p>dirs/Altec_639.wav</p></td>
         <td><p>Altec</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>dirs/Altec_670A.wav</p></td>
         <td><p>Altec</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>dirs/Altec_670B.wav</p></td>
         <td><p>Altec</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>dirs/American_R331.wav</p></td>
         <td><p>American</p></td>
-                    <tr>
+        </tr>
+                <tr>
         <td><p>dirs/Amperite_RA.wav</p></td>
         <td><p>Amperite</p></td>
-                </tbody>
+        </tr>
+            <tr><td><p class="table-statistic">66 rows x 1 column</p></td></tr>
+    </tbody>
     </table>
 
     
