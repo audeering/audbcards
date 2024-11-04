@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.2 (2024-05-04)
+--------------------------
+
+* Added: number of rows and columns
+  to the table preview
+
+
 Version 0.3.1 (2024-07-27)
 --------------------------
 
