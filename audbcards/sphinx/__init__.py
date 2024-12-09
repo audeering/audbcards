@@ -82,6 +82,7 @@ def builder_inited(app: sphinx.application.Sphinx):
 
         print("Get list of available datasets... ", end="", flush=True)
         df = audb.available(only_latest=True)
+        df = df[~df.index.duplicated(keep="first")]
         df = df.sort_index()
         print("done")
 
