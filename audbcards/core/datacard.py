@@ -555,7 +555,7 @@ class Datacard(object):
         with tempfile.TemporaryDirectory() as tmpdir:
             for file in audeer.list_file_names(template_dir):
                 shutil.copyfile(file, os.path.join(tmpdir, os.path.basename(file)))
-            if self.template_dir is not None:
+            if self.template_dir is not None and os.path.isdir(self.template_dir):
                 # Overwrite with user defined templates
                 for file in audeer.list_file_names(self.template_dir):
                     shutil.copyfile(file, os.path.join(tmpdir, os.path.basename(file)))
