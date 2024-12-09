@@ -57,7 +57,9 @@ def builder_inited(app: sphinx.application.Sphinx):
     """
     # Read config values
     sections = app.config.audbcards_datasets
-    template_dir = os.path.join(app.srcdir, app.config.audbcards_templates)
+    template_dir = app.config.audbcards_templates
+    if template_dir is not None:
+        template_dir = os.path.join(app.srcdir, template_dir)
 
     # Add CSS and JS files for table preview feature
     static_dir = audeer.mkdir(app.builder.outdir, "_static")
