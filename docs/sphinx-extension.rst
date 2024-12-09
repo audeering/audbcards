@@ -128,11 +128,11 @@ e.g.
 
 .. code-block:: rst
 
-    A list of public datasets is shown at :ref:`data-public`.
+    A list of public datasets is shown at :ref:`audb-public`.
 
 Which will render as:
 
-    A list of public datasets is shown at :ref:`data-public`.
+    A list of public datasets is shown at :ref:`audb-public`.
 
 And you can reference single data cards
 by a combination of their folder
@@ -141,11 +141,11 @@ e.g.
 
 .. code-block:: rst
 
-    :ref:`data-public-emodb` shows the data card for emodb.
+    :ref:`audb-public-emodb` shows the data card for emodb.
 
 Which will render as:
 
-    :ref:`data-public-emodb` shows the data card for emodb.
+    :ref:`audb-public-emodb` shows the data card for emodb.
 
 
 List of available datasets

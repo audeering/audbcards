@@ -42,12 +42,12 @@ intersphinx_mapping = {
 # Configure audbcards extension
 audbcards_datasets = [
     (
-        "data-public",
-        "data-public",
+        "audb-public",
+        "audb-public",
         audb.Repository(
-            name="data-public",
-            host="https://audeering.jfrog.io/artifactory",
-            backend="artifactory",
+            name="audb-public",
+            host="s3.dualstack.eu-north-1.amazonaws.com",
+            backend="s3",
         ),
         True,
     ),
@@ -61,6 +61,7 @@ html_theme_options = {
     "display_version": True,
     "logo_only": False,
     "footer_links": False,
+    "wide_pages": ["audb-public"],
 }
 html_context = {
     "display_github": True,
