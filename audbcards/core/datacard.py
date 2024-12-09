@@ -563,19 +563,19 @@ class Datacard(object):
                     "Using default templates only."
                 )
 
-            environment = jinja2.Environment(
-                loader=jinja2.ChoiceLoader(loaders),
-                trim_blocks=True,
-            )
-            template = environment.get_template("datacard.j2")
+        environment = jinja2.Environment(
+            loader=jinja2.ChoiceLoader(loaders),
+            trim_blocks=True,
+        )
+        template = environment.get_template("datacard.j2")
 
-            # Convert dataset object to dictionary
-            dataset = self.dataset._cached_properties()
+        # Convert dataset object to dictionary
+        dataset = self.dataset._cached_properties()
 
-            # Add additional datacard only properties
-            dataset = self._expand_dataset(dataset)
+        # Add additional datacard only properties
+        dataset = self._expand_dataset(dataset)
 
-            content = template.render(dataset)
+        content = template.render(dataset)
 
         # Add RST preamble
         if len(self.rst_preamble) > 0:
