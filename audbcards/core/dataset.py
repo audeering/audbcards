@@ -989,9 +989,7 @@ def create_datasets_page(
         )
         for dataset in datasets
     ]
-    repositories = [
-        f"`{repo.name} <{repo.host}>`__" for repo in audb.config.REPOSITORIES
-    ]
+    repositories = [f"{repo.name}" for repo in audb.config.REPOSITORIES]
     content = {
         "data": data,
         "name": audeer.basename_wo_ext(rst_file),
