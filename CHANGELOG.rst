@@ -20,7 +20,7 @@ Version 0.3.3 (2024-12-08)
   indicating that a table can be previewed
 * Changed: removed URL link from
   ``audbcards.Dataset.repositories``
-  as some backends to not have a valid URL
+  as some backends do not have a valid URL
 
 
 Version 0.3.2 (2024-05-04)
