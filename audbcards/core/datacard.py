@@ -1,7 +1,6 @@
 import functools
 import os
 import shutil
-import tempfile
 import typing
 import warnings
 
@@ -553,24 +552,19 @@ class Datacard(object):
 
         """
         template_dir = os.path.join(os.path.dirname(__file__), "templates")
-        with tempfile.TemporaryDirectory() as tmpdir:
-            for file in audeer.list_file_names(template_dir):
-                shutil.copyfile(file, os.path.join(tmpdir, os.path.basename(file)))
-            if self.template_dir is not None:
-                if os.path.exists(self.template_dir):
-                    # Overwrite with user defined templates
-                    for file in audeer.list_file_names(self.template_dir):
-                        shutil.copyfile(
-                            file, os.path.join(tmpdir, os.path.basename(file))
-                        )
-                else:
-                    warnings.warn(
-                        f"Template directory '{self.template_dir}' does not exist. "
-                        "Using default templates only."
-                    )
+        loaders = [jinja2.FileSystemLoader(template_dir)]
+
+        if self.template_dir is not None:
+            if os.path.exists(self.template_dir):
+                loaders.insert(0, jinja2.FileSystemLoader(self.template_dir))
+            else:
+                warnings.warn(
+                    f"Template directory '{self.template_dir}' does not exist. "
+                    "Using default templates only."
+                )
 
             environment = jinja2.Environment(
-                loader=jinja2.FileSystemLoader(tmpdir),
+                loader=jinja2.ChoiceLoader(loaders),
                 trim_blocks=True,
             )
             template = environment.get_template("datacard.j2")
