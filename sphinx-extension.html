@@ -32,8 +32,10 @@
   <link rel="stylesheet" href="_static/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="data-public" href="data-public.html" />
+    <link rel="next" title="audb-public" href="audb-public.html" />
     <link rel="prev" title="Installation" href="install.html" />
+    
+      
     
   
 
@@ -66,7 +68,7 @@
             
             
               <div class="version">
-                v0.3.2
+                v0.3.3
               </div>
             
           
@@ -102,7 +104,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Example Data Cards</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="data-public.html">data-public</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audb-public.html">audb-public</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
@@ -181,7 +183,7 @@ E.g. you can list it in a TOC inside <code class="docutils literal notranslate">
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h2>
 <p>You can configure the extension
-to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.9.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
+to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.11.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
 to look for datasets,
 select a name for the folder
 the data cards are stored,
@@ -249,34 +251,39 @@ e.g. in <code class="docutils literal notranslate"><span class="pre">docs/index.
     data-private
 </pre></div>
 </div>
+<p>A user can also influence
+how the resulting datacard appears,
+by setting the config the <code class="docutils literal notranslate"><span class="pre">audbcards_templates</span></code> folder.
+The value needs to be relative to the sphinx source dir
+(e.g. <code class="docutils literal notranslate"><span class="pre">docs/</span></code>).</p>
 </div>
 <div class="section" id="referencing">
 <h2>Referencing<a class="headerlink" href="#referencing" title="Permalink to this heading">¶</a></h2>
 <p>You can reference dataset overview pages
 by their folder name,
 e.g.</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>A list of public datasets is shown at <span class="na">:ref:</span><span class="nv">`data-public`</span>.
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>A list of public datasets is shown at <span class="na">:ref:</span><span class="nv">`audb-public`</span>.
 </pre></div>
 </div>
 <p>Which will render as:</p>
 <blockquote>
-<div><p>A list of public datasets is shown at <a class="reference internal" href="data-public.html#data-public"><span class="std std-ref">data-public</span></a>.</p>
+<div><p>A list of public datasets is shown at <a class="reference internal" href="audb-public.html#audb-public"><span class="std std-ref">audb-public</span></a>.</p>
 </div></blockquote>
 <p>And you can reference single data cards
 by a combination of their folder
 and dataset name,
 e.g.</p>
-<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:ref:</span><span class="nv">`data-public-emodb`</span> shows the data card for emodb.
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:ref:</span><span class="nv">`audb-public-emodb`</span> shows the data card for emodb.
 </pre></div>
 </div>
 <p>Which will render as:</p>
 <blockquote>
-<div><p><a class="reference internal" href="data-public/emodb.html#data-public-emodb"><span class="std std-ref">emodb</span></a> shows the data card for emodb.</p>
+<div><p><a class="reference internal" href="audb-public/emodb.html#audb-public-emodb"><span class="std std-ref">emodb</span></a> shows the data card for emodb.</p>
 </div></blockquote>
 </div>
 <div class="section" id="list-of-available-datasets">
 <h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Permalink to this heading">¶</a></h2>
-<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.9.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
+<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.11.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
 to get an overview of all available datasets.
 This information can be reused inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>
 as it is stored in the <code class="docutils literal notranslate"><span class="pre">app.audbcards</span></code> dictionary
@@ -297,7 +304,7 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="data-public.html" class="btn btn-neutral float-right" title="data-public" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audb-public.html" class="btn btn-neutral float-right" title="audb-public" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -312,7 +319,7 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

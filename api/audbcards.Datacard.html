@@ -35,6 +35,8 @@
     <link rel="next" title="Dataset" href="audbcards.Dataset.html" />
     <link rel="prev" title="config" href="audbcards.config.html" />
     
+      
+    
   
 
   
@@ -66,7 +68,7 @@
             
             
               <div class="version">
-                v0.3.2
+                v0.3.3
               </div>
             
           
@@ -97,7 +99,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Example Data Cards</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../data-public.html">data-public</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../audb-public.html">audb-public</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
@@ -116,6 +118,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#segment-duration-distribution">segment_duration_distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sphinx-build-dir">sphinx_build_dir</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sphinx-src-dir">sphinx_src_dir</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#template-dir">template_dir</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="audbcards.Dataset.html">Dataset</a></li>
@@ -168,7 +171,7 @@
 <h1>Datacard<a class="headerlink" href="#datacard" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audbcards.Datacard">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Datacard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'datasets'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphinx_build_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphinx_src_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/datacard.html#Datacard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Datacard" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Datacard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'datasets'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphinx_build_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphinx_src_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/datacard.html#Datacard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Datacard" title="Permalink to this definition">¶</a></dt>
 <dd><p>Datacard of a dataset.</p>
 <p>The datacard object
 writes a RST file
@@ -200,6 +203,15 @@ a call to <a class="reference internal" href="#audbcards.Datacard.player" title=
 will store a waveform plot of the example audio file
 under
 <code class="docutils literal notranslate"><span class="pre">&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;dataset-name&gt;/</span></code></p></li>
+<li><p><strong>template_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – folder containing user defined template files.
+The following templates will overwrite default ones:
+<code class="docutils literal notranslate"><span class="pre">datacard_description.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datacard_example.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datacard_header.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datacard.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datacard_schemes.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datacard_tables.j2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">datasets.j2</span></code></p></li>
 <li><p><strong>cache_root</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – cache folder.
 If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
 the environmental variable <code class="docutils literal notranslate"><span class="pre">AUDBCARDS_CACHE_ROOT</span></code>,
@@ -400,6 +412,15 @@ no distribution plot is created.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="template-dir">
+<h2>template_dir<a class="headerlink" href="#template-dir" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audbcards.Datacard.template_dir">
+<span class="sig-prename descclassname"><span class="pre">Datacard.</span></span><span class="sig-name descname"><span class="pre">template_dir</span></span><a class="headerlink" href="#audbcards.Datacard.template_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>User defined template dir.</p>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -425,7 +446,7 @@ no distribution plot is created.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

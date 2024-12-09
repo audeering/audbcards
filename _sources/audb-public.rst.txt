@@ -1,0 +1,53 @@
+.. _audb-public:
+
+audb-public
+===========
+Datasets available with audb_ as of |today|
+in the
+repository
+**audb-public**.
+For each dataset, the latest version is shown.
+
+.. csv-table::
+    :header-rows: 1
+    :widths: 10, 20, 7, 4, 25
+    :file: audb-public.csv
+
+.. _audb: https://audeering.github.io/audb/
+
+
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+
+    audb-public/air
+    audb-public/clac
+    audb-public/cmu-mosei
+    audb-public/cmu-mosi
+    audb-public/cochlscene
+    audb-public/cough-speech-sneeze
+    audb-public/crema-d
+    audb-public/css10
+    audb-public/eesc
+    audb-public/emodb
+    audb-public/emouerj
+    audb-public/emozionalmente
+    audb-public/esc-50
+    audb-public/expresso
+    audb-public/fsdnoisy18k
+    audb-public/ir-c4dm
+    audb-public/kannada
+    audb-public/ljspeech
+    audb-public/mesd
+    audb-public/micirp
+    audb-public/musan
+    audb-public/nemo
+    audb-public/openair
+    audb-public/quechua
+    audb-public/ravdess
+    audb-public/ravdess-videos
+    audb-public/speech-accent-archive
+    audb-public/subesco
+    audb-public/urbansound8k
+    audb-public/vadtoolkit
+    audb-public/wham

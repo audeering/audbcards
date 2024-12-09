@@ -33,6 +33,8 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     
+      
+    
   
 
   
@@ -64,7 +66,7 @@
             
             
               <div class="version">
-                v0.3.2
+                v0.3.3
               </div>
             
           
@@ -95,7 +97,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Example Data Cards</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data-public.html">data-public</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../audb-public.html">audb-public</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
@@ -1134,9 +1136,7 @@
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span>
     <span class="p">]</span>
-    <span class="n">repositories</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">&gt;`__&quot;</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span>
-    <span class="p">]</span>
+    <span class="n">repositories</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">]</span>
     <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">audeer</span><span class="o">.</span><span class="n">basename_wo_ext</span><span class="p">(</span><span class="n">rst_file</span><span class="p">),</span>
@@ -1163,7 +1163,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/11/04 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -54,3 +54,7 @@ sphinx\_src\_dir
 ----------------
 .. autoattribute:: Datacard.sphinx_src_dir
     
+template\_dir
+-------------
+.. autoattribute:: Datacard.template_dir
+    
