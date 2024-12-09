@@ -29,6 +29,8 @@ Minimal database.
 Tables
 ^^^^^^
 
+Click on a row to toggle a preview.
+
 .. raw:: html
 
     <table class="clickable docutils align-default">
