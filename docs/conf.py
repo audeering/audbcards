@@ -52,6 +52,7 @@ audbcards_datasets = [
         True,
     ),
 ]
+audbcards_templates = "_templates"
 
 
 # HTML --------------------------------------------------------------------
