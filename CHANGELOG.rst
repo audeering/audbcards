@@ -7,6 +7,22 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.3 (2024-12-08)
+--------------------------
+
+* Added: ``template_dir`` argument to ``audbcards.Datacard``
+* Added: ``audbcards_templates`` configuration value
+  to sphinx extension
+  for providing user defined templates
+* Added: support for Python 3.12
+* Added: support for Python 3.13
+* Added: a sentence on top of the tables table
+  indicating that a table can be previewed
+* Changed: removed URL link from
+  ``audbcards.Dataset.repositories``
+  as some backends to not have a valid URL
+
+
 Version 0.3.2 (2024-05-04)
 --------------------------
 
