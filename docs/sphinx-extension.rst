@@ -112,6 +112,12 @@ e.g. in ``docs/index.rst`` you could then write:
         data-public
         data-private
 
+A user can also influence
+how the resulting datacard appears,
+by setting the config the ``audbcards_templates`` folder.
+The value needs to be relative to the sphinx source dir
+(e.g. ``docs/``).
+
 
 Referencing
 -----------
