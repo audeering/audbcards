@@ -1,6 +1,7 @@
 import functools
 import os
 import shutil
+import tempfile
 import typing
 
 import jinja2
@@ -50,6 +51,15 @@ class Datacard(object):
             will store a waveform plot of the example audio file
             under
             ``<sphinx_src_dir>/<path>/<dataset-name>/``
+        template_dir: folder containing user defined template files.
+            The following templates will overwrite default ones:
+            ``datacard_description.j2``,
+            ``datacard_example.j2``,
+            ``datacard_header.j2``,
+            ``datacard.j2``,
+            ``datacard_schemes.j2``,
+            ``datacard_tables.j2``,
+            ``datasets.j2``
         cache_root: cache folder.
             If ``None``,
             the environmental variable ``AUDBCARDS_CACHE_ROOT``,
@@ -66,6 +76,7 @@ class Datacard(object):
         example: bool = True,
         sphinx_build_dir: str = None,
         sphinx_src_dir: str = None,
+        template_dir: str = None,
         cache_root: str = None,
     ):
         self.dataset = dataset
@@ -82,6 +93,9 @@ class Datacard(object):
 
         self.sphinx_src_dir = sphinx_src_dir
         """Sphinx source dir."""
+
+        self.template_dir = template_dir
+        """User defined template dir."""
 
         if cache_root is None:
             cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
@@ -538,19 +552,27 @@ class Datacard(object):
 
         """
         template_dir = os.path.join(os.path.dirname(__file__), "templates")
-        environment = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(template_dir),
-            trim_blocks=True,
-        )
-        template = environment.get_template("datacard.j2")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for file in audeer.list_file_names(template_dir):
+                shutil.copyfile(file, os.path.join(tmpdir, os.path.basename(file)))
+            if self.template_dir is not None:
+                # Overwrite with user defined templates
+                for file in audeer.list_file_names(self.template_dir):
+                    shutil.copyfile(file, os.path.join(tmpdir, os.path.basename(file)))
 
-        # Convert dataset object to dictionary
-        dataset = self.dataset._cached_properties()
+            environment = jinja2.Environment(
+                loader=jinja2.FileSystemLoader(tmpdir),
+                trim_blocks=True,
+            )
+            template = environment.get_template("datacard.j2")
 
-        # Add additional datacard only properties
-        dataset = self._expand_dataset(dataset)
+            # Convert dataset object to dictionary
+            dataset = self.dataset._cached_properties()
 
-        content = template.render(dataset)
+            # Add additional datacard only properties
+            dataset = self._expand_dataset(dataset)
+
+            content = template.render(dataset)
 
         # Add RST preamble
         if len(self.rst_preamble) > 0:
