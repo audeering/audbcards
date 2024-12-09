@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.5 (2024-12-09)
+--------------------------
+
+* Fixed: list the first occurrences
+  for datasets
+  that are mirrored in several repositories
+
+
 Version 0.3.4 (2024-12-08)
 --------------------------
 
