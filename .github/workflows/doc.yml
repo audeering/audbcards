@@ -38,7 +38,7 @@ jobs:
     - name: Ubuntu - install libsndfile
       run: |
         sudo apt-get update
-        sudo apt-get install --no-install-recommends --yes libsndfile1
+        sudo apt-get install --no-install-recommends --yes libsndfile1 ffmpeg mediafile
 
     - name: Install package
       run: |
