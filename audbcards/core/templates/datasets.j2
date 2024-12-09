@@ -10,7 +10,7 @@ repositories
 {% else %}
 repository
 {% endif %}
-{{ repositories|join(', ') }}.
+**{{ repositories|join('**, **') }}**.
 For each dataset, the latest version is shown.
 
 {% if data|length > 0 %}
