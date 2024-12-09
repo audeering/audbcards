@@ -43,6 +43,11 @@ jobs:
         pip install -r requirements.txt
         pip install -r docs/requirements.txt
 
+    - name: Ubuntu - install audio + video handling
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends --yes libsndfile1 ffmpeg mediainfo
+
     - name: Build documentation
       run: python -m sphinx docs/ build/html -b html
 
