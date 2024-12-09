@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.4 (2024-12-08)
+--------------------------
+
+* Fixed: sphinx extension
+  when ``audbcards_templates`` is empty
+
+
 Version 0.3.3 (2024-12-08)
 --------------------------
 
