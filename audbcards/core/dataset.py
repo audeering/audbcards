@@ -340,7 +340,7 @@ class _Dataset:
     @functools.cached_property
     def file_durations(self) -> typing.List:
         r"""File durations in dataset in seconds."""
-        return [self.deps.duration(file) for file in self.deps.media]
+        return [dur for file in self.deps.media if (dur := self.deps.duration(file))]
 
     @functools.cached_property
     def formats(self) -> typing.List[str]:
