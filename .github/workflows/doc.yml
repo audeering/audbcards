@@ -45,4 +45,4 @@ jobs:
 
       # DOCS
     - name: Test building user documentation
-      run: uv run python -m sphinx docs/ build/html/ -b html -W
+      run: uv run --group doc python -m sphinx docs/ build/html/ -b html -W
