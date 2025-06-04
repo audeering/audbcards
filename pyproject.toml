@@ -52,6 +52,22 @@ repository = 'https://github.com/audeering/audbcards/'
 documentation = 'https://audeering.github.io/audbcards/'
 
 
+# ===== Dependency groups =================================================
+[dependency-groups]
+dev = [
+    'audb >=1.11.0',
+    'audeer >=1.21.0',
+    'audformat >=1.3.1',
+    'pytest',
+    'sphinx',
+    'sphinx-apipages',
+    'sphinx-audeering-theme >=1.2.1',
+    'sphinx-autodoc-typehints',
+    'sphinx-copybutton',
+    'tabulate',
+]
+
+
 # ===== BUILD-SYSTEM ======================================================
 #
 # Requirements for building the Python package
