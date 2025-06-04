@@ -551,8 +551,8 @@ class TestDatasetLoadTables:
 
         """
         self.dataset = audbcards.Dataset(
-            self.__class__name,
-            self.__class__version,
+            self.__class__.name,
+            self.__class__.version,
             cache_root=self.__class__.cache_root,
             load_tables=load_tables,
         )
