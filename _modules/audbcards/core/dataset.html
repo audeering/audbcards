@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v0.3.5
+                v0.3.6
               </div>
             
           
@@ -145,27 +145,27 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audbcards.core.dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">typing</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 
-<span class="kn">import</span> <span class="nn">jinja2</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">audb</span>
-<span class="kn">import</span> <span class="nn">audbackend</span>
-<span class="kn">import</span> <span class="nn">audeer</span>
-<span class="kn">import</span> <span class="nn">audformat</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audformat</span>
 
-<span class="kn">from</span> <span class="nn">audbcards.core</span> <span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">audbcards.core.config</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audbcards.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audbcards.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 
 
-<span class="k">class</span> <span class="nc">_Dataset</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Dataset</span><span class="p">:</span>
     <span class="n">_table_related_cached_properties</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;segment_durations&quot;</span><span class="p">,</span>
         <span class="s2">&quot;segments&quot;</span><span class="p">,</span>
@@ -205,7 +205,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -249,7 +249,7 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -267,7 +267,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">exclude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
 
-        <span class="k">def</span> <span class="nf">getstate</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">getstate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span> <span class="o">=</span> <span class="n">getstate</span>
@@ -297,7 +297,7 @@
             <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">other_version</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the name of the cache file.&quot;&quot;&quot;</span>
         <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
@@ -308,7 +308,7 @@
         <span class="k">return</span> <span class="n">cache_filename</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load pickled object instance.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">()</span>
@@ -317,7 +317,7 @@
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove unsupported characters and restrict length.</span>
 
 <span class="sd">        The text is stripped from HTML tags or newlines,</span>
@@ -344,7 +344,7 @@
         <span class="k">return</span> <span class="n">text</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save object instance to path as pickle.&quot;&quot;&quot;</span>
         <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
@@ -352,45 +352,45 @@
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset backend object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_backend&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">deps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset dependency table.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_deps&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dependencies</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deps</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset header.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_header&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_header</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object containing dataset.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_repository_object&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_repository_object</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">archives</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">archives</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of archives of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">]))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">author</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">author</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Authors of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">author</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">bit_depths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bit_depths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bit depths of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
@@ -405,7 +405,7 @@
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Channels of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
@@ -420,12 +420,12 @@
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Source of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">description</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Total duration of media files in dataset.&quot;&quot;&quot;</span>
         <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span>
@@ -434,7 +434,7 @@
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Example media file.</span>
 
 <span class="sd">        The media file is selected</span>
@@ -480,32 +480,38 @@
         <span class="k">return</span> <span class="n">selected_media</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">file_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File durations in dataset in seconds.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File durations in dataset in seconds.</span>
+
+<span class="sd">        Non media files,</span>
+<span class="sd">        or media files containing 0 samples</span>
+<span class="sd">        are excluded from this list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">dur</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="p">(</span><span class="n">dur</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">))]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">formats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File formats of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">])))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Languages of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">languages</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">iso_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iso_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Languages of the database as ISO 639-3 if possible.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_iso_languages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">languages</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;License of dataset.</span>
 
 <span class="sd">        If no license is given,</span>
@@ -515,7 +521,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">license_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">license_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link to license of dataset.</span>
 
 <span class="sd">        If no link is available</span>
@@ -528,31 +534,31 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license_url</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Name of dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">publication_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publication_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Date dataset was uploaded to repository.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">publication_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publication_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;User who uploaded dataset to repository.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">owner</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository containing the dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">repository_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">repository_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link to repository in Artifactory web UI.&quot;&quot;&quot;</span>
         <span class="c1"># NOTE: this needs to be changed</span>
         <span class="c1"># as we want to support different backends</span>
@@ -564,7 +570,7 @@
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">sampling_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sampling_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sampling rates of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
@@ -579,12 +585,12 @@
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">schemes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schemes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schemes of dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">schemes_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schemes_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Summary of dataset schemes.</span>
 
 <span class="sd">        It lists all schemes in a string,</span>
@@ -596,7 +602,7 @@
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">format_schemes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">schemes_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schemes_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Schemes table with name, type, min, max, labels, mappings.</span>
 
 <span class="sd">        The table is represented as a dictionary</span>
@@ -619,12 +625,12 @@
         <span class="k">return</span> <span class="n">scheme_data</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of segments in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Segment durations in dataset.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
@@ -637,7 +643,7 @@
         <span class="k">return</span> <span class="n">durations</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">short_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">short_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Description of dataset shortened to 150 chars.&quot;&quot;&quot;</span>
         <span class="n">length</span> <span class="o">=</span> <span class="mi">150</span>
         <span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
@@ -648,19 +654,19 @@
         <span class="k">return</span> <span class="n">description</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Source of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">source</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tables of the dataset.&quot;&quot;&quot;</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">tables_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tables_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns for each table of the dataset.</span>
 
 <span class="sd">        Returns:</span>
@@ -676,7 +682,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">tables_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tables_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Table preview for each table of the dataset.</span>
 
 <span class="sd">        Shows the header</span>
@@ -716,7 +722,7 @@
         <span class="k">return</span> <span class="n">preview</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">tables_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tables_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of rows for each table of the dataset.</span>
 
 <span class="sd">        Returns:</span>
@@ -732,7 +738,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;rows&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">tables_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tables_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tables of the dataset.&quot;&quot;&quot;</span>
         <span class="n">table_list</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Columns&quot;</span><span class="p">]]</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
@@ -748,16 +754,16 @@
         <span class="k">return</span> <span class="n">table_list</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Usage of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">usage</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
 
-    <span class="k">def</span> <span class="nf">_cached_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cached_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">exclude</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span> <span class="o">=</span> <span class="p">[],</span>
@@ -788,26 +794,26 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">props</span>
 
-    <span class="k">def</span> <span class="nf">_load_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load backend object containing dataset.&quot;&quot;&quot;</span>
         <span class="n">backend_interface</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">backend_interface</span>
 
-    <span class="k">def</span> <span class="nf">_load_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load dataset dependencies.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_load_header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load dataset header.&quot;&quot;&quot;</span>
         <span class="c1"># Ensure misc tables are loaded</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">load_tables</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_load_repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load repository object containing dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">repository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">_scheme_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scheme_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Column names for the scheme table.</span>
 
 <span class="sd">        Column names always include ``&#39;ID&#39;`` and ``&#39;Dtype&#39;``,</span>
@@ -837,7 +843,7 @@
 
         <span class="k">return</span> <span class="n">columns</span>
 
-    <span class="k">def</span> <span class="nf">_scheme_to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scheme_to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme_id</span><span class="p">):</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="n">scheme_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheme_table_columns</span>
 
@@ -913,7 +919,7 @@
         <span class="k">return</span> <span class="n">data_dict</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Segments of dataset as combined index.&quot;&quot;&quot;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
@@ -928,7 +934,7 @@
         <span class="k">return</span> <span class="n">index</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">_tables_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tables_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Table information of tables in the dataset.</span>
 
 <span class="sd">        Caches table information to improve performance</span>
@@ -961,7 +967,7 @@
         <span class="k">return</span> <span class="n">stats</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_map_iso_languages</span><span class="p">(</span><span class="n">languages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_iso_languages</span><span class="p">(</span><span class="n">languages</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate ISO languages for a list of languages.</span>
 
 <span class="sd">        Leaves languages intact if :func:`audformat.utils.map_language`</span>
@@ -986,7 +992,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">iso_languages</span><span class="p">)))</span>
 
 
-<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../api/audbcards.Dataset.html#audbcards.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../api/audbcards.Dataset.html#audbcards.Dataset">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset representation.</span>
 
 <span class="sd">    Dataset object that represents a dataset</span>
@@ -1008,7 +1014,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1027,7 +1033,7 @@
 
     <span class="c1"># Add an __init__() function,</span>
     <span class="c1"># to allow documenting instance variables</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1048,30 +1054,30 @@
         <span class="nb">vars</span><span class="p">()[</span><span class="n">_prop</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_Dataset</span><span class="p">,</span> <span class="n">_prop</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_map_iso_languages</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_iso_languages</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_map_iso_languages</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">cache_path</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_dataset_cache_path</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cache_path</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ds</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save object instance to path as pickle.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">create_datasets_page</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_datasets_page</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Dataset</span><span class="p">],</span>
     <span class="n">rst_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./datasets.rst&quot;</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1163,7 +1169,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/06/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

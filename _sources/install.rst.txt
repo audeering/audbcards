@@ -5,9 +5,6 @@ To install :mod:`audbcards` run:
 
 .. code-block:: bash
 
-    $ # Create and activate Python virtual environment, e.g.
-    $ # virtualenv --python=python3 ${HOME}/.envs/audbcards
-    $ # source ${HOME}/.envs/audbcards/bin/activate
     $ pip install audbcards
 
 :mod:`audbcards` uses :mod:`audiofile`

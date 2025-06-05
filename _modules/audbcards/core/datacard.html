@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v0.3.5
+                v0.3.6
               </div>
             
           
@@ -145,28 +145,28 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audbcards.core.datacard</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">typing</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">import</span> <span class="nn">jinja2</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 
-<span class="kn">import</span> <span class="nn">audb</span>
-<span class="kn">import</span> <span class="nn">audeer</span>
-<span class="kn">import</span> <span class="nn">audiofile</span>
-<span class="kn">import</span> <span class="nn">audplot</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audiofile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audplot</span>
 
-<span class="kn">from</span> <span class="nn">audbcards.core.config</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">audbcards.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">audbcards.core.utils</span> <span class="kn">import</span> <span class="n">set_plot_margins</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audbcards.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audbcards.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audbcards.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_plot_margins</span>
 
 
-<div class="viewcode-block" id="Datacard"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard">[docs]</a><span class="k">class</span> <span class="nc">Datacard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Datacard"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Datacard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Datacard of a dataset.</span>
 
 <span class="sd">    The datacard object</span>
@@ -215,7 +215,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -253,12 +253,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;RST code added at top of data card.&quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span> <span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Property Accessor for rendered jinja2 content.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">file_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of files durations, and plotted distribution.</span>
 
 <span class="sd">        This generates a single line</span>
@@ -333,7 +333,7 @@
 
         <span class="k">return</span> <span class="n">distribution_str</span>
 
-<div class="viewcode-block" id="Datacard.player"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>    <span class="k">def</span> <span class="nf">player</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="Datacard.player"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">player</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an audio/video player showing the waveform.</span>
 
 <span class="sd">        If :attr:`audbcards.Datacard.sphinx_build_dir`</span>
@@ -380,7 +380,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">load_media_to_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">load_media_to_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file with audb and copy to audbcards cache.</span>
 
 <span class="sd">            Load example media file to cache,</span>
@@ -406,7 +406,7 @@
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">media</span><span class="p">,</span> <span class="n">cache_example_media</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">cache_example_media</span>
 
-        <span class="k">def</span> <span class="nf">plot_waveform_to_cache</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">plot_waveform_to_cache</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot waveform of example media to cache.</span>
 
 <span class="sd">            Args:</span>
@@ -482,7 +482,7 @@
 
         <span class="k">return</span> <span class="n">player_str</span></div>
 
-<div class="viewcode-block" id="Datacard.save"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Datacard.save"><a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.save">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save content of rendered template to rst.</span>
 
 <span class="sd">        Args:</span>
@@ -505,7 +505,7 @@
                 <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">segment_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of segment durations, and plotted distribution.</span>
 
 <span class="sd">        This generates a single line</span>
@@ -581,7 +581,7 @@
 
         <span class="k">return</span> <span class="n">distribution_str</span>
 
-    <span class="k">def</span> <span class="nf">_inline_image</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_inline_image</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">text1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -609,7 +609,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;.. |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| image:: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text1</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">text2</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_plot_distribution</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_distribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">,</span>
     <span class="p">):</span>
@@ -659,7 +659,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_expand_dataset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_expand_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
@@ -687,7 +687,7 @@
         <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;segment_duration_distribution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_duration_distribution</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
-    <span class="k">def</span> <span class="nf">_render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Render content of data card with Jinja2.</span>
 
 <span class="sd">        It uses the dictionary representation</span>
@@ -744,7 +744,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/06/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
