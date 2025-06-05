@@ -339,7 +339,13 @@ class _Dataset:
 
     @functools.cached_property
     def file_durations(self) -> typing.List:
-        r"""File durations in dataset in seconds."""
+        r"""File durations in dataset in seconds.
+
+        Non media files,
+        or media files containing 0 samples
+        are excluded from this list.
+
+        """
         return [dur for file in self.deps.media if (dur := self.deps.duration(file))]
 
     @functools.cached_property
