@@ -54,12 +54,20 @@ documentation = 'https://audeering.github.io/audbcards/'
 
 # ===== Dependency groups =================================================
 [dependency-groups]
+dev = [
+    {include-group = 'test'},
+    {include-group = 'doc'},
+]
 test = [
     'audb >=1.11.0',
     'audeer >=1.21.0',
     'audformat >=1.3.1',
     'pytest',
     'tabulate',
+]
+doc = [
+    {include-group = 'doc-test'},
+    {include-group = 'doc-theme'},
 ]
 doc-test = [
     'audb >=1.11.0',
@@ -71,10 +79,6 @@ doc-test = [
 ]
 doc-theme = [
     'sphinx-audeering-theme >=1.2.1',
-]
-doc = [
-    {include-group = 'doc-test'},
-    {include-group = 'doc-theme'},
 ]
 
 
