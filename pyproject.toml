@@ -61,7 +61,7 @@ test = [
     'pytest',
     'tabulate',
 ]
-doc-sphinx = [
+doc-test = [
     'audb >=1.11.0',
     'audbcards',
     'sphinx',
@@ -73,7 +73,7 @@ doc-theme = [
     'sphinx-audeering-theme >=1.2.1',
 ]
 doc = [
-    {include-group = 'doc-sphinx'},
+    {include-group = 'doc-test'},
     {include-group = 'doc-theme'},
 ]
 
@@ -232,16 +232,3 @@ audbcards = ['core/templates/*']
 #
 # Use setuptools_scm to get version from git
 [tool.setuptools_scm]
-
-
-# ----- uv ----------------------------------------------------------------
-#
-[tool.uv]
-# Allow dev and doc dependency-groups
-# to have conflicting requirements
-conflicts = [
-    [
-        { group = "doc-test" },
-        { group = "doc-theme" },
-    ]
-]

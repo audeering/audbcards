@@ -37,7 +37,7 @@ jobs:
     - name: Set up ${{ matrix.sphinx }}
       run: |
         python -V
-        uv sync --group doc-sphinx
+        uv sync --group doc-test
 
     - name: Tests
       run: |
