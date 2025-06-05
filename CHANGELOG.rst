@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.6 (2025-06-05)
+--------------------------
+
+* Changed: exclude zero durations
+  from ``audbcards.Dataset.file_durations``
+* Fixed: ``audbcards.Dataset.schemes_summary``
+  for a scheme with name ``speaker``
+  that contains a list as labels
+
+
 Version 0.3.5 (2024-12-09)
 --------------------------
 
