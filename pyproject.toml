@@ -230,6 +230,7 @@ audbcards = ['core/templates/*']
 
 # ----- uv ----------------------------------------------------------------
 #
+[tool.uv]
 # Allow dev and doc dependency-groups
 # to have conflicting requirements
 conflicts = [
