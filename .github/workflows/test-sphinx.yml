@@ -21,10 +21,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache .cache/audbcards
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/audbcards
+        key: audbcards-1
+
+    - name: Cache audb
+      uses: actions/cache@v4
+      with:
+        path: ~/audb
+        key: audb-1
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
     - name: Ubuntu - install audio + video handling
       run: |
@@ -34,11 +49,8 @@ jobs:
     - name: Set up ${{ matrix.sphinx }}
       run: |
         python -V
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r docs/requirements.txt
-        pip install "${{ matrix.sphinx }}"
+        uv sync
 
     - name: Tests
       run: |
-        python -m sphinx docs/ build/html -b html -D html_theme=alabaster
+        uv run --with "${{ matrix.sphinx }}" python -m sphinx docs/ build/html -b html -D html_theme=alabaster
