@@ -46,12 +46,15 @@ def format_schemes(
                 # Keys are the same for all entries,
                 # using the first one is enough
                 labels = list(labels[0].keys())
-                speaker = [{scheme: labels}]
+                if labels:
+                    speaker = [{scheme: labels}]
+                else:
+                    speaker = [scheme]
                 max_schemes -= 1
             except KeyError:
-                emotion = [scheme]
+                speaker = [scheme]
             except AttributeError:
-                emotion = [scheme]
+                speaker = [scheme]
         else:
             filtered_schemes.append(scheme)
     # Force emotion and speaker to the beginning of the list
