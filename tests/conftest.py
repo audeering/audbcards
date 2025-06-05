@@ -1,3 +1,4 @@
+import json
 import os
 import typing
 
@@ -221,6 +222,69 @@ def medium_db(
     # Create audio files and store database
     durations = [1, 301]
     create_audio_files(db, db_path, durations)
+    db.save(db_path)
+
+    # Publish and load database
+    audb.publish(db_path, pytest.VERSION, repository)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
+    return db
+
+
+@pytest.fixture
+def mixed_db(
+    tmpdir,
+    repository,
+    audb_cache,
+    scope="session",
+    autouse=True,
+):
+    r"""Publish and load a mixed database.
+
+    The name of the database will be ``mixed_db``.
+
+    The database contains one WAV and one JSON file,
+    and corresponding ``"audio"`` and ``"json"`` tables.
+
+    """
+    name = "mixed_db"
+
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+
+    db = audformat.Database(
+        name=name,
+        source="https://github.com/audeering/audbcards",
+        usage="unrestricted",
+        expires=None,
+        languages=[],
+        description="Mixed database.",
+        author="H Wierstorf, C Geng, B E Abrougui",
+        license=audformat.define.License.CC0_1_0,
+    )
+
+    # Table 'audio'
+    db.schemes["transcription"] = audformat.Scheme("str")
+    index = audformat.filewise_index(["f0.wav"])
+    db["audio"] = audformat.Table(index)
+    db["audio"]["transcription"] = audformat.Column()
+    db["audio"]["transcription"].set(["Hello World"])
+    path = audeer.path(db_path, "f0.wav")
+    sampling_rate = 8000
+    signal = np.random.normal(0, 0.1, (1, int(0.1 * sampling_rate)))  # 0.1 s
+    audiofile.write(path, signal, sampling_rate, normalize=True)
+
+    # Table 'json'
+    db.schemes["turns"] = audformat.Scheme("int")
+    index = audformat.filewise_index(["c0.json"])
+    db["json"] = audformat.Table(index)
+    db["json"]["turns"] = audformat.Column()
+    db["json"]["turns"].set([1])
+    path = audeer.path(db_path, "c0.json")
+    var = {"role": "human", "text": "Hello World"}
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump(var, fp, ensure_ascii=False, indent=2)
+
     db.save(db_path)
 
     # Publish and load database

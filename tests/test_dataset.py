@@ -95,6 +95,23 @@ def test_dataset_property_scope(tmpdir, db, request):
             {"files": 2, "segments": 4, "speaker": 2},
             [0.5, 0.5, 150, 151],
         ),
+        (
+            "mixed_db",
+            "Mixed database.",
+            [
+                ["ID", "Dtype"],
+                ["transcription", "str"],
+                ["turns", "int"],
+            ],
+            [
+                ["ID", "Type", "Columns"],
+                ["audio", "filewise", "transcription"],
+                ["json", "filewise", "turns"],
+            ],
+            {"audio": 1, "json": 1},
+            {"audio": 1, "json": 1},
+            [],
+        ),
     ],
 )
 def test_dataset(
@@ -152,9 +169,9 @@ def test_dataset(
         list(
             set(
                 [
-                    audiofile.bit_depth(file)
+                    bit_depth
                     for file in db.files
-                    if audiofile.bit_depth(file)
+                    if (bit_depth := audiofile.bit_depth(file))
                 ]
             )
         )
@@ -163,13 +180,17 @@ def test_dataset(
 
     # channels
     expected_channels = sorted(
-        list(set([audiofile.channels(file) for file in db.files]))
+        list(
+            set(
+                [
+                    channel
+                    for file in expected_deps.media
+                    if (channel := expected_deps.channels(file))
+                ]
+            )
+        )
     )
     assert dataset.channels == expected_channels
-
-    # duration
-    expected_duration = db.files_duration(db.files).sum()
-    assert dataset.duration == pd.to_timedelta(expected_duration)
 
     # files
     expected_files = len(db.files)
@@ -177,9 +198,13 @@ def test_dataset(
 
     # file_durations
     expected_file_durations = [
-        expected_deps.duration(file) for file in expected_deps.media
+        dur for file in expected_deps.media if (dur := expected_deps.duration(file))
     ]
     assert dataset.file_durations == expected_file_durations
+
+    # duration
+    expected_duration = sum(expected_file_durations)
+    assert dataset.duration == pd.to_timedelta(expected_duration, unit="s")
 
     # formats
     expected_formats = sorted(
@@ -220,7 +245,15 @@ def test_dataset(
 
     # sampling_rates
     expected_sampling_rates = sorted(
-        list(set([audiofile.sampling_rate(file) for file in db.files]))
+        list(
+            set(
+                [
+                    sr
+                    for file in expected_deps.media
+                    if (sr := expected_deps.sampling_rate(file))
+                ]
+            )
+        )
     )
     assert dataset.sampling_rates == expected_sampling_rates
 
