@@ -170,7 +170,7 @@ def test_dataset(
             set(
                 [
                     bit_depth
-                    for file in db.files
+                    for file in expected_deps.media
                     if (bit_depth := audiofile.bit_depth(file))
                 ]
             )
