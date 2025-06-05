@@ -58,7 +58,6 @@ def bare_db(
     repository,
     audb_cache,
     scope="session",
-    autouse=True,
 ):
     r"""Publish and load a bare database.
 
@@ -90,7 +89,6 @@ def minimal_db(
     repository,
     audb_cache,
     scope="session",
-    autouse=True,
 ):
     r"""Publish and load a minimal database.
 
@@ -143,7 +141,6 @@ def medium_db(
     repository,
     audb_cache,
     scope="session",
-    autouse=True,
 ):
     r"""Publish and load a medium test database.
 
@@ -238,7 +235,6 @@ def mixed_db(
     repository,
     audb_cache,
     scope="session",
-    autouse=True,
 ):
     r"""Publish and load a mixed database.
 
