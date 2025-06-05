@@ -61,14 +61,20 @@ test = [
     'pytest',
     'tabulate',
 ]
-doc = [
+doc-sphinx = [
     'audb >=1.11.0',
     'audbcards',
     'sphinx',
     'sphinx-apipages',
-    'sphinx-audeering-theme >=1.2.1',
     'sphinx-autodoc-typehints',
     'sphinx-copybutton',
+]
+doc-theme = [
+    'sphinx-audeering-theme >=1.2.1',
+]
+doc = [
+    {include-group = 'doc-sphinx'},
+    {include-group = 'doc-theme'},
 ]
 
 
@@ -235,7 +241,7 @@ audbcards = ['core/templates/*']
 # to have conflicting requirements
 conflicts = [
     [
-        { group = "dev" },
-        { group = "test" },
+        { group = "doc-test" },
+        { group = "doc-theme" },
     ]
 ]
