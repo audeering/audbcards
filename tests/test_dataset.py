@@ -7,6 +7,7 @@ import pytest
 
 import audb
 import audeer
+import audformat
 
 import audbcards
 
@@ -529,6 +530,24 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
 def test_dataset_parse_text(text, expected):
     """Test parsing of text."""
     assert audbcards.Dataset._parse_text(text) == expected
+
+
+def test_dataset_scheme_summary(tmpdir, repository, audb_cache):
+    """Test scheme_summary attribute."""
+    # Create dataset using speaker scheme labels
+    # (https://github.com/audeering/audbcards/issues/118)
+    name = "db"
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+    db = audformat.Database(name=name)
+    db.schemes["speaker"] = audformat.Scheme("str", labels=["s0", "s1"])
+    db.save(db_path)
+
+    # Publish and load database
+    version = "1.0.0"
+    audb.publish(db_path, version, repository)
+
+    ds = audbcards.Dataset(name, version)
+    assert ds.schemes_summary == "speaker"
 
 
 class TestDatasetLoadTables:
