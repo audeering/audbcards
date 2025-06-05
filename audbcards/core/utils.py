@@ -51,9 +51,7 @@ def format_schemes(
                 else:
                     speaker = [scheme]
                 max_schemes -= 1
-            except KeyError:
-                speaker = [scheme]
-            except AttributeError:
+            except (KeyError, AttributeError):
                 speaker = [scheme]
         else:
             filtered_schemes.append(scheme)
