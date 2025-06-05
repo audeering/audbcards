@@ -41,6 +41,14 @@ jobs:
         sudo apt-get install --no-install-recommends --yes libsndfile1
       if: matrix.os == 'ubuntu-latest'
 
+    - name: OSX - install mediainfo
+      run: brew install mediainfo
+      if: matrix.os == 'macOS-latest'
+
+    - name: Windows - install mediainfo
+      run: choco install mediainfo-cli
+      if: matrix.os == 'windows-latest'
+
     - name: Sync Python environment
       run: uv sync
 
