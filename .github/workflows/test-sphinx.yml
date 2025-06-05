@@ -37,9 +37,8 @@ jobs:
     - name: Set up ${{ matrix.sphinx }}
       run: |
         python -V
-        uv add "${{ matrix.sphinx }}"
         uv sync --group test
 
     - name: Tests
       run: |
-        uv run python -m sphinx docs/ build/html -b html -D html_theme=alabaster
+        uv run --with "${{ matrix.sphinx }}" python -m sphinx docs/ build/html -b html -D html_theme=alabaster
