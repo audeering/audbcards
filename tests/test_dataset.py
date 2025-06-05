@@ -7,7 +7,6 @@ import pytest
 
 import audb
 import audeer
-import audiofile
 
 import audbcards
 
@@ -168,11 +167,9 @@ def test_dataset(
     expected_bit_depths = sorted(
         list(
             set(
-                [
-                    bit_depth
-                    for file in expected_deps.media
-                    if (bit_depth := audiofile.bit_depth(file))
-                ]
+                bit_depth
+                for file in expected_deps.media
+                if (bit_depth := expected_deps.bit_depth(file))
             )
         )
     )
@@ -182,11 +179,9 @@ def test_dataset(
     expected_channels = sorted(
         list(
             set(
-                [
-                    channel
-                    for file in expected_deps.media
-                    if (channel := expected_deps.channels(file))
-                ]
+                channel
+                for file in expected_deps.media
+                if (channel := expected_deps.channels(file))
             )
         )
     )
@@ -208,7 +203,7 @@ def test_dataset(
 
     # formats
     expected_formats = sorted(
-        list(set([audeer.file_extension(file) for file in db.files]))
+        list(set(audeer.file_extension(file) for file in db.files))
     )
     assert dataset.formats == expected_formats
 
@@ -247,11 +242,9 @@ def test_dataset(
     expected_sampling_rates = sorted(
         list(
             set(
-                [
-                    sr
-                    for file in expected_deps.media
-                    if (sr := expected_deps.sampling_rate(file))
-                ]
+                sr
+                for file in expected_deps.media
+                if (sr := expected_deps.sampling_rate(file))
             )
         )
     )
