@@ -226,3 +226,15 @@ audbcards = ['core/templates/*']
 #
 # Use setuptools_scm to get version from git
 [tool.setuptools_scm]
+
+
+# ----- uv ----------------------------------------------------------------
+#
+# Allow dev and doc dependency-groups
+# to have conflicting requirements
+conflicts = [
+    [
+        { group = "dev" },
+        { group = "test" },
+    ]
+]
