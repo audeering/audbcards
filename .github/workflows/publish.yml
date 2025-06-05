@@ -54,7 +54,7 @@ jobs:
         sudo apt-get install --no-install-recommends --yes libsndfile1 ffmpeg mediainfo
 
     - name: Build documentation
-      run: uv run --group doc python -m sphinx docs/ build/html -b html
+      run: uv run python -m sphinx docs/ build/html -b html
 
     - name: Deploy documentation to Github pages
       uses: peaceiris/actions-gh-pages@v4

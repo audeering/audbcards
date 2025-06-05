@@ -42,7 +42,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
 
     - name: Sync Python environment
-      run: uv sync --group test
+      run: uv sync
 
     # TESTS
     - name: Test with pytest
