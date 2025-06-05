@@ -265,23 +265,36 @@ def mixed_db(
 
     # Table 'audio'
     db.schemes["transcription"] = audformat.Scheme("str")
-    index = audformat.filewise_index(["f0.wav"])
+    index = audformat.filewise_index(["f0.wav", "f1.wav"])
     db["audio"] = audformat.Table(index)
     db["audio"]["transcription"] = audformat.Column()
-    db["audio"]["transcription"].set(["Hello World"])
-    path = audeer.path(db_path, "f0.wav")
+    db["audio"]["transcription"].set(["Hello World", ""])
     sampling_rate = 8000
+    path = audeer.path(db_path, "f0.wav")
     signal = np.random.normal(0, 0.1, (1, int(0.1 * sampling_rate)))  # 0.1 s
     audiofile.write(path, signal, sampling_rate, normalize=True)
+    path = audeer.path(db_path, "f1.wav")
+    signal = np.random.normal(0, 0.1, (1, 0))  # 0.0 s
+    audiofile.write(path, signal, sampling_rate, normalize=False)
 
     # Table 'json'
     db.schemes["turns"] = audformat.Scheme("int")
     index = audformat.filewise_index(["c0.json"])
     db["json"] = audformat.Table(index)
     db["json"]["turns"] = audformat.Column()
-    db["json"]["turns"].set([1])
+    db["json"]["turns"].set([2])
     path = audeer.path(db_path, "c0.json")
-    var = {"role": "human", "text": "Hello World"}
+    var = [
+        {
+            "role": "human",
+            "audio": "f0.wav",
+            "transcription": "Hello World",
+        },
+        {
+            "role": "assistant",
+            "audio": "f1.wav",
+        },
+    ]
     with open(path, "w", encoding="utf-8") as fp:
         json.dump(var, fp, ensure_ascii=False, indent=2)
 

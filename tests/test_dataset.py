@@ -108,7 +108,7 @@ def test_dataset_property_scope(tmpdir, db, request):
                 ["json", "filewise", "turns"],
             ],
             {"audio": 1, "json": 1},
-            {"audio": 1, "json": 1},
+            {"audio": 2, "json": 1},
             [],
         ),
     ],
@@ -196,6 +196,7 @@ def test_dataset(
         dur for file in expected_deps.media if (dur := expected_deps.duration(file))
     ]
     assert dataset.file_durations == expected_file_durations
+    assert all([d > 0 for d in dataset.file_durations])
 
     # duration
     expected_duration = sum(expected_file_durations)
