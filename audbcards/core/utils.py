@@ -1,4 +1,6 @@
-import typing
+from __future__ import annotations
+
+from collections.abc import Sequence
 
 import matplotlib.pyplot as plt
 
@@ -7,8 +9,8 @@ import audformat
 
 
 def format_schemes(
-    schemes: typing.Dict[str, audformat.Scheme],
-    excludes: typing.Sequence[str] = ["duration"],
+    schemes: dict[str, audformat.Scheme],
+    excludes: Sequence[str] = ["duration"],
     max_schemes: int = 15,
 ) -> str:
     """Convert schemes object into string.
@@ -77,10 +79,10 @@ def format_schemes(
 
 
 def limit_presented_samples(
-    samples: typing.Sequence,
+    samples: Sequence,
     limit: int,
     replacement_text: str = "...",
-) -> typing.List:
+) -> list:
     r"""Limit the printing of sequences.
 
     If the sequence contains too many samples,

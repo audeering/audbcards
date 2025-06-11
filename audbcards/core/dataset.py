@@ -1,9 +1,11 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import functools
 import inspect
 import os
 import pickle
 import re
-import typing
 
 import jinja2
 import numpy as np
@@ -63,7 +65,7 @@ class _Dataset:
         name: str,
         version: str,
         *,
-        cache_root: str = None,
+        cache_root: str | None = None,
         load_tables: bool = True,
     ):
         r"""Instantiate Dataset Object."""
@@ -106,7 +108,7 @@ class _Dataset:
         self,
         name: str,
         version: str,
-        cache_root: str = None,
+        cache_root: str | None = None,
         load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
@@ -205,7 +207,7 @@ class _Dataset:
             pickle.dump(obj, f, protocol=4)
 
     @property
-    def backend(self) -> typing.Type[audbackend.interface.Base]:
+    def backend(self) -> type[audbackend.interface.Base]:
         r"""Dataset backend object."""
         if not hasattr(self, "_backend"):  # when loaded from cache
             self._backend = self._load_backend()
@@ -238,12 +240,12 @@ class _Dataset:
         return len(set([self.deps.archive(file) for file in self.deps.media]))
 
     @functools.cached_property
-    def author(self) -> typing.List[str]:
+    def author(self) -> list[str]:
         r"""Authors of the database."""
         return self.header.author
 
     @functools.cached_property
-    def bit_depths(self) -> typing.List[int]:
+    def bit_depths(self) -> list[int]:
         r"""Bit depths of media files in dataset."""
         return sorted(
             list(
@@ -258,7 +260,7 @@ class _Dataset:
         )
 
     @functools.cached_property
-    def channels(self) -> typing.List[int]:
+    def channels(self) -> list[int]:
         r"""Channels of media files in dataset."""
         return sorted(
             list(
@@ -287,7 +289,7 @@ class _Dataset:
         )
 
     @functools.cached_property
-    def example_media(self) -> typing.Optional[str]:
+    def example_media(self) -> str | None:
         r"""Example media file.
 
         The media file is selected
@@ -338,7 +340,7 @@ class _Dataset:
         return len(self.deps.media)
 
     @functools.cached_property
-    def file_durations(self) -> typing.List:
+    def file_durations(self) -> list:
         r"""File durations in dataset in seconds.
 
         Non media files,
@@ -349,17 +351,17 @@ class _Dataset:
         return [dur for file in self.deps.media if (dur := self.deps.duration(file))]
 
     @functools.cached_property
-    def formats(self) -> typing.List[str]:
+    def formats(self) -> list[str]:
         r"""File formats of media files in dataset."""
         return sorted(list(set([self.deps.format(file) for file in self.deps.media])))
 
     @functools.cached_property
-    def languages(self) -> typing.List[str]:
+    def languages(self) -> list[str]:
         r"""Languages of the database."""
         return self.header.languages
 
     @functools.cached_property
-    def iso_languages(self) -> typing.List[str]:
+    def iso_languages(self) -> list[str]:
         r"""Languages of the database as ISO 639-3 if possible."""
         return self._map_iso_languages(self.languages)
 
@@ -374,7 +376,7 @@ class _Dataset:
         return self.header.license or "Unknown"
 
     @functools.cached_property
-    def license_link(self) -> typing.Optional[str]:
+    def license_link(self) -> str | None:
         r"""Link to license of dataset.
 
         If no link is available
@@ -423,7 +425,7 @@ class _Dataset:
         )
 
     @functools.cached_property
-    def sampling_rates(self) -> typing.List[int]:
+    def sampling_rates(self) -> list[int]:
         r"""Sampling rates of media files in dataset."""
         return sorted(
             list(
@@ -438,7 +440,7 @@ class _Dataset:
         )
 
     @functools.cached_property
-    def schemes(self) -> typing.List[str]:
+    def schemes(self) -> list[str]:
         r"""Schemes of dataset."""
         return list(self.header.schemes)
 
@@ -455,7 +457,7 @@ class _Dataset:
         return utils.format_schemes(self.header.schemes)
 
     @functools.cached_property
-    def schemes_table(self) -> typing.List[typing.List[str]]:
+    def schemes_table(self) -> list[list[str]]:
         """Schemes table with name, type, min, max, labels, mappings.
 
         The table is represented as a dictionary
@@ -483,7 +485,7 @@ class _Dataset:
         return str(len(self._segments))
 
     @functools.cached_property
-    def segment_durations(self) -> typing.List[float]:
+    def segment_durations(self) -> list[float]:
         r"""Segment durations in dataset."""
         if len(self._segments) == 0:
             durations = []
@@ -512,14 +514,14 @@ class _Dataset:
         return self.header.source
 
     @functools.cached_property
-    def tables(self) -> typing.List[str]:
+    def tables(self) -> list[str]:
         """Tables of the dataset."""
         db = self.header
         tables = list(db)
         return tables
 
     @functools.cached_property
-    def tables_columns(self) -> typing.Dict[str, int]:
+    def tables_columns(self) -> dict[str, int]:
         """Number of columns for each table of the dataset.
 
         Returns:
@@ -535,7 +537,7 @@ class _Dataset:
         return {table: stats["columns"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
-    def tables_preview(self) -> typing.Dict[str, typing.List[typing.List[str]]]:
+    def tables_preview(self) -> dict[str, list[list[str]]]:
         """Table preview for each table of the dataset.
 
         Shows the header
@@ -575,7 +577,7 @@ class _Dataset:
         return preview
 
     @functools.cached_property
-    def tables_rows(self) -> typing.Dict[str, int]:
+    def tables_rows(self) -> dict[str, int]:
         """Number of rows for each table of the dataset.
 
         Returns:
@@ -591,7 +593,7 @@ class _Dataset:
         return {table: stats["rows"] for table, stats in self._tables_stats.items()}
 
     @functools.cached_property
-    def tables_table(self) -> typing.List[str]:
+    def tables_table(self) -> list[str]:
         """Tables of the dataset."""
         table_list = [["ID", "Type", "Columns"]]
         db = self.header
@@ -619,8 +621,8 @@ class _Dataset:
     def _cached_properties(
         self,
         *,
-        exclude: typing.Sequence = [],
-    ) -> typing.Dict[str, typing.Any]:
+        exclude: Sequence = [],
+    ) -> dict[str, object]:
         """Get list of cached properties of the object.
 
         When collecting the cached properties,
@@ -647,7 +649,7 @@ class _Dataset:
         )
         return props
 
-    def _load_backend(self) -> typing.Type[audbackend.interface.Base]:
+    def _load_backend(self) -> type[audbackend.interface.Base]:
         r"""Load backend object containing dataset."""
         backend_interface = self.repository_object.create_backend_interface()
         return backend_interface
@@ -666,7 +668,7 @@ class _Dataset:
         return audb.repository(self.name, self.version)
 
     @functools.cached_property
-    def _scheme_table_columns(self) -> typing.List[str]:
+    def _scheme_table_columns(self) -> list[str]:
         """Column names for the scheme table.
 
         Column names always include ``'ID'`` and ``'Dtype'``,
@@ -787,7 +789,7 @@ class _Dataset:
         return index
 
     @functools.cached_property
-    def _tables_stats(self) -> typing.Dict[str, dict]:
+    def _tables_stats(self) -> dict[str, dict]:
         """Table information of tables in the dataset.
 
         Caches table information to improve performance
@@ -820,7 +822,7 @@ class _Dataset:
         return stats
 
     @staticmethod
-    def _map_iso_languages(languages: typing.List[str]) -> typing.List[str]:
+    def _map_iso_languages(languages: list[str]) -> list[str]:
         r"""Calculate ISO languages for a list of languages.
 
         Leaves languages intact if :func:`audformat.utils.map_language`
@@ -872,7 +874,7 @@ class Dataset(object):
         name: str,
         version: str,
         *,
-        cache_root: str = None,
+        cache_root: str | None = None,
         load_tables: bool = True,
     ):
         r"""Create Dataset Instance."""
@@ -891,7 +893,7 @@ class Dataset(object):
         name: str,
         version: str,
         *,
-        cache_root: str = None,
+        cache_root: str | None = None,
         load_tables: bool = True,
     ):
         self.cache_root = audeer.mkdir(cache_root)
@@ -931,7 +933,7 @@ class Dataset(object):
 
 
 def create_datasets_page(
-    datasets: typing.Sequence[Dataset],
+    datasets: Sequence[Dataset],
     rst_file: str = "./datasets.rst",
     *,
     datacards_path: str = "./datasets",
