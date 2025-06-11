@@ -1,7 +1,9 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import functools
 import os
 import shutil
-import typing
 import warnings
 
 import jinja2
@@ -74,10 +76,10 @@ class Datacard(object):
         *,
         path: str = "datasets",
         example: bool = True,
-        sphinx_build_dir: str = None,
-        sphinx_src_dir: str = None,
-        template_dir: str = None,
-        cache_root: str = None,
+        sphinx_build_dir: str | None = None,
+        sphinx_src_dir: str | None = None,
+        template_dir: str | None = None,
+        cache_root: str | None = None,
     ):
         self.dataset = dataset
         """Dataset object."""
@@ -335,7 +337,7 @@ class Datacard(object):
 
         return player_str
 
-    def save(self, file: str = None):
+    def save(self, file: str | None = None):
         """Save content of rendered template to rst.
 
         Args:
@@ -464,7 +466,7 @@ class Datacard(object):
 
     def _plot_distribution(
         self,
-        values: typing.Sequence,
+        values: Sequence,
     ):
         r"""Plot inline distribution.
 
@@ -514,8 +516,8 @@ class Datacard(object):
 
     def _expand_dataset(
         self,
-        dataset: typing.Dict,
-    ) -> typing.Dict:
+        dataset: dict,
+    ) -> dict:
         r"""Expand dataset dict by additional entries.
 
         Additional properties are added

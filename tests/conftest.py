@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 import json
 import os
-import typing
 
 import numpy as np
 import pandas as pd
@@ -307,7 +309,7 @@ def mixed_db(
 def create_audio_files(
     db: audformat.Database,
     db_path: str,
-    durations: typing.Sequence[float],
+    durations: Sequence[float],
     *,
     sampling_rate: int = 8000,
     seed: int = 1,
