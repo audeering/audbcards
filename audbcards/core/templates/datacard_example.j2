@@ -10,3 +10,17 @@ Example
 {{ player }}
 {% endif %}
 {% endif %}
+{% if example_json is not none %}
+{% if example_media is none %}
+
+Example
+{% for n in range("Example"|length) %}^{% endfor %}
+{% endif %}
+
+
+:file:`{{ example_json }}`
+{% if json %}
+
+{{ json }}
+{% endif %}
+{% endif %}
