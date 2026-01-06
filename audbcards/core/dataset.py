@@ -671,7 +671,7 @@ class _Dataset:
         """
         archives = self.deps().archive
         selected_archive = archives.iloc[index]
-        return len([archive for archive in archives if archive == selected_archive])
+        return (archives == selected_archive).sum()
 
     def _load_backend(self) -> type[audbackend.interface.Base]:
         r"""Load backend object containing dataset."""
