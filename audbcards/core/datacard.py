@@ -558,6 +558,8 @@ class Datacard(object):
             if self.dataset.example_media is not None:
                 player = self.player()
                 dataset["player"] = player
+            if self.dataset.example_json is not None:
+                dataset["json"] = self.json()
         dataset["file_duration_distribution"] = self.file_duration_distribution
         dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset
