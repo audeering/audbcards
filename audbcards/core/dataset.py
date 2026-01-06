@@ -19,7 +19,7 @@ from audbcards.core import utils
 from audbcards.core.config import config
 
 
-random.seed(123)
+rng = random.Random(123)
 
 
 class _Dataset:
@@ -305,7 +305,7 @@ class _Dataset:
         json_idx = [n for n, ext in enumerate(self.deps().format) if ext == "json"]
         if not json_idx:
             return None
-        index = random.choice(json_idx)
+        index = rng.choice(json_idx)
         return self.deps.files[index] if self._files_in_archive(index) < 100 else None
 
     @functools.cached_property
