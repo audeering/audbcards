@@ -84,6 +84,77 @@ def bare_db(
 
 
 @pytest.fixture
+def json_db(
+    tmpdir,
+    repository,
+    audb_cache,
+    scope="session",
+):
+    r"""Publish and load a database with json files.
+
+    The name of the database will be ``json_db``.
+
+    The database contains two JSON files,
+    and a corresponding ``"json"`` table
+    without a column.
+
+    """
+    name = "json_db"
+
+    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+
+    db = audformat.Database(
+        name=name,
+        source="https://github.com/audeering/audbcards",
+        usage="unrestricted",
+        expires=None,
+        languages=[],
+        description="Json database.",
+        author="H Wierstorf",
+        license=audformat.define.License.CC0_1_0,
+    )
+
+    # Table 'json'
+    index = audformat.filewise_index(["f0.json", "f1.json"])
+    db["json"] = audformat.Table(index)
+    path = audeer.path(db_path, "f0.json")
+    var = [
+        {
+            "role": "human",
+            "text": "What's the weather?",
+        },
+        {
+            "role": "assistant",
+            "text": "Nice",
+        },
+    ]
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump(var, fp, ensure_ascii=False, indent=2)
+    path = audeer.path(db_path, "f1.json")
+    var = [
+        {
+            "role": "human",
+            "text": "What's the capital of France?",
+        },
+        {
+            "role": "assistant",
+            "text": "Paris",
+        },
+    ]
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump(var, fp, ensure_ascii=False, indent=2)
+
+    db.save(db_path)
+
+    # Publish and load database
+    audb.publish(db_path, pytest.VERSION, repository)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    tmp_root = str(tmpdir.parts()[1])
+    assert db.root.startswith(tmp_root)
+    return db
+
+
+@pytest.fixture
 def minimal_db(
     tmpdir,
     repository,

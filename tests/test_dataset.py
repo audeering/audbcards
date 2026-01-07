@@ -363,6 +363,25 @@ def test_dataset_example_media(db, cache, request):
     assert dataset.example_media == expected_example
 
 
+@pytest.mark.parametrize(
+    "db, expected",
+    [
+        ("mixed_db", "c0.json"),
+        ("medium_db", None),
+    ],
+)
+def test_dataset_example_json(db, expected, cache, request):
+    r"""Test Dataset.example_json.
+
+    It checks that the desired json file
+    is selected as example.
+
+    """
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    assert dataset.example_json == expected
+
+
 @pytest.fixture
 def constructor(tmpdir, medium_db, request):
     """Fixture to test Dataset constructor."""

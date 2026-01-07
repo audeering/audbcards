@@ -19,6 +19,8 @@ from audbcards.core.utils import set_plot_margins
         "bare_db",
         "minimal_db",
         "medium_db",
+        "json_db",
+        "mixed_db",
     ],
 )
 def test_datacard(tmpdir, db, cache, request):
@@ -46,6 +48,7 @@ def test_datacard(tmpdir, db, cache, request):
         content = re.sub(pattern, "", content)
         expected_content = re.sub(pattern, "", expected_content)
 
+    print(content)
     assert content == expected_content
 
 
