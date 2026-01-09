@@ -3,6 +3,7 @@ import functools
 import inspect
 import os
 import pickle
+import random
 import re
 
 import jinja2
@@ -16,6 +17,9 @@ import audformat
 
 from audbcards.core import utils
 from audbcards.core.config import config
+
+
+rng = random.Random(123)
 
 
 class _Dataset:
@@ -287,6 +291,24 @@ class _Dataset:
         )
 
     @functools.cached_property
+    def example_json(self) -> str | None:
+        r"""Example json file.
+
+        Path to example json file from dataset.
+        The json file needs to be stored in an archive
+        with less than 100 files.
+        If the json file does not meet this criterium
+        or no json file is part of the dataset,
+        ``None`` is returned instead.
+
+        """
+        json_idx = [n for n, ext in enumerate(self.deps().format) if ext == "json"]
+        if not json_idx:
+            return None
+        index = rng.choice(json_idx)
+        return self.deps.files[index] if self._files_in_archive(index) < 100 else None
+
+    @functools.cached_property
     def example_media(self) -> str | None:
         r"""Example media file.
 
@@ -320,17 +342,7 @@ class _Dataset:
             range(len(durations)),
             key=lambda n: abs(durations[n] - selected_duration),
         )
-        # Ensure we don't have too many other files in the archive
-        # containing the selected file
-        archives = self.deps().archive
-        selected_archive = archives.iloc[index]
-        number_of_files = len(
-            [archive for archive in archives if archive == selected_archive]
-        )
-        selected_media = None
-        if number_of_files < 100:
-            selected_media = self.deps.media[index]
-        return selected_media
+        return self.deps.media[index] if self._files_in_archive(index) < 100 else None
 
     @functools.cached_property
     def files(self) -> int:
@@ -646,6 +658,20 @@ class _Dataset:
             )
         )
         return props
+
+    def _files_in_archive(self, index: int) -> int:
+        """Number of files in archive for given file index.
+
+        Args:
+            index: index in dependency table
+
+        Returns:
+            number of files stored in the archive for given index
+
+        """
+        archives = self.deps().archive
+        selected_archive = archives.iloc[index]
+        return (archives == selected_archive).sum()
 
     def _load_backend(self) -> type[audbackend.interface.Base]:
         r"""Load backend object containing dataset."""
