@@ -294,7 +294,7 @@ class _Dataset:
     def example_json(self) -> str | None:
         r"""Example json file.
 
-        Content of example json file from dataset.
+        Path to example json file from dataset.
         The json file needs to be stored in an archive
         with less than 100 files.
         If the json file does not meet this criterium
