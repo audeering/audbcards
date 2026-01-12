@@ -26,6 +26,10 @@ file\_duration\_distribution
 ----------------------------
 .. autoattribute:: Datacard.file_duration_distribution
     
+json\(\)
+--------
+.. automethod:: Datacard.json
+    
 path
 ----
 .. autoattribute:: Datacard.path

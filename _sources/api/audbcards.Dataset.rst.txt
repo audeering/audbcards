@@ -42,6 +42,10 @@ duration
 --------
 .. autoattribute:: Dataset.duration
     
+example\_json
+-------------
+.. autoattribute:: Dataset.example_json
+    
 example\_media
 --------------
 .. autoattribute:: Dataset.example_media

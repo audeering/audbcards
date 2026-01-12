@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sphinx extension &mdash; audbcards</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v0.3.6
+                v0.4.0
               </div>
             
           
@@ -151,8 +152,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sphinx-extension">
-<h1>Sphinx extension<a class="headerlink" href="#sphinx-extension" title="Permalink to this heading">¶</a></h1>
+  <section id="sphinx-extension">
+<h1>Sphinx extension<a class="headerlink" href="#sphinx-extension" title="Link to this heading">¶</a></h1>
 <p><a class="reference internal" href="api/audbcards.html#module-audbcards" title="audbcards"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audbcards</span></code></a> provides a <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/index.html">sphinx extension</a>,
 to integrate data cards in a sphinx document.
 For listing all available datasets,
@@ -180,10 +181,10 @@ E.g. you can list it in a TOC inside <code class="docutils literal notranslate">
     datasets
 </pre></div>
 </div>
-<div class="section" id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h2>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
 <p>You can configure the extension
-to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.11.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
+to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.11.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
 to look for datasets,
 select a name for the folder
 the data cards are stored,
@@ -256,9 +257,9 @@ how the resulting datacard appears,
 by setting the config the <code class="docutils literal notranslate"><span class="pre">audbcards_templates</span></code> folder.
 The value needs to be relative to the sphinx source dir
 (e.g. <code class="docutils literal notranslate"><span class="pre">docs/</span></code>).</p>
-</div>
-<div class="section" id="referencing">
-<h2>Referencing<a class="headerlink" href="#referencing" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="referencing">
+<h2>Referencing<a class="headerlink" href="#referencing" title="Link to this heading">¶</a></h2>
 <p>You can reference dataset overview pages
 by their folder name,
 e.g.</p>
@@ -280,10 +281,10 @@ e.g.</p>
 <blockquote>
 <div><p><a class="reference internal" href="audb-public/emodb.html#audb-public-emodb"><span class="std std-ref">emodb</span></a> shows the data card for emodb.</p>
 </div></blockquote>
-</div>
-<div class="section" id="list-of-available-datasets">
-<h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Permalink to this heading">¶</a></h2>
-<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.11.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
+</section>
+<section id="list-of-available-datasets">
+<h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Link to this heading">¶</a></h2>
+<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.11.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
 to get an overview of all available datasets.
 This information can be reused inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>
 as it is stored in the <code class="docutils literal notranslate"><span class="pre">app.audbcards</span></code> dictionary
@@ -293,8 +294,8 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
     <span class="c1"># ...</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -319,7 +320,7 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/06/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/01/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -351,15 +352,12 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script src="_static/table-preview.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/table-preview.js?v=a02f8c22"></script>
     
 
   

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Changelog &mdash; audbcards</title>
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                v0.3.6
+                v0.4.0
               </div>
             
           
@@ -109,6 +110,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-0-2026-01-12">Version 0.4.0 (2026-01-12)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-3-6-2025-06-05">Version 0.3.6 (2025-06-05)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-3-5-2024-12-09">Version 0.3.5 (2024-12-09)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-3-4-2024-12-08">Version 0.3.4 (2024-12-08)</a></li>
@@ -156,13 +158,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="changelog">
-<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<div class="section" id="version-0-3-6-2025-06-05">
-<h2>Version 0.3.6 (2025-06-05)<a class="headerlink" href="#version-0-3-6-2025-06-05" title="Permalink to this heading">¶</a></h2>
+<section id="version-0-4-0-2026-01-12">
+<h2>Version 0.4.0 (2026-01-12)<a class="headerlink" href="#version-0-4-0-2026-01-12" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.example_json</span></code></p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard.json</span></code></p></li>
+<li><p>Added: show JSON examples on the datacard</p></li>
+<li><p>Removed: support for Python 3.9</p></li>
+</ul>
+</section>
+<section id="version-0-3-6-2025-06-05">
+<h2>Version 0.3.6 (2025-06-05)<a class="headerlink" href="#version-0-3-6-2025-06-05" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Changed: exclude zero durations
 from <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.file_durations</span></code></p></li>
@@ -170,24 +181,24 @@ from <code class="docutils literal notranslate"><span class="pre">audbcards.Data
 for a scheme with name <code class="docutils literal notranslate"><span class="pre">speaker</span></code>
 that contains a list as labels</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-5-2024-12-09">
-<h2>Version 0.3.5 (2024-12-09)<a class="headerlink" href="#version-0-3-5-2024-12-09" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-5-2024-12-09">
+<h2>Version 0.3.5 (2024-12-09)<a class="headerlink" href="#version-0-3-5-2024-12-09" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: list the first occurrences
 for datasets
 that are mirrored in several repositories</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-4-2024-12-08">
-<h2>Version 0.3.4 (2024-12-08)<a class="headerlink" href="#version-0-3-4-2024-12-08" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-4-2024-12-08">
+<h2>Version 0.3.4 (2024-12-08)<a class="headerlink" href="#version-0-3-4-2024-12-08" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: sphinx extension
 when <code class="docutils literal notranslate"><span class="pre">audbcards_templates</span></code> is empty</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-3-2024-12-08">
-<h2>Version 0.3.3 (2024-12-08)<a class="headerlink" href="#version-0-3-3-2024-12-08" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-3-2024-12-08">
+<h2>Version 0.3.3 (2024-12-08)<a class="headerlink" href="#version-0-3-3-2024-12-08" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">template_dir</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard</span></code></p></li>
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards_templates</span></code> configuration value
@@ -201,23 +212,23 @@ indicating that a table can be previewed</p></li>
 <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.repositories</span></code>
 as some backends do not have a valid URL</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-2-2024-05-04">
-<h2>Version 0.3.2 (2024-05-04)<a class="headerlink" href="#version-0-3-2-2024-05-04" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-2-2024-05-04">
+<h2>Version 0.3.2 (2024-05-04)<a class="headerlink" href="#version-0-3-2-2024-05-04" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: number of rows and columns
 to the table preview</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-1-2024-07-27">
-<h2>Version 0.3.1 (2024-07-27)<a class="headerlink" href="#version-0-3-1-2024-07-27" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-1-2024-07-27">
+<h2>Version 0.3.1 (2024-07-27)<a class="headerlink" href="#version-0-3-1-2024-07-27" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed: inclusion of custom CSS and JS file
 of the sphinx extension</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-3-0-2024-07-26">
-<h2>Version 0.3.0 (2024-07-26)<a class="headerlink" href="#version-0-3-0-2024-07-26" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-3-0-2024-07-26">
+<h2>Version 0.3.0 (2024-07-26)<a class="headerlink" href="#version-0-3-0-2024-07-26" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: table preview for each table of a dataset
 on the datacard</p></li>
@@ -234,9 +245,9 @@ more than 100 files per archive</p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audeer&gt;=2.2.0</span></code></p></li>
 <li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audiofile&gt;=1.5.0</span></code></p></li>
 </ul>
-</div>
-<div class="section" id="version-0-2-0-2024-05-15">
-<h2>Version 0.2.0 (2024-05-15)<a class="headerlink" href="#version-0-2-0-2024-05-15" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-2-0-2024-05-15">
+<h2>Version 0.2.0 (2024-05-15)<a class="headerlink" href="#version-0-2-0-2024-05-15" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards.config.CACHE_ROOT</span></code>
 to configure the default cache root</p></li>
@@ -261,9 +272,9 @@ from API documentation</p></li>
 <li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard.example_media</span></code>,
 use <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.example_media</span></code> instead</p></li>
 </ul>
-</div>
-<div class="section" id="version-0-1-0-2024-03-27">
-<h2>Version 0.1.0 (2024-03-27)<a class="headerlink" href="#version-0-1-0-2024-03-27" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="version-0-1-0-2024-03-27">
+<h2>Version 0.1.0 (2024-03-27)<a class="headerlink" href="#version-0-1-0-2024-03-27" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Added: initial release,
 including the classes
@@ -271,8 +282,8 @@ including the classes
 and <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset</span></code>,
 and the <code class="docutils literal notranslate"><span class="pre">audbcards.sphinx</span></code> extension</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -295,7 +306,7 @@ and the <code class="docutils literal notranslate"><span class="pre">audbcards.s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/06/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/01/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -327,15 +338,12 @@ and the <code class="docutils literal notranslate"><span class="pre">audbcards.s
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script src="_static/table-preview.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/table-preview.js?v=a02f8c22"></script>
     
 
   
