@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.0 (2026-01-12)
+--------------------------
+
+* Added: ``audbcards.Dataset.example_json``
+* Added: ``audbcards.Datacard.json``
+* Added: show JSON examples on the datacard
+* Removed: support for Python 3.9
+
+
 Version 0.3.6 (2025-06-05)
 --------------------------
 
