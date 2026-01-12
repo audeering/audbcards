@@ -2,6 +2,7 @@ from collections.abc import Sequence
 import functools
 import os
 import shutil
+import textwrap
 import warnings
 
 import jinja2
@@ -185,6 +186,27 @@ class Datacard(object):
             )
 
         return distribution_str
+
+    def json(self) -> str:
+        r"""Show content of a json file.
+
+        Returns:
+            String containing RST code to include the json content as code
+
+        """
+        # Load chosen json file
+        json_file = audb.load_media(
+            self.dataset.name,
+            self.dataset.example_json,
+            version=self.dataset.version,
+            verbose=False,
+        )[0]
+        # Read json content as string
+        with open(json_file, encoding="utf-8") as fp:
+            content = fp.read()
+
+        # String holding the RST code to include the json
+        return ".. code:: json\n" "\n" f"{textwrap.indent(content, '  ')}\n"
 
     def player(self) -> str:
         r"""Create an audio/video player showing the waveform.
@@ -536,6 +558,8 @@ class Datacard(object):
             if self.dataset.example_media is not None:
                 player = self.player()
                 dataset["player"] = player
+            if self.dataset.example_json is not None:
+                dataset["json"] = self.json()
         dataset["file_duration_distribution"] = self.file_duration_distribution
         dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset
