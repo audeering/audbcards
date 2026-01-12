@@ -23,41 +23,51 @@ pytest.TEMPLATE_DIR = audeer.mkdir(
 )
 
 
-@pytest.fixture
-def cache(tmpdir, scope="function"):
+@pytest.fixture(scope="function")
+def cache(tmpdir):
     """Local cache folder."""
     return audeer.mkdir(audeer.path(tmpdir, "cache"))
 
 
-@pytest.fixture
-def audb_cache(tmpdir, scope="session", autouse=True):
+@pytest.fixture(scope="session", autouse=True)
+def audb_cache(tmpdir_factory):
     """Local audb cache folder."""
-    cache = audeer.mkdir(audeer.path(tmpdir, "audb-cache"))
+    cache = tmpdir_factory.mktemp("audb-cache")
+    current_cache = audb.config.CACHE_ROOT
+    current_shared_cache = audb.config.SHARED_CACHE_ROOT
     audb.config.CACHE_ROOT = cache
     audb.config.SHARED_CACHE_ROOT = cache
 
+    yield
 
-@pytest.fixture
-def repository(tmpdir, scope="session"):
+    audb.config.CACHE_ROOT = current_cache
+    audb.config.SHARED_CACHE_ROOT = current_shared_cache
+
+
+@pytest.fixture(scope="session")
+def repository(tmpdir_factory):
     """Local audb repository only visible inside the tests."""
     name = "data-local"
-    host = audeer.mkdir(audeer.path(tmpdir, "repo"))
+    host = tmpdir_factory.mktemp("repo")
     audeer.mkdir(audeer.path(host, name))
+    current_repositories = audb.config.REPOSITORIES
     repository = audb.Repository(
         name=name,
         host=host,
         backend="file-system",
     )
     audb.config.REPOSITORIES = [repository]
-    return repository
+
+    yield repository
+
+    audb.config.REPOSITORIES = current_repositories
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def bare_db(
-    tmpdir,
+    tmpdir_factory,
     repository,
     audb_cache,
-    scope="session",
 ):
     r"""Publish and load a bare database.
 
@@ -70,7 +80,7 @@ def bare_db(
     """
     name = "bare_db"
 
-    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+    db_path = tmpdir_factory.mktemp(name)
 
     db = audformat.Database(name=name)
     db.save(db_path)
@@ -78,17 +88,14 @@ def bare_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    tmp_root = str(tmpdir.parts()[1])
-    assert db.root.startswith(tmp_root)
     return db
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def minimal_db(
-    tmpdir,
+    tmpdir_factory,
     repository,
     audb_cache,
-    scope="session",
 ):
     r"""Publish and load a minimal database.
 
@@ -103,7 +110,7 @@ def minimal_db(
     """
     name = "minimal_db"
 
-    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+    db_path = tmpdir_factory.mktemp(name)
 
     db = audformat.Database(
         name=name,
@@ -130,17 +137,14 @@ def minimal_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    tmp_root = str(tmpdir.parts()[1])
-    assert db.root.startswith(tmp_root)
     return db
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def medium_db(
-    tmpdir,
+    tmpdir_factory,
     repository,
     audb_cache,
-    scope="session",
 ):
     r"""Publish and load a medium test database.
 
@@ -154,7 +158,7 @@ def medium_db(
     """
     name = "medium_db"
 
-    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+    db_path = tmpdir_factory.mktemp(name)
 
     db = audformat.Database(
         name=name,
@@ -224,17 +228,14 @@ def medium_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    tmp_root = str(tmpdir.parts()[1])
-    assert db.root.startswith(tmp_root)
     return db
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def mixed_db(
-    tmpdir,
+    tmpdir_factory,
     repository,
     audb_cache,
-    scope="session",
 ):
     r"""Publish and load a mixed database.
 
@@ -246,7 +247,7 @@ def mixed_db(
     """
     name = "mixed_db"
 
-    db_path = audeer.mkdir(audeer.path(tmpdir, name))
+    db_path = tmpdir_factory.mktemp(name)
 
     db = audformat.Database(
         name=name,
@@ -299,8 +300,6 @@ def mixed_db(
     # Publish and load database
     audb.publish(db_path, pytest.VERSION, repository)
     db = audb.load(name, version=pytest.VERSION, verbose=False)
-    tmp_root = str(tmpdir.parts()[1])
-    assert db.root.startswith(tmp_root)
     return db
 
 
