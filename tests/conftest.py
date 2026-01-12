@@ -33,8 +33,15 @@ def cache(tmpdir):
 def audb_cache(tmpdir_factory):
     """Local audb cache folder."""
     cache = tmpdir_factory.mktemp("audb-cache")
+    current_cache = audb.config.CACHE_ROOT
+    current_shared_cache = audb.config.SHARED_CACHE_ROOT
     audb.config.CACHE_ROOT = cache
     audb.config.SHARED_CACHE_ROOT = cache
+
+    yield
+
+    audb.config.CACHE_ROOT = current_cache
+    audb.config.SHARED_CACHE_ROOT = current_shared_cache
 
 
 @pytest.fixture(scope="session")
@@ -43,13 +50,17 @@ def repository(tmpdir_factory):
     name = "data-local"
     host = tmpdir_factory.mktemp("repo")
     audeer.mkdir(audeer.path(host, name))
+    current_repositories = audb.config.REPOSITORIES
     repository = audb.Repository(
         name=name,
         host=host,
         backend="file-system",
     )
     audb.config.REPOSITORIES = [repository]
-    return repository
+
+    yield repository
+
+    audb.config.REPOSITORIES = current_repositories
 
 
 @pytest.fixture(scope="session")
