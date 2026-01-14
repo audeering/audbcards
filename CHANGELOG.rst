@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.1 (2026-01-14)
+--------------------------
+
+* Changed: hide missing audio entries in datacard
+
+
 Version 0.4.0 (2026-01-12)
 --------------------------
 
