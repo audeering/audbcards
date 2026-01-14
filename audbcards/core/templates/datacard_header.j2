@@ -21,11 +21,15 @@ usage         {{ usage }}
 languages     {{ languages|join(', ') }}
 {% endif %}
 format        {{ formats|join(', ') }}
+{% if sampling_rates|length > 0 %}
 channel       {{ channels|join(', ') }}
 sampling rate {{ sampling_rates|join(', ') }}
 bit depth     {{ bit_depths|join(', ') }}
 duration      {{ duration }}
 files         {{ files }}, duration distribution: {{ file_duration_distribution }}
+{% else %}
+files         {{ files }}
+{% endif %}
 {% if segments != "0" %}
 segments      {{ segments }}, duration distribution: {{ segment_duration_distribution }}
 {% endif %}
