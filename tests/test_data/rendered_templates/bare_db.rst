@@ -10,11 +10,7 @@ source
 usage         unrestricted
 languages     
 format        
-channel       
-sampling rate 
-bit depth     
-duration      0 days 00:00:00
-files         0, duration distribution: each file is 0.0 s
+files         0
 repository    `data-local <.../data-local/bare_db>`__
 published     2023-04-05 by author
 ============= ======================

@@ -12,11 +12,7 @@ source        https://github.com/audeering/audbcards
 usage         unrestricted
 languages     
 format        json
-channel       
-sampling rate 
-bit depth     
-duration      0 days 00:00:00
-files         2, duration distribution: each file is 0.0 s
+files         2
 
 
 ============= ======================
