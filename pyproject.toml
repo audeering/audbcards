@@ -34,7 +34,7 @@ classifiers = [
 ]
 requires-python = '>=3.10'
 dependencies = [
-    'audb >=1.7.0',
+    'audb >=1.9.0',
     'audeer >=2.2.0',
     'audiofile >=1.5.0',
     'audplot >=1.4.6',
