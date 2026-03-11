@@ -204,7 +204,7 @@ class Datacard(object):
         )[0]
         # Read json content and format with consistent indentation
         with open(json_file, encoding="utf-8") as fp:
-            content = json.dumps(json.load(fp), indent=2)
+            content = json.dumps(json.load(fp), ensure_ascii=False, indent=2)
 
         # String holding the RST code to include the json
         return ".. code:: json\n" "\n" f"{textwrap.indent(content, '  ')}\n"
