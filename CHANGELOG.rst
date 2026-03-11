@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.2 (2026-03-11)
+--------------------------
+
+* Fixed: ensure JSON media examples on datacards
+  are always presented as multi-line with an indent of 2
+
+
 Version 0.4.1 (2026-01-14)
 --------------------------
 
