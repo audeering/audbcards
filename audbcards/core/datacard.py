@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 import functools
+import json
 import os
 import shutil
 import textwrap
@@ -201,9 +202,9 @@ class Datacard(object):
             version=self.dataset.version,
             verbose=False,
         )[0]
-        # Read json content as string
+        # Read json content and format with consistent indentation
         with open(json_file, encoding="utf-8") as fp:
-            content = fp.read()
+            content = json.dumps(json.load(fp), indent=2)
 
         # String holding the RST code to include the json
         return ".. code:: json\n" "\n" f"{textwrap.indent(content, '  ')}\n"

@@ -1,9 +1,11 @@
+import json
 import os
 import re
 
 import matplotlib.pyplot as plt
 import pytest
 
+import audb
 import audeer
 import audiofile
 import audplot
@@ -49,6 +51,54 @@ def test_datacard(tmpdir, db, cache, request):
         expected_content = re.sub(pattern, "", expected_content)
 
     assert content == expected_content
+
+
+def test_datacard_json_formatting(cache, json_db):
+    r"""Test Datacard.json always returns formatted JSON.
+
+    Even when the source JSON file uses compact
+    single-line formatting,
+    the output should be pretty-printed
+    with an indent of 2.
+
+    """
+    dataset = audbcards.Dataset(json_db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(dataset, cache_root=cache)
+
+    expected = (
+        ".. code:: json\n"
+        "\n"
+        "  [\n"
+        "    {\n"
+        '      "role": "human",\n'
+        '      "text": "What\'s the weather?"\n'
+        "    },\n"
+        "    {\n"
+        '      "role": "assistant",\n'
+        '      "text": "Nice"\n'
+        "    }\n"
+        "  ]\n"
+    )
+
+    # Verify formatting with already well-formatted JSON
+    result = datacard.json()
+    assert result == expected
+
+    # Overwrite cached JSON file with compact single-line format
+    json_file = audb.load_media(
+        dataset.name,
+        dataset.example_json,
+        version=dataset.version,
+        verbose=False,
+    )[0]
+    with open(json_file, encoding="utf-8") as fp:
+        data = json.load(fp)
+    with open(json_file, "w", encoding="utf-8") as fp:
+        json.dump(data, fp, separators=(",", ":"))
+
+    # Verify output is still properly formatted
+    result = datacard.json()
+    assert result == expected
 
 
 @pytest.mark.parametrize(
