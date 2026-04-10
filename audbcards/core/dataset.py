@@ -327,22 +327,32 @@ class _Dataset:
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
-        durations = self.file_durations
-        selected_durations = [d for d in durations if d >= min_dur and d <= max_dur]
+        # Build list of (media_file, duration) pairs,
+        # keeping only files with non-zero duration
+        media_durations = [
+            (file, dur) for file in self.deps.media if (dur := self.deps.duration(file))
+        ]
+        selected = [
+            (file, dur)
+            for file, dur in media_durations
+            if dur >= min_dur and dur <= max_dur
+        ]
 
-        if len(selected_durations) == 0:
+        if len(selected) == 0:
             return None
 
-        selected_duration = np.median(selected_durations)
-        # Get index for duration closest to selected duration
+        selected_duration = np.median([dur for _, dur in selected])
+        # Get entry with duration closest to selected duration
         # see https://stackoverflow.com/a/9706105
-        # durations.index(selected_duration)
-        # is an alternative but fails due to rounding errors
         index = min(
-            range(len(durations)),
-            key=lambda n: abs(durations[n] - selected_duration),
+            range(len(media_durations)),
+            key=lambda n: abs(media_durations[n][1] - selected_duration),
         )
-        return self.deps.media[index] if self._files_in_archive(index) < 100 else None
+        file = media_durations[index][0]
+        archives = self.deps().archive
+        file_archive = self.deps.archive(file)
+        n_files_in_archive = (archives == file_archive).sum()
+        return file if n_files_in_archive < 100 else None
 
     @functools.cached_property
     def files(self) -> int:
