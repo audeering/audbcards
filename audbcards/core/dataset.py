@@ -327,11 +327,7 @@ class _Dataset:
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
-        # Build list of (media_file, duration) pairs,
-        # keeping only files with non-zero duration
-        media_durations = [
-            (file, dur) for file in self.deps.media if (dur := self.deps.duration(file))
-        ]
+        media_durations = self._media_with_durations
         selected = [
             (file, dur)
             for file, dur in media_durations
@@ -360,6 +356,19 @@ class _Dataset:
         return len(self.deps.media)
 
     @functools.cached_property
+    def _media_with_durations(self) -> list[tuple[str, float]]:
+        r"""Media files paired with their durations.
+
+        Non media files,
+        or media files containing 0 samples
+        are excluded from this list.
+
+        """
+        return [
+            (file, dur) for file in self.deps.media if (dur := self.deps.duration(file))
+        ]
+
+    @functools.cached_property
     def file_durations(self) -> list:
         r"""File durations in dataset in seconds.
 
@@ -368,7 +377,7 @@ class _Dataset:
         are excluded from this list.
 
         """
-        return [dur for file in self.deps.media if (dur := self.deps.duration(file))]
+        return [dur for _, dur in self._media_with_durations]
 
     @functools.cached_property
     def formats(self) -> list[str]:
