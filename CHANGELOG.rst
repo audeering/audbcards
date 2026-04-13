@@ -11,7 +11,7 @@ Version 0.4.3 (2026-04-13)
 --------------------------
 
 * Fixed: ensure ``audbcards.Dataset.example_media``
-  ignores non audio/video files
+  ignores files that are neither audio nor video
 
 
 Version 0.4.2 (2026-03-11)
