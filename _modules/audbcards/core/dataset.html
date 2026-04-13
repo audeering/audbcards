@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v0.4.2
+                v0.4.3
               </div>
             
           
@@ -453,7 +453,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">json_idx</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">json_idx</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">file</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -474,27 +475,41 @@
         <span class="c1"># Pick a meaningful duration for the example audio file</span>
         <span class="n">min_dur</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">max_dur</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 min</span>
-        <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_durations</span>
-        <span class="n">selected_durations</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">durations</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="n">min_dur</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">max_dur</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">media_durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_with_durations</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dur</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">file</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="n">media_durations</span>
+            <span class="k">if</span> <span class="n">dur</span> <span class="o">&gt;=</span> <span class="n">min_dur</span> <span class="ow">and</span> <span class="n">dur</span> <span class="o">&lt;=</span> <span class="n">max_dur</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">selected_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">selected_durations</span><span class="p">)</span>
-        <span class="c1"># Get index for duration closest to selected duration</span>
-        <span class="c1"># see https://stackoverflow.com/a/9706105</span>
-        <span class="c1"># durations.index(selected_duration)</span>
-        <span class="c1"># is an alternative but fails due to rounding errors</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)),</span>
-            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">durations</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">selected_duration</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">median_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">([</span><span class="n">dur</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">])</span>
+
+        <span class="c1"># pick file with duration closest to median</span>
+        <span class="n">file</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">median_duration</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">file</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of media files in dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">)</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_media_with_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Media files paired with their durations.</span>
+
+<span class="sd">        Non media files,</span>
+<span class="sd">        or media files containing 0 samples</span>
+<span class="sd">        are excluded from this list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dur</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="p">(</span><span class="n">dur</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+        <span class="p">]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">file_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
@@ -505,7 +520,7 @@
 <span class="sd">        are excluded from this list.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">dur</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="p">(</span><span class="n">dur</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">dur</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_with_durations</span><span class="p">]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -806,19 +821,19 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">props</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_files_in_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_files_in_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of files in archive for given file index.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            index: index in dependency table</span>
+<span class="sd">            file: file in dependency table</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            number of files stored in the archive for given index</span>
+<span class="sd">            number of files stored in the archive for given file</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">archives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">archive</span>
-        <span class="n">selected_archive</span> <span class="o">=</span> <span class="n">archives</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">archives</span> <span class="o">==</span> <span class="n">selected_archive</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">file_archive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">archives</span> <span class="o">==</span> <span class="n">file_archive</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load backend object containing dataset.&quot;&quot;&quot;</span>
@@ -1198,7 +1213,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/03/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/04/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

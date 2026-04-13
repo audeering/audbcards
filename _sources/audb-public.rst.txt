@@ -28,6 +28,7 @@ For each dataset, the latest version is shown.
     audb-public/cough-speech-sneeze
     audb-public/crema-d
     audb-public/css10
+    audb-public/cstr-vctk
     audb-public/eesc
     audb-public/emodb
     audb-public/emouerj

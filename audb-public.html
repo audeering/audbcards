@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                v0.4.2
+                v0.4.3
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audb-public/cough-speech-sneeze.html">cough-speech-sneeze</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb-public/crema-d.html">crema-d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb-public/css10.html">css10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audb-public/cstr-vctk.html">cstr-vctk</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb-public/eesc.html">eesc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb-public/emodb.html">emodb</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audb-public/emouerj.html">emouerj</a></li>
@@ -184,7 +185,7 @@
             
   <section id="audb-public">
 <span id="id1"></span><h1>audb-public<a class="headerlink" href="#audb-public" title="Link to this heading">¶</a></h1>
-<p>Datasets available with <a class="reference external" href="https://audeering.github.io/audb/">audb</a> as of Mar 11, 2026
+<p>Datasets available with <a class="reference external" href="https://audeering.github.io/audb/">audb</a> as of Apr 13, 2026
 in the
 repository
 <strong>audb-public</strong>.
@@ -254,139 +255,145 @@ For each dataset, the latest version is shown.</p>
 <td><p>1.0.0</p></td>
 <td><p>speaker, language, normalized-transcription, transcription</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/eesc.html">eesc</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/cstr-vctk.html">cstr-vctk</a></p></td>
+<td><p>The CSTR’s VCTK Corpus (Centre for Speech Technology Voice Cloning Toolkit) includes speech data uttered by 110 English speakers with various accen…</p></td>
+<td><p><a class="reference external" href="https://datashare.ed.ac.uk/bitstream/handle/10283/3443/license_text.txt">CC-BY-4.0</a></p></td>
+<td><p>1.0.0</p></td>
+<td><p>speaker, accent, age, gender, language, microphone, recording_id, region, transcription</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/eesc.html">eesc</a></p></td>
 <td><p>The establishment of the Estonian Emotional Speech Corpus (EESC) began in 2006 within the framework of the National Programme for Estonian Language…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/3.0/deed.en">CC-BY-3.0</a></p></td>
 <td><p>1.0.1</p></td>
 <td><p>emotion: [anger, happiness, neutral, sadness], speaker: [gender, language], emotion.agreement, gender, language, text-matches-emotion, transcription</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/emodb.html">emodb</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/emodb.html">emodb</a></p></td>
 <td><p>Berlin Database of Emotional Speech. A German database of emotional utterances spoken by actors recorded as a part of the DFG funded research proje…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0-1.0</a></p></td>
 <td><p>2.0.0</p></td>
 <td><p>emotion: [anger, boredom, disgust, fear, happiness, sadness, neutral], speaker: [age, gender, language], age, confidence, gender, language, naturalness, transcription</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/emouerj.html">emouerj</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/emouerj.html">emouerj</a></p></td>
 <td><p>emoUERJ contains recordings of 10 portuguese sentences pronounced by 8 speakers in 4 emotions: happiness,anger,sadness,neutral.</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>emotion: [happiness, anger, sadness, neutral], speaker: [gender], gender, take</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/emozionalmente.html">emozionalmente</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/emozionalmente.html">emozionalmente</a></p></td>
 <td><p>Emozionalmente is an extensive, crowdsourced Italian emotional speech corpus. The dataset consists of 6902 labeled samples acted out by 431 amateur…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>emotion: [anger, disgust, fear, happiness, neutral, no_agreement, sadness, surprise], speaker: [age, gender, mother_tongue], age, emotion.agreement, gender, mother_tongue, transcription, votes</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/esc-50.html">esc-50</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/esc-50.html">esc-50</a></p></td>
 <td><p>The ESC-50 dataset is a labeled collection of 2000 environmental audio recordings suitable for benchmarking methods of environmental sound classifi…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc/3.0/">CC-BY-NC-3.0</a></p></td>
 <td><p>1.0.1</p></td>
 <td><p>category, clip_id, esc10, fold, major, take</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/expresso.html">expresso</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/expresso.html">expresso</a></p></td>
 <td><p>Expresso is a dataset of expressive speech recordings. It contains read speech and singing in various styles including default, confused, enunciate…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>speaker, channel, corpus, id, speaking_style, style</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/fsdnoisy18k.html">fsdnoisy18k</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/fsdnoisy18k.html">fsdnoisy18k</a></p></td>
 <td><p>FSDnoisy18k is an audio dataset collected with the aim of fostering the investigation of label noise in sound event classification. It contains 42….</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>categories, license, manually_verified, noisy_small</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/ir-c4dm.html">ir-c4dm</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/ir-c4dm.html">ir-c4dm</a></p></td>
 <td><p>This collection of room impulse responses was measured in the Great Hall, the Octagon, and a classroom at the Mile End campus of Queen Mary, Univer…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>room, x, y</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/kannada.html">kannada</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/kannada.html">kannada</a></p></td>
 <td><p>This database contains six different sentences, pronounced by thirteen people (four male and nine female) in six emotions (anger, sadness, surprise…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.1</p></td>
 <td><p>emotion: [anger, sadness, surprise, happiness, fear, neutral], speaker: [gender, age], age, gender, sentence</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/ljspeech.html">ljspeech</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/ljspeech.html">ljspeech</a></p></td>
 <td><p>LJSpeech consists of 13,100 short audio clips of a single speaker reading passages from 7 non-fiction books. A transcription is provided for each c…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/publicdomain/zero/1.0/">CC0-1.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>speaker: [gender], gender, normalized-transcription, transcription</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/mesd.html">mesd</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/mesd.html">mesd</a></p></td>
 <td><p>MESD (Mexican Emotional Speech Database) contains single-word utterances for different emotions like anger, disgust, fear, happiness, neutral, and …</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.1</p></td>
 <td><p>emotion: [anger, disgust, fear, happiness, neutral, sadness], gender, word, word_corpus</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/micirp.html">micirp</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/micirp.html">micirp</a></p></td>
 <td><p>The Microphone Impulse Response Project (MicIRP) contains impulse response data for vintage microphones. The impulse response files were created us…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>manufacturer</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/musan.html">musan</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/musan.html">musan</a></p></td>
 <td><p>The goal of this corpus is to provide data for music/speech discrimination, speech/nonspeech detection, and voice activity detection. The corpus is…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>artist, background_noise, composer, gender, genre, language, vocals</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/nemo.html">nemo</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/nemo.html">nemo</a></p></td>
 <td><p>NEMO is a polish dataset with emotional speech. It contains over 3 hours of emotional speech in 6 categories: anger, fear, happiness, sadness, surp…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA-4.0</a></p></td>
 <td><p>1.0.1</p></td>
 <td><p>emotion: [anger, sadness, surprise, happiness, fear, neutral], speaker: [gender, age], age, gender, normalized_text, raw_text, sentence</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/openair.html">openair</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/openair.html">openair</a></p></td>
 <td><p>Impulse Responses (IR) and Reverberation Time (RT60) for different rooms. RT is given in seconds at 500Hz. Openair also has BRIRs and RT60s for 31….</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>reverberation-time</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/quechua.html">quechua</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/quechua.html">quechua</a></p></td>
 <td><p>Quechua contains 12420 recordings of emotional speech in Quechua Collao. Six actors were asked to read words and sentences with nine emotional cate…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.2</p></td>
 <td><p>emotion: [anger, boredom, happiness, sleepiness, sadness, calmness, fear, exitement, neutral], speaker: [gender], arousal, arousal.agreement, arousal.original, dominance, …, is_single_word, sentence, transcription, translation, valence, valence.agreement, valence.original</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/ravdess.html">ravdess</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/ravdess.html">ravdess</a></p></td>
 <td><p>The Ryerson Audio-Visual Database of Emotional Speech and Song The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS) contains 73…</p></td>
 <td><p><a class="reference external" href="http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">CC-BY-NC-SA-4.0</a></p></td>
 <td><p>1.1.3</p></td>
 <td><p>emotion: [anger, calm, disgust, fear, happiness, neutral, sadness, surprise], speaker: [gender, language], emotional intensity, transcription, vocal channel</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/ravdess-videos.html">ravdess-videos</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/ravdess-videos.html">ravdess-videos</a></p></td>
 <td><p>The Ryerson Audio-Visual Database of Emotional Speech and Song The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS) contains 73…</p></td>
 <td><p><a class="reference external" href="http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">CC-BY-NC-SA-4.0</a></p></td>
 <td><p>1.0.3</p></td>
 <td><p>emotion: [neutral, calm, happy, sad, angry, fearful, disgust, suprised], speaker: [gender, language], emotional intensity, transcription, vocal channel</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/speech-accent-archive.html">speech-accent-archive</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/speech-accent-archive.html">speech-accent-archive</a></p></td>
 <td><p>This dataset contains 2138 speech samples, each from a different talker reading the same reading passage. Talkers come from 177 countries and have …</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA-4.0</a></p></td>
 <td><p>2.2.0</p></td>
 <td><p>speaker, age, age_onset, birthplace, content, country, native_language, sex, tone</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/subesco.html">subesco</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/subesco.html">subesco</a></p></td>
 <td><p>SUBESCO is an audio-only emotional speech corpus of 7000 sentence-level utterances of the Bangla language. The corpus contains 7:40:40h of audio an…</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>emotion: [anger, disgust, fear, happiness, neutral, sadness, surprise], speaker: [gender], gender, sentence_number, speaker_name, take_number</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/urbansound8k.html">urbansound8k</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/urbansound8k.html">urbansound8k</a></p></td>
 <td><p>The UrbanSound8k dataset contains 8732 labeled sound excerpts (&lt;=4s) of urban sounds from 10 classes. All excerpts are taken from field recordings …</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc/3.0/">CC-BY-NC-3.0</a></p></td>
 <td><p>1.0.0</p></td>
 <td><p>category, clip_id, fold, salience</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="audb-public/vadtoolkit.html">vadtoolkit</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="audb-public/vadtoolkit.html">vadtoolkit</a></p></td>
 <td><p>VAD Toolkit: A Database for Voice Activity Detection At each environment, conversational speech by two Korean male speakers was recorded. The groun…</p></td>
 <td><p><a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a></p></td>
 <td><p>1.1.0</p></td>
 <td><p>noise</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="audb-public/wham.html">wham</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="audb-public/wham.html">wham</a></p></td>
 <td><p>The noise audio was collected at various urban locations throughout the San Francisco Bay Area in late 2018. The environments primarily consist of …</p></td>
 <td><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a></p></td>
 <td><p>1.0.0</p></td>
@@ -421,7 +428,7 @@ For each dataset, the latest version is shown.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/03/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/04/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
