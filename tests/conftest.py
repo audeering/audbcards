@@ -371,6 +371,74 @@ def mixed_db(
     return db
 
 
+@pytest.fixture(scope="session")
+def mixed_media_db(
+    tmpdir_factory,
+    repository,
+    audb_cache,
+):
+    r"""Publish and load a database with WAV and JSON files.
+
+    The name of the database will be ``mixed_media_db``.
+
+    The database contains WAV files with valid durations
+    and a JSON file that sorts before them alphabetically.
+    This means ``deps.media`` is ordered as:
+
+        a0.json (0s), b0.wav (1s), b1.wav (2s), b2.wav (3s)
+
+    When zero-duration files are filtered out,
+    the resulting list ``[1, 2, 3]`` is shorter
+    and index N in the filtered list
+    no longer corresponds to index N in ``deps.media``.
+
+    """
+    name = "mixed_media_db"
+
+    db_path = tmpdir_factory.mktemp(name)
+
+    db = audformat.Database(
+        name=name,
+        source="https://github.com/audeering/audbcards",
+        usage="unrestricted",
+        expires=None,
+        languages=[],
+        description="Mixed media database.",
+        author="H Wierstorf",
+        license=audformat.define.License.CC0_1_0,
+    )
+
+    # Table 'audio' with WAV files named to sort after JSON
+    db.schemes["transcription"] = audformat.Scheme("str")
+    index = audformat.filewise_index(["b0.wav", "b1.wav", "b2.wav"])
+    db["audio"] = audformat.Table(index)
+    db["audio"]["transcription"] = audformat.Column()
+    db["audio"]["transcription"].set(["one", "two", "three"])
+    sampling_rate = 8000
+    for filename, duration in [("b0.wav", 1), ("b1.wav", 2), ("b2.wav", 3)]:
+        path = audeer.path(db_path, filename)
+        samples = int(duration * sampling_rate)
+        signal = np.random.normal(0, 0.1, (1, samples))
+        audiofile.write(path, signal, sampling_rate, normalize=True)
+
+    # Table 'json' with file that sorts before WAV files
+    db.schemes["turns"] = audformat.Scheme("int")
+    index = audformat.filewise_index(["a0.json"])
+    db["json"] = audformat.Table(index)
+    db["json"]["turns"] = audformat.Column()
+    db["json"]["turns"].set([1])
+    path = audeer.path(db_path, "a0.json")
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump({"role": "human"}, fp)
+
+    db.save(db_path)
+
+    # Publish and load database
+    audb.publish(db_path, pytest.VERSION, repository)
+    db = audb.load(name, version=pytest.VERSION, verbose=False)
+    return db
+
+
 def create_audio_files(
     db: audformat.Database,
     db_path: str,

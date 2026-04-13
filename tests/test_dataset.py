@@ -363,6 +363,23 @@ def test_dataset_example_media(db, cache, request):
     assert dataset.example_media == expected_example
 
 
+def test_dataset_example_media_mixed(cache, mixed_media_db):
+    r"""Test Dataset.example_media with mixed WAV and JSON files.
+
+    The database has deps.media ordered as:
+        a0.json (0s), b0.wav (1s), b1.wav (2s), b2.wav (3s)
+
+    The median of valid durations [1, 2, 3] is 2,
+    so example_media should return b1.wav.
+    A buggy implementation that indexes deps.media
+    with an index from the filtered durations list
+    would return b0.wav (off by one due to the skipped JSON).
+
+    """
+    dataset = audbcards.Dataset(mixed_media_db.name, pytest.VERSION, cache_root=cache)
+    assert dataset.example_media == "b1.wav"
+
+
 @pytest.mark.parametrize(
     "db, expected",
     [
