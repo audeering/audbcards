@@ -345,9 +345,8 @@ class _Dataset:
             key=lambda n: abs(media_durations[n][1] - selected_duration),
         )
         file = media_durations[index][0]
-        archives = self.deps().archive
         file_archive = self.deps.archive(file)
-        n_files_in_archive = (archives == file_archive).sum()
+        n_files_in_archive = (self.deps.archives == file_archive).sum()
         return file if n_files_in_archive < 100 else None
 
     @functools.cached_property
