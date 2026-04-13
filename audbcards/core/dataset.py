@@ -306,7 +306,8 @@ class _Dataset:
         if not json_idx:
             return None
         index = rng.choice(json_idx)
-        return self.deps.files[index] if self._files_in_archive(index) < 100 else None
+        file = self.deps.files[index]
+        return file if self._files_in_archive(file) < 100 else None
 
     @functools.cached_property
     def example_media(self) -> str | None:
@@ -327,27 +328,23 @@ class _Dataset:
         # Pick a meaningful duration for the example audio file
         min_dur = 0.5
         max_dur = 300  # 5 min
+
         media_durations = self._media_with_durations
-        selected = [
+        candidates = [
             (file, dur)
             for file, dur in media_durations
             if dur >= min_dur and dur <= max_dur
         ]
 
-        if len(selected) == 0:
+        if len(candidates) == 0:
             return None
 
-        selected_duration = np.median([dur for _, dur in selected])
-        # Get entry with duration closest to selected duration
-        # see https://stackoverflow.com/a/9706105
-        index = min(
-            range(len(media_durations)),
-            key=lambda n: abs(media_durations[n][1] - selected_duration),
-        )
-        file = media_durations[index][0]
-        file_archive = self.deps.archive(file)
-        n_files_in_archive = (self.deps.archives == file_archive).sum()
-        return file if n_files_in_archive < 100 else None
+        median_duration = np.median([dur for _, dur in candidates])
+
+        # pick file with duration closest to median
+        file, _ = min(candidates, key=lambda item: abs(item[1] - median_duration))
+
+        return file if self._files_in_archive(file) < 100 else None
 
     @functools.cached_property
     def files(self) -> int:
@@ -677,19 +674,19 @@ class _Dataset:
         )
         return props
 
-    def _files_in_archive(self, index: int) -> int:
+    def _files_in_archive(self, file: str) -> int:
         """Number of files in archive for given file index.
 
         Args:
-            index: index in dependency table
+            file: file in dependency table
 
         Returns:
-            number of files stored in the archive for given index
+            number of files stored in the archive for given file
 
         """
         archives = self.deps().archive
-        selected_archive = archives.iloc[index]
-        return (archives == selected_archive).sum()
+        file_archive = self.deps.archive(file)
+        return (archives == file_archive).sum()
 
     def _load_backend(self) -> type[audbackend.interface.Base]:
         r"""Load backend object containing dataset."""
