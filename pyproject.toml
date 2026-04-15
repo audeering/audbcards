@@ -212,6 +212,7 @@ convention = 'google'
 #
 # Find all (sub-)modules of the Python package
 [tool.setuptools.packages.find]
+include = ['audbcards*']
 
 [tool.setuptools.package-data]
 audbcards = ['core/templates/*']
