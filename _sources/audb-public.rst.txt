@@ -21,6 +21,7 @@ For each dataset, the latest version is shown.
     :hidden:
 
     audb-public/air
+    audb-public/berkeley-function-calling-leaderboard
     audb-public/clac
     audb-public/cmu-mosei
     audb-public/cmu-mosi
