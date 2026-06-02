@@ -7,6 +7,6 @@ Schemes
     :header-rows: 1
 
 {% for row in schemes_table %}
-    "{{ row|join('", "') }}"
+    "{{ row|map('replace', '"', '""')|join('", "') }}"
 {% endfor %}
 {% endif %}
