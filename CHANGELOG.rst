@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.4 (2026-06-02)
+--------------------------
+
+* Fixed: support scheme labels with quotes
+
+
 Version 0.4.3 (2026-04-13)
 --------------------------
 
