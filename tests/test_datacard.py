@@ -1,7 +1,9 @@
+import csv
 import json
 import os
 import re
 
+import jinja2
 import matplotlib.pyplot as plt
 import pytest
 
@@ -99,6 +101,50 @@ def test_datacard_json_formatting(cache, json_db):
     # Verify output is still properly formatted
     result = datacard.json()
     assert result == expected
+
+
+def test_datacard_schemes_table_quoting():
+    r"""Schemes with labels containing double quotes render valid CSV.
+
+    The ``Schemes`` section of a data card is rendered
+    as an RST ``csv-table`` directive,
+    where every cell is wrapped in double quotes.
+    Double quotes inside a label
+    (as in ``saarbruecken-voice-database-v2``)
+    must be CSV-escaped by doubling them,
+    otherwise the directive fails to parse
+    with ``',' expected after '"'``.
+
+    """
+    template_dir = os.path.join(
+        os.path.dirname(audbcards.core.datacard.__file__),
+        "templates",
+    )
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_dir),
+        trim_blocks=True,
+    )
+    template = environment.get_template("datacard_schemes.j2")
+
+    schemes_table = [
+        ["ID", "Dtype", "Labels"],
+        ["diagnosis", "str", 'foo, "quoted" label, bar'],
+        ["gender", "str", "female, male"],
+    ]
+    content = template.render(schemes_table=schemes_table)
+
+    # Embedded double quotes are escaped by doubling them
+    assert '""quoted""' in content
+
+    # Every data row parses back to the original cells,
+    # mirroring how docutils parses the csv-table directive
+    rows = [
+        line.strip() for line in content.splitlines() if line.strip().startswith('"')
+    ]
+    assert len(rows) == len(schemes_table)
+    for line, expected_row in zip(rows, schemes_table):
+        parsed = next(csv.reader([line], skipinitialspace=True))
+        assert parsed == [str(cell) for cell in expected_row]
 
 
 @pytest.mark.parametrize(
