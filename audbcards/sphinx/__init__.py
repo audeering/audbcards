@@ -81,7 +81,7 @@ def builder_inited(app: sphinx.application.Sphinx):
         audb.config.REPOSITORIES = audeer.to_list(repositories)
 
         print("Get list of available datasets... ", end="", flush=True)
-        df = audb.available(only_latest=True)
+        df = audb.available(only_latest=True, num_workers=10)
         df = df[~df.index.duplicated(keep="first")]
         df = df.sort_index()
         print("done")
