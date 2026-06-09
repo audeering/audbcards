@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.5 (2026-06-09)
+--------------------------
+
+* Added: support for Python 3.14
+* Changed: depend on ``audb>=1.12.0``
+* Changed: use ``num_workers=10`` in ``audb.available()``
+  to speed up collecting available datasets
+* Changed: exclude ``tests/`` and ``docs/`` folders from the Python package
+
+
 Version 0.4.4 (2026-06-02)
 --------------------------
 
