@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.6 (2026-07-28)
+--------------------------
+
+* Changed: show ``audbcards.Dataset.example_json``
+  for archives of up to 1000 files
+
+
 Version 0.4.5 (2026-06-09)
 --------------------------
 
