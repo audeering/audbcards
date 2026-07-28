@@ -296,7 +296,7 @@ class _Dataset:
 
         Path to example json file from dataset.
         The json file needs to be stored in an archive
-        with less than 100 files.
+        with at most 1000 files.
         If the json file does not meet this criterium
         or no json file is part of the dataset,
         ``None`` is returned instead.
@@ -307,7 +307,7 @@ class _Dataset:
             return None
         index = rng.choice(json_idx)
         file = self.deps.files[index]
-        return file if self._files_in_archive(file) < 100 else None
+        return file if self._files_in_archive(file) <= 1000 else None
 
     @functools.cached_property
     def example_media(self) -> str | None:
@@ -320,7 +320,7 @@ class _Dataset:
         between 0.5 s and 300 s.
         In addition,
         the media file needs to be stored in an archive
-        with less than 100 media files.
+        with less than 100 files.
         If no media file meets this criterium,
         ``None`` is returned instead.
 
