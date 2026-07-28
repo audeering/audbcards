@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v0.4.5
+                v0.4.6
               </div>
             
           
@@ -443,7 +443,7 @@
 
 <span class="sd">        Path to example json file from dataset.</span>
 <span class="sd">        The json file needs to be stored in an archive</span>
-<span class="sd">        with less than 100 files.</span>
+<span class="sd">        with at most 1000 files.</span>
 <span class="sd">        If the json file does not meet this criterium</span>
 <span class="sd">        or no json file is part of the dataset,</span>
 <span class="sd">        ``None`` is returned instead.</span>
@@ -454,7 +454,7 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">json_idx</span><span class="p">)</span>
         <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">file</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">file</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
@@ -467,7 +467,7 @@
 <span class="sd">        between 0.5 s and 300 s.</span>
 <span class="sd">        In addition,</span>
 <span class="sd">        the media file needs to be stored in an archive</span>
-<span class="sd">        with less than 100 media files.</span>
+<span class="sd">        with less than 100 files.</span>
 <span class="sd">        If no media file meets this criterium,</span>
 <span class="sd">        ``None`` is returned instead.</span>
 
@@ -1213,7 +1213,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/06/09 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/28 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
