@@ -399,6 +399,58 @@ def test_dataset_example_json(db, expected, cache, request):
     assert dataset.example_json == expected
 
 
+@pytest.mark.parametrize(
+    "files_in_archive, expected",
+    [
+        (1000, "c0.json"),
+        (1001, None),
+    ],
+)
+def test_dataset_example_json_archive_limit(
+    cache, mixed_db, monkeypatch, files_in_archive, expected
+):
+    r"""Test archive size limit of Dataset.example_json.
+
+    A json file is only selected as example
+    if it is stored in an archive
+    with at most 1000 files.
+
+    """
+    monkeypatch.setattr(
+        audbcards.core.dataset._Dataset,
+        "_files_in_archive",
+        lambda self, file: files_in_archive,
+    )
+    dataset = audbcards.Dataset(mixed_db.name, pytest.VERSION, cache_root=cache)
+    assert dataset.example_json == expected
+
+
+@pytest.mark.parametrize(
+    "files_in_archive, expected_example",
+    [
+        (99, True),
+        (100, False),
+    ],
+)
+def test_dataset_example_media_archive_limit(
+    cache, medium_db, monkeypatch, files_in_archive, expected_example
+):
+    r"""Test archive size limit of Dataset.example_media.
+
+    A media file is only selected as example
+    if it is stored in an archive
+    with less than 100 files.
+
+    """
+    monkeypatch.setattr(
+        audbcards.core.dataset._Dataset,
+        "_files_in_archive",
+        lambda self, file: files_in_archive,
+    )
+    dataset = audbcards.Dataset(medium_db.name, pytest.VERSION, cache_root=cache)
+    assert (dataset.example_media is not None) == expected_example
+
+
 @pytest.fixture
 def constructor(tmpdir, medium_db, request):
     """Fixture to test Dataset constructor."""
