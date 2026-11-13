@@ -41,8 +41,14 @@ to use only certain :class:`audb.Repository`
 to look for datasets,
 select a name for the folder
 the data cards are stored,
-and select if an audio example should be integrated
+and select if an example section should be integrated
 on the data cards.
+The example section shows
+an audio or video player
+for media examples,
+and the content of JSON examples.
+If disabled,
+the whole example section is omitted.
 All of those options are handled
 by the ``audbcards_datasets`` entry
 inside ``docs/conf.py``.
@@ -62,7 +68,7 @@ and header to the repository name:
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            True,  # show audio examples
+            True,  # show example section
         ),  
     ]
 
@@ -84,7 +90,7 @@ In ``docs/conf.py`` you provide a list of entries:
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            True,  # show audio examples
+            True,  # show example section
         ),  
         (   
             "data-private",  # folder name
@@ -94,7 +100,7 @@ In ``docs/conf.py`` you provide a list of entries:
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            False,  # don't show audio examples
+            False,  # don't show example section
         ),  
     ]
 

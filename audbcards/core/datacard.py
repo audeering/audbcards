@@ -36,9 +36,13 @@ class Datacard(object):
         path: path to folder
             that store datacard files
         example: if ``True``,
-            include an audio or video example in the data card
+            include an example section in the data card,
             showing the waveform of the audio
             and an interactive player
+            for audio or video examples,
+            and the content of JSON examples.
+            If ``False``,
+            the example section is omitted
         sphinx_build_dir: build dir of sphinx.
             If not ``None``
             and ``example`` is ``True``,
@@ -88,7 +92,7 @@ class Datacard(object):
         """Folder to store datacard."""
 
         self.example = example
-        """If an audio example should be included."""
+        """If the example section with media or JSON examples should be included."""
 
         self.sphinx_build_dir = sphinx_build_dir
         """Sphinx build dir."""
@@ -561,6 +565,11 @@ class Datacard(object):
                 dataset["player"] = player
             if self.dataset.example_json is not None:
                 dataset["json"] = self.json()
+        else:
+            # Hide examples from all templates,
+            # including user provided ones
+            dataset["example_media"] = None
+            dataset["example_json"] = None
         dataset["file_duration_distribution"] = self.file_duration_distribution
         dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset

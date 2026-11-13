@@ -11,6 +11,8 @@ import audeer
 import audformat
 import audiofile
 
+import audbcards
+
 
 pytest.VERSION = "1.0.0"
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +29,18 @@ pytest.TEMPLATE_DIR = audeer.mkdir(
 def cache(tmpdir):
     """Local cache folder."""
     return audeer.mkdir(audeer.path(tmpdir, "cache"))
+
+
+@pytest.fixture(scope="function", autouse=True)
+def reset_rng():
+    """Reset random generator used to select example files.
+
+    This ensures selected example files
+    do not depend on the order
+    in which tests are executed.
+
+    """
+    audbcards.core.dataset.rng.seed(123)
 
 
 @pytest.fixture(scope="session", autouse=True)

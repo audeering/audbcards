@@ -55,6 +55,69 @@ def test_datacard(tmpdir, db, cache, request):
     assert content == expected_content
 
 
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+        "json_db",
+        "mixed_db",
+    ],
+)
+@pytest.mark.parametrize("example", [True, False])
+def test_datacard_example(tmpdir, db, example, cache, request):
+    r"""Test example section is only included if example is True."""
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(dataset, example=example, cache_root=cache)
+    datacard.sphinx_build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard.sphinx_src_dir = audeer.mkdir(tmpdir, "docs")
+
+    content = datacard._render_template()
+
+    lines = content.split("\n")
+    assert ("Example" in lines) == example
+    if dataset.example_media is not None:
+        assert (f":file:`{dataset.example_media}`" in content) == example
+    if dataset.example_json is not None:
+        assert (f":file:`{dataset.example_json}`" in content) == example
+        assert (".. code:: json" in content) == example
+
+
+@pytest.mark.parametrize("db", ["medium_db", "json_db"])
+def test_datacard_example_custom_template(tmpdir, db, cache, request):
+    r"""Test example section is hidden for user templates.
+
+    A user provided ``datacard_example.j2``
+    that does not check ``example``
+    should not render the example section
+    when ``example`` is ``False``.
+
+    """
+    db = request.getfixturevalue(db)
+    template_dir = audeer.mkdir(tmpdir, "templates")
+    with open(os.path.join(template_dir, "datacard_example.j2"), "w") as fp:
+        fp.write(
+            "{% if example_media is not none %}\n"
+            "Custom media: {{ example_media }}\n"
+            "{% endif %}\n"
+            "{% if example_json is not none %}\n"
+            "Custom json: {{ example_json }}\n"
+            "{% endif %}\n"
+        )
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(
+        dataset,
+        example=False,
+        template_dir=template_dir,
+        cache_root=cache,
+    )
+
+    content = datacard._render_template()
+
+    assert "Custom media" not in content
+    assert "Custom json" not in content
+
+
 def test_datacard_json_formatting(cache, json_db):
     r"""Test Datacard.json always returns formatted JSON.
 
