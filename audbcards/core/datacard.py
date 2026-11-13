@@ -566,6 +566,11 @@ class Datacard(object):
                 dataset["player"] = player
             if self.dataset.example_json is not None:
                 dataset["json"] = self.json()
+        else:
+            # Hide examples from all templates,
+            # including user provided ones
+            dataset["example_media"] = None
+            dataset["example_json"] = None
         dataset["file_duration_distribution"] = self.file_duration_distribution
         dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset
