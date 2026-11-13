@@ -294,6 +294,24 @@ def test_datacard_folder_errors(tmpdir, folder, error, match):
         audbcards.sphinx.datacard_folder(src_dir, folder)
 
 
+def test_datacard_folder_different_drive(tmpdir, monkeypatch):
+    r"""Test folder on another drive under Windows.
+
+    :func:`os.path.commonpath` raises a ``ValueError``
+    for paths on different drives under Windows,
+    which is simulated here for all platforms.
+
+    """
+    src_dir = audeer.mkdir(tmpdir, "docs")
+
+    def commonpath(paths):
+        raise ValueError("Paths don't have the same drive")
+
+    monkeypatch.setattr(os.path, "commonpath", commonpath)
+    with pytest.raises(ValueError, match="needs to be a sub folder"):
+        audbcards.sphinx.datacard_folder(src_dir, "data")
+
+
 def test_parse_section():
     r"""Test parsing of config entries and their defaults."""
     current_repos = audb.config.REPOSITORIES

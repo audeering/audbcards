@@ -223,7 +223,12 @@ def datacard_folder(srcdir: str, folder: str) -> str:
         )
     srcdir = audeer.path(srcdir)
     path = audeer.path(srcdir, folder)
-    if path == srcdir or os.path.commonpath([srcdir, path]) != srcdir:
+    try:
+        is_sub_folder = path != srcdir and os.path.commonpath([srcdir, path]) == srcdir
+    except ValueError:
+        # Paths on different drives under Windows
+        is_sub_folder = False
+    if not is_sub_folder:
         raise ValueError(
             f"The 'folder' {folder!r} of an 'audbcards_datasets' entry "
             f"needs to be a sub folder of the sphinx source folder '{srcdir}'."
