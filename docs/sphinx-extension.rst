@@ -48,6 +48,10 @@ The following keys are supported:
     Name of the folder
     the data cards are stored in,
     and of the datasets overview page.
+    It needs to be a sub folder
+    of the sphinx source folder,
+    as it is deleted
+    before and after building the documentation.
     This key is required.
 
 ``"header"``

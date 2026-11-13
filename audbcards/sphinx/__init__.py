@@ -58,8 +58,13 @@ def builder_inited(app: sphinx.application.Sphinx):
     It is available as ``app.builder``.
 
     """
-    # Read config values
-    sections = app.config.audbcards_datasets
+    # Read config values,
+    # and validate all entries
+    # before deleting or creating any files
+    sections = [parse_section(section) for section in app.config.audbcards_datasets]
+    datacard_paths = [
+        datacard_folder(app.srcdir, section["folder"]) for section in sections
+    ]
     template_dir = app.config.audbcards_templates
     if template_dir is not None:
         template_dir = os.path.join(app.srcdir, template_dir)
@@ -73,8 +78,7 @@ def builder_inited(app: sphinx.application.Sphinx):
     app.add_js_file(table_preview_js_file)
 
     # Gather and build data cards for each requested section
-    for section in sections:
-        section = parse_section(section)
+    for section, datacard_path in zip(sections, datacard_paths):
         path = section["folder"]
         header = section["header"]
         repositories = section["repositories"]
@@ -82,7 +86,6 @@ def builder_inited(app: sphinx.application.Sphinx):
         table_preview = section["table_preview"]
 
         # Clear existing data cards
-        datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
         audeer.mkdir(datacard_path)
 
@@ -133,7 +136,7 @@ def builder_inited(app: sphinx.application.Sphinx):
             # Create datasets overview page
             create_datasets_page(
                 datasets,
-                audeer.path(app.srcdir, f"{path}.rst"),
+                f"{datacard_path}.rst",
                 datacards_path=path,
                 header=header,
             )
@@ -166,19 +169,61 @@ def builder_finished(
     # Delete auto-generated data card output folder
     sections = app.config.audbcards_datasets
     for section in sections:
-        path = section_folder(section)
-        if path is None:
+        # Skip invalid entries,
+        # as cleanup also runs after an error,
+        # e.g. raised for an invalid entry,
+        # and should not raise another error
+        try:
+            datacard_path = datacard_folder(app.srcdir, section_folder(section))
+        except (TypeError, ValueError):
             continue
-        datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
         for ext in ["rst", "csv"]:
-            file = audeer.path(app.srcdir, f"{path}.{ext}")
+            file = f"{datacard_path}.{ext}"
             if os.path.exists(file):
                 os.remove(file)
 
 
 # ===== HELPER FUNCTIONS ==================================================
 #
+def datacard_folder(srcdir: str, folder: str) -> str:
+    r"""Path of data card folder of an ``audbcards_datasets`` entry.
+
+    As the data card folder
+    is deleted before the data cards are created,
+    and after the build has finished,
+    it needs to be a sub folder
+    of the sphinx source folder.
+
+    Args:
+        srcdir: sphinx source folder
+        folder: value of the ``"folder"`` key
+            of an ``audbcards_datasets`` entry
+
+    Returns:
+        absolute path of data card folder
+
+    Raises:
+        TypeError: if ``folder`` is not a string
+        ValueError: if ``folder`` is not a sub folder
+            of ``srcdir``
+
+    """
+    if not isinstance(folder, str):
+        raise TypeError(
+            "The 'folder' of an 'audbcards_datasets' entry "
+            f"needs to be a string, but got {type(folder).__name__}: {folder!r}."
+        )
+    srcdir = audeer.path(srcdir)
+    path = audeer.path(srcdir, folder)
+    if path == srcdir or os.path.commonpath([srcdir, path]) != srcdir:
+        raise ValueError(
+            f"The 'folder' {folder!r} of an 'audbcards_datasets' entry "
+            f"needs to be a sub folder of the sphinx source folder '{srcdir}'."
+        )
+    return path
+
+
 def parse_section(section: dict | Sequence) -> dict:
     r"""Parse entry of the ``audbcards_datasets`` config.
 
@@ -247,7 +292,7 @@ def parse_section(section: dict | Sequence) -> dict:
     }
 
 
-def section_folder(section: dict | Sequence) -> str | None:
+def section_folder(section: dict | Sequence) -> object:
     r"""Folder of entry of the ``audbcards_datasets`` config.
 
     In contrast to :func:`parse_section`,
@@ -255,12 +300,15 @@ def section_folder(section: dict | Sequence) -> str | None:
     for an invalid entry,
     as it is used during cleanup,
     which runs also after an error.
+    The returned value is not validated,
+    use :func:`datacard_folder` for that.
 
     Args:
         section: entry of the ``audbcards_datasets`` config
 
     Returns:
-        folder of entry or ``None`` if it cannot be determined
+        value of ``"folder"`` of entry
+        or ``None`` if it cannot be determined
 
     """
     if isinstance(section, dict):

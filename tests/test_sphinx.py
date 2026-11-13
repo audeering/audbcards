@@ -67,13 +67,33 @@ def test_builder_finished_invalid_sections(tmpdir):
     e.g. raised for an invalid entry,
     and should not raise another error.
 
+    Folders outside of the sphinx source folder,
+    or the source folder itself,
+    must not be deleted.
+
     """
     src_dir = audeer.mkdir(tmpdir, "docs")
     folder = audeer.mkdir(src_dir, "data-a")
-    sections = [{"header": "No folder"}, (), "invalid", {"folder": "data-a"}]
+    src_file = audeer.touch(src_dir, "index.rst")
+    sibling_file = audeer.touch(tmpdir, "other.rst")
+    sections = [
+        {"header": "No folder"},
+        (),
+        "invalid",
+        {"folder": None},
+        {"folder": 1},
+        {"folder": ""},
+        {"folder": "."},
+        {"folder": ".."},
+        {"folder": "data-a/../.."},
+        (str(tmpdir), "Header", [], True),
+        {"folder": "data-a"},
+    ]
     app = sphinx_app(src_dir, None, sections)
     audbcards.sphinx.builder_finished(app, None)
     assert not os.path.exists(folder)
+    assert os.path.exists(src_file)
+    assert os.path.exists(sibling_file)
 
 
 @pytest.mark.parametrize(
@@ -197,6 +217,60 @@ def test_builder_inited_restores_repositories(tmpdir, monkeypatch):
         audbcards.sphinx.builder_inited(app)
 
     assert audb.config.REPOSITORIES is current_repos
+
+
+def test_builder_inited_invalid_folder(tmpdir, monkeypatch):
+    r"""Test invalid folders raise before any data card is deleted."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    datacard_file = audeer.touch(audeer.mkdir(src_dir, "data-a"), "db.rst")
+    sections = [{"folder": "data-a"}, {"folder": ".."}]
+    app = sphinx_app(src_dir, build_dir, sections)
+
+    def available(*args, **kwargs):
+        raise AssertionError("audb.available() should not be called")
+
+    monkeypatch.setattr(audb, "available", available)
+
+    with pytest.raises(ValueError, match="needs to be a sub folder"):
+        audbcards.sphinx.builder_inited(app)
+    assert os.path.exists(datacard_file)
+
+
+@pytest.mark.parametrize(
+    "folder, expected",
+    [
+        ("data", "data"),
+        ("data/", "data"),
+        ("data/sub", os.path.join("data", "sub")),
+        ("data/../other", "other"),
+    ],
+)
+def test_datacard_folder(tmpdir, folder, expected):
+    r"""Test data card folder inside sphinx source folder."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    path = audbcards.sphinx.datacard_folder(src_dir, folder)
+    assert path == os.path.join(audeer.path(src_dir), expected)
+
+
+@pytest.mark.parametrize(
+    "folder, error, match",
+    [
+        (None, TypeError, "needs to be a string"),
+        (1, TypeError, "needs to be a string"),
+        ("", ValueError, "needs to be a sub folder"),
+        (".", ValueError, "needs to be a sub folder"),
+        ("data/..", ValueError, "needs to be a sub folder"),
+        ("..", ValueError, "needs to be a sub folder"),
+        ("../docs-other", ValueError, "needs to be a sub folder"),
+        (os.path.abspath(os.sep), ValueError, "needs to be a sub folder"),
+    ],
+)
+def test_datacard_folder_errors(tmpdir, folder, error, match):
+    r"""Test errors for folders outside sphinx source folder."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    with pytest.raises(error, match=match):
+        audbcards.sphinx.datacard_folder(src_dir, folder)
 
 
 def test_parse_section():
