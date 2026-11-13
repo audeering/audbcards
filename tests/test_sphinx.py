@@ -259,6 +259,32 @@ def test_builder_inited_invalid_folder(tmpdir, monkeypatch):
 
 
 @pytest.mark.parametrize(
+    "folders",
+    [
+        ["data-a", "data-a"],
+        ["data-a", "data-a/"],
+        ["data-a", "data-b", "data-c/../data-a"],
+    ],
+)
+def test_builder_inited_duplicate_folder(tmpdir, monkeypatch, folders):
+    r"""Test entries sharing a folder raise before any data card is deleted."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    datacard_file = audeer.touch(audeer.mkdir(src_dir, "data-a"), "db.rst")
+    sections = [{"folder": folder} for folder in folders]
+    app = sphinx_app(src_dir, build_dir, sections)
+
+    def available(*args, **kwargs):
+        raise AssertionError("audb.available() should not be called")
+
+    monkeypatch.setattr(audb, "available", available)
+
+    with pytest.raises(ValueError, match="points to the same folder as 'data-a'"):
+        audbcards.sphinx.builder_inited(app)
+    assert os.path.exists(datacard_file)
+
+
+@pytest.mark.parametrize(
     "folder, expected",
     [
         ("data", "data"),

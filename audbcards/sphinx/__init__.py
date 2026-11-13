@@ -72,6 +72,20 @@ def builder_inited(app: sphinx.application.Sphinx):
     datacard_paths = [
         datacard_folder(app.srcdir, section["folder"]) for section in sections
     ]
+    # Each entry clears its data card folder
+    # and writes its overview page,
+    # hence entries cannot share a folder
+    seen = {}
+    for section, datacard_path in zip(sections, datacard_paths):
+        if datacard_path in seen:
+            raise ValueError(
+                f"The 'folder' {section['folder']!r} "
+                "of an 'audbcards_datasets' entry "
+                f"points to the same folder as {seen[datacard_path]!r} "
+                "of another entry. "
+                "Each entry needs its own folder."
+            )
+        seen[datacard_path] = section["folder"]
     template_dir = app.config.audbcards_templates
     if template_dir is not None:
         template_dir = os.path.join(app.srcdir, template_dir)

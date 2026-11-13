@@ -52,6 +52,7 @@ The following keys are supported:
     of the sphinx source folder,
     as it is deleted
     before and after building the documentation.
+    Each entry needs its own folder.
     This key is required.
 
 ``"header"``
