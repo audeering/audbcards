@@ -84,52 +84,57 @@ def builder_inited(app: sphinx.application.Sphinx):
         current_repos = audb.config.REPOSITORIES
         audb.config.REPOSITORIES = audeer.to_list(repositories)
 
-        print("Get list of available datasets... ", end="", flush=True)
-        df = audb.available(only_latest=True, num_workers=10)
-        df = df[~df.index.duplicated(keep="first")]
-        df = df.sort_index()
-        print("done")
+        try:
+            print("Get list of available datasets... ", end="", flush=True)
+            df = audb.available(only_latest=True, num_workers=10)
+            df = df[~df.index.duplicated(keep="first")]
+            df = df.sort_index()
+            print("done")
 
-        # Store list of datasets in app
-        # to make them accessible in `docs/conf.py`
-        app.audbcards = {}
-        app.audbcards["df"] = df
+            # Store list of datasets in app
+            # to make them accessible in `docs/conf.py`
+            app.audbcards = {}
+            app.audbcards["df"] = df
 
-        # Iterate datasets and create data card pages
-        names = list(df.index)
-        versions = list(df["version"])
-        datasets = []
-        for name, version in zip(names, versions):
-            print(f"Parse {name}-{version}... ", end="", flush=True)
-            dataset = Dataset(name, version)
-            datacard = Datacard(
-                dataset,
-                path=path,
-                sphinx_build_dir=app.builder.outdir,
-                sphinx_src_dir=app.srcdir,
-                template_dir=template_dir,
-                example=example,
-                table_preview=table_preview,
+            # Iterate datasets and create data card pages
+            names = list(df.index)
+            versions = list(df["version"])
+            datasets = []
+            for name, version in zip(names, versions):
+                print(f"Parse {name}-{version}... ", end="", flush=True)
+                dataset = Dataset(name, version)
+                datacard = Datacard(
+                    dataset,
+                    path=path,
+                    sphinx_build_dir=app.builder.outdir,
+                    sphinx_src_dir=app.srcdir,
+                    template_dir=template_dir,
+                    example=example,
+                    table_preview=table_preview,
+                )
+                rst_file = os.path.join(
+                    os.path.basename(app.srcdir),
+                    path,
+                    f"{dataset.name}.rst",
+                )
+                datacard.save(rst_file)
+                datasets.append(dataset)
+                out_file = rst_file.replace(
+                    str(app.srcdir), os.path.basename(app.srcdir)
+                )
+                print(f"wrote {out_file}")
+
+            # Create datasets overview page
+            create_datasets_page(
+                datasets,
+                audeer.path(app.srcdir, f"{path}.rst"),
+                datacards_path=path,
+                header=header,
             )
-            rst_file = os.path.join(
-                os.path.basename(app.srcdir),
-                path,
-                f"{dataset.name}.rst",
-            )
-            datacard.save(rst_file)
-            datasets.append(dataset)
-            out_file = rst_file.replace(str(app.srcdir), os.path.basename(app.srcdir))
-            print(f"wrote {out_file}")
-
-        # Create datasets overview page
-        create_datasets_page(
-            datasets,
-            audeer.path(app.srcdir, f"{path}.rst"),
-            datacards_path=path,
-            header=header,
-        )
-
-        audb.config.REPOSITORIES = current_repos
+        finally:
+            # Restore available repositories,
+            # even if building the data cards failed
+            audb.config.REPOSITORIES = current_repos
 
 
 def builder_finished(
