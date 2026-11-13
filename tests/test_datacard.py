@@ -55,6 +55,34 @@ def test_datacard(tmpdir, db, cache, request):
     assert content == expected_content
 
 
+@pytest.mark.parametrize(
+    "db",
+    [
+        "medium_db",
+        "json_db",
+        "mixed_db",
+    ],
+)
+@pytest.mark.parametrize("example", [True, False])
+def test_datacard_example(tmpdir, db, example, cache, request):
+    r"""Test example section is only included if example is True."""
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(dataset, example=example, cache_root=cache)
+    datacard.sphinx_build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard.sphinx_src_dir = audeer.mkdir(tmpdir, "docs")
+
+    content = datacard._render_template()
+
+    lines = content.split("\n")
+    assert ("Example" in lines) == example
+    if dataset.example_media is not None:
+        assert (f":file:`{dataset.example_media}`" in content) == example
+    if dataset.example_json is not None:
+        assert (f":file:`{dataset.example_json}`" in content) == example
+        assert (".. code:: json" in content) == example
+
+
 def test_datacard_json_formatting(cache, json_db):
     r"""Test Datacard.json always returns formatted JSON.
 
