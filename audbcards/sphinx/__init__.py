@@ -72,6 +72,20 @@ def builder_inited(app: sphinx.application.Sphinx):
     datacard_paths = [
         datacard_folder(app.srcdir, section["folder"]) for section in sections
     ]
+    # Each entry clears its data card folder
+    # and writes its overview page,
+    # hence entries cannot share a folder
+    seen = {}
+    for section, datacard_path in zip(sections, datacard_paths):
+        if datacard_path in seen:
+            raise ValueError(
+                f"The 'folder' {section['folder']!r} "
+                "of an 'audbcards_datasets' entry "
+                f"points to the same folder as {seen[datacard_path]!r} "
+                "of another entry. "
+                "Each entry needs its own folder."
+            )
+        seen[datacard_path] = section["folder"]
     template_dir = app.config.audbcards_templates
     if template_dir is not None:
         template_dir = os.path.join(app.srcdir, template_dir)
@@ -83,6 +97,13 @@ def builder_inited(app: sphinx.application.Sphinx):
         shutil.copyfile(audeer.path(current_dir, file), audeer.path(static_dir, file))
     app.add_css_file(table_preview_css_file)
     app.add_js_file(table_preview_js_file)
+
+    # Store list of datasets in app
+    # to make them accessible in `docs/conf.py`.
+    # "dfs" holds the datasets of each section,
+    # with the folder of the section as key.
+    # "df" holds the datasets of the last section
+    app.audbcards = {"dfs": {}}
 
     # Gather and build data cards for each requested section
     for section, datacard_path in zip(sections, datacard_paths):
@@ -107,10 +128,8 @@ def builder_inited(app: sphinx.application.Sphinx):
             df = df.sort_index()
             print("done")
 
-            # Store list of datasets in app
-            # to make them accessible in `docs/conf.py`
-            app.audbcards = {}
             app.audbcards["df"] = df
+            app.audbcards["dfs"][path] = df
 
             # Iterate datasets and create data card pages
             names = list(df.index)

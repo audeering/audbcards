@@ -259,6 +259,32 @@ def test_builder_inited_invalid_folder(tmpdir, monkeypatch):
 
 
 @pytest.mark.parametrize(
+    "folders",
+    [
+        ["data-a", "data-a"],
+        ["data-a", "data-a/"],
+        ["data-a", "data-b", "data-c/../data-a"],
+    ],
+)
+def test_builder_inited_duplicate_folder(tmpdir, monkeypatch, folders):
+    r"""Test entries sharing a folder raise before any data card is deleted."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    datacard_file = audeer.touch(audeer.mkdir(src_dir, "data-a"), "db.rst")
+    sections = [{"folder": folder} for folder in folders]
+    app = sphinx_app(src_dir, build_dir, sections)
+
+    def available(*args, **kwargs):
+        raise AssertionError("audb.available() should not be called")
+
+    monkeypatch.setattr(audb, "available", available)
+
+    with pytest.raises(ValueError, match="points to the same folder as 'data-a'"):
+        audbcards.sphinx.builder_inited(app)
+    assert os.path.exists(datacard_file)
+
+
+@pytest.mark.parametrize(
     "folder, expected",
     [
         ("data", "data"),
@@ -398,3 +424,48 @@ def test_parse_section_errors(section, error, match, tuple_info):
     message = str(excinfo.value)
     assert audbcards.sphinx.section_keys_info in message
     assert (audbcards.sphinx.section_tuple_info in message) == tuple_info
+
+
+def test_builder_inited_dfs(tmpdir, monkeypatch):
+    r"""Test lists of datasets are stored for each section."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    repo_a = audb.Repository("repo-a", "host", "file-system")
+    repo_b = audb.Repository("repo-b", "host", "file-system")
+    sections = [
+        {"folder": "data-a", "repositories": repo_a},
+        {"folder": "data-b", "repositories": repo_b},
+    ]
+    app = sphinx_app(src_dir, build_dir, sections)
+    dfs = {
+        repo_a: pd.DataFrame({"version": ["1.0.0"]}, index=["db-a"]),
+        repo_b: pd.DataFrame({"version": ["2.0.0"]}, index=["db-b"]),
+    }
+
+    def available(*args, **kwargs):
+        return dfs[audb.config.REPOSITORIES[0]]
+
+    monkeypatch.setattr(audb, "available", available)
+    monkeypatch.setattr(
+        audbcards.sphinx,
+        "Dataset",
+        lambda name, version: types.SimpleNamespace(name=name),
+    )
+    monkeypatch.setattr(
+        audbcards.sphinx,
+        "Datacard",
+        lambda *args, **kwargs: types.SimpleNamespace(save=lambda file: None),
+    )
+    monkeypatch.setattr(
+        audbcards.sphinx,
+        "create_datasets_page",
+        lambda *args, **kwargs: None,
+    )
+
+    audbcards.sphinx.builder_inited(app)
+
+    assert list(app.audbcards["dfs"]) == ["data-a", "data-b"]
+    pd.testing.assert_frame_equal(app.audbcards["dfs"]["data-a"], dfs[repo_a])
+    pd.testing.assert_frame_equal(app.audbcards["dfs"]["data-b"], dfs[repo_b])
+    # "df" holds the datasets of the last section
+    pd.testing.assert_frame_equal(app.audbcards["df"], dfs[repo_b])
