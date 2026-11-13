@@ -2,6 +2,7 @@ from collections.abc import Sequence
 import json
 import os
 
+import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
@@ -13,6 +14,12 @@ import audiofile
 
 import audbcards
 
+
+# Use non-interactive backend for plots,
+# as interactive backends like TkAgg
+# might not be available,
+# e.g. on Windows CI runners
+matplotlib.use("Agg")
 
 pytest.VERSION = "1.0.0"
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
