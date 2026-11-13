@@ -70,7 +70,7 @@
             
             
               <div class="version">
-                v0.5.0
+                v0.5.1
               </div>
             
           
@@ -199,6 +199,7 @@ It needs to be a sub folder
 of the sphinx source folder,
 as it is deleted
 before and after building the documentation.
+Each entry needs its own folder.
 This key is required.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;header&quot;</span></code></dt><dd><p>Header of the datasets overview page.
@@ -328,15 +329,25 @@ e.g.</p>
 <section id="list-of-available-datasets">
 <h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Link to this heading">¶</a></h2>
 <p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb v1.15.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
+for every entry of <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code>
 to get an overview of all available datasets.
 This information can be reused inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>
 as it is stored in the <code class="docutils literal notranslate"><span class="pre">app.audbcards</span></code> dictionary
-under the <code class="docutils literal notranslate"><span class="pre">&quot;df&quot;</span></code> key, e.g.</p>
+under the <code class="docutils literal notranslate"><span class="pre">&quot;dfs&quot;</span></code> key,
+which maps the <code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code> of each entry
+to its list of datasets,
+e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">sphinx</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">Sphinx</span><span class="p">):</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">audbcards</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span>
-    <span class="c1"># ...</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"builder-inited"</span><span class="p">,</span> <span class="n">list_datasets</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">list_datasets</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">sphinx</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">Sphinx</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">folder</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">audbcards</span><span class="p">[</span><span class="s2">"dfs"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># ...</span>
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;df&quot;</span></code> key holds the list of datasets
+of the last entry of <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code>.</p>
 </section>
 </section>
 

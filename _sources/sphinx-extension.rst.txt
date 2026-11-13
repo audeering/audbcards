@@ -52,6 +52,7 @@ The following keys are supported:
     of the sphinx source folder,
     as it is deleted
     before and after building the documentation.
+    Each entry needs its own folder.
     This key is required.
 
 ``"header"``
@@ -200,16 +201,27 @@ List of available datasets
 --------------------------
 
 The sphinx extension calls :func:`audb.available`
+for every entry of ``audbcards_datasets``
 to get an overview of all available datasets.
 This information can be reused inside ``docs/conf.py``
 as it is stored in the ``app.audbcards`` dictionary
-under the ``"df"`` key, e.g.
+under the ``"dfs"`` key,
+which maps the ``"folder"`` of each entry
+to its list of datasets,
+e.g.
 
 .. code-block:: python
 
     def setup(app: sphinx.application.Sphinx):
-        df = app.audbcards["df"]
-        # ...
+        app.connect("builder-inited", list_datasets)
+
+
+    def list_datasets(app: sphinx.application.Sphinx):
+        for folder, df in app.audbcards["dfs"].items():
+            # ...
+
+The ``"df"`` key holds the list of datasets
+of the last entry of ``audbcards_datasets``.
         
 
 .. _sphinx extension: https://www.sphinx-doc.org/en/master/usage/extensions/index.html
