@@ -3,7 +3,9 @@
 Tables
 ^^^^^^
 
+{% if tables_preview is not none %}
 Click on a row to toggle a preview.
+{% endif %}
 
 .. raw:: html
 
@@ -20,10 +22,15 @@ Click on a row to toggle a preview.
     <tbody>
     {% for row in tables_table %}
     {% if not loop.first %}
+{% if tables_preview is not none %}
     <tr onClick="toggleRow(this)" class="row-{{ loop.cycle('odd', 'even') }} clickable grid">
+{% else %}
+    <tr class="row-{{ loop.cycle('odd', 'even') }} grid">
+{% endif %}
     {% for column in row %}
     <td><p>{{ column }}</p></td>
     {% endfor %}
+{% if tables_preview is not none %}
     <td class="expanded-row-content hide-row">
 
     {##### START TABLE PREVIEW #####}
@@ -53,6 +60,7 @@ Click on a row to toggle a preview.
     {##### END TABLE PREVIEW #####}
 
     </td>
+{% endif %}
     </tr>
     {% endif %}
     {% endfor %}

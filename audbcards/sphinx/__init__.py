@@ -24,8 +24,8 @@ def setup(app: sphinx.application.Sphinx):
     app.add_config_value(
         "audbcards_datasets",
         [
-            # folder/name, header, repositories, example
-            ("datasets", "Datasets", [audb.config.REPOSITORIES], True),
+            # folder/name, header, repositories, example, table preview
+            ("datasets", "Datasets", [audb.config.REPOSITORIES], True, True),
         ],
         False,
     )
@@ -70,7 +70,11 @@ def builder_inited(app: sphinx.application.Sphinx):
     app.add_js_file(table_preview_js_file)
 
     # Gather and build data cards for each requested section
-    for path, header, repositories, example in sections:
+    for section in sections:
+        # Table preview entry is optional
+        path, header, repositories, example, *table_preview = section
+        table_preview = table_preview[0] if table_preview else True
+
         # Clear existing data cards
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
@@ -105,6 +109,7 @@ def builder_inited(app: sphinx.application.Sphinx):
                 sphinx_src_dir=app.srcdir,
                 template_dir=template_dir,
                 example=example,
+                table_preview=table_preview,
             )
             rst_file = os.path.join(
                 os.path.basename(app.srcdir),

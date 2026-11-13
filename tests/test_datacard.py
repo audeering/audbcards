@@ -118,6 +118,33 @@ def test_datacard_example_custom_template(tmpdir, db, cache, request):
     assert "Custom json" not in content
 
 
+@pytest.mark.parametrize("db", ["minimal_db", "medium_db"])
+@pytest.mark.parametrize("table_preview", [True, False])
+def test_datacard_table_preview(tmpdir, db, table_preview, cache, request):
+    r"""Test table preview is only included if table_preview is True."""
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(
+        dataset,
+        table_preview=table_preview,
+        cache_root=cache,
+    )
+    datacard.sphinx_build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard.sphinx_src_dir = audeer.mkdir(tmpdir, "docs")
+
+    content = datacard._render_template()
+
+    # Tables overview is always shown
+    assert "Tables\n^^^^^^" in content
+    for table in db.tables:
+        assert f"<td><p>{table}</p></td>" in content
+    # Preview and clickable rows are only shown with table_preview
+    assert ("Click on a row to toggle a preview." in content) == table_preview
+    assert ('onClick="toggleRow(this)"' in content) == table_preview
+    assert ("expanded-row-content" in content) == table_preview
+    assert ("table-statistic" in content) == table_preview
+
+
 def test_datacard_json_formatting(cache, json_db):
     r"""Test Datacard.json always returns formatted JSON.
 
