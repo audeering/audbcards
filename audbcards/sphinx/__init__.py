@@ -84,6 +84,13 @@ def builder_inited(app: sphinx.application.Sphinx):
     app.add_css_file(table_preview_css_file)
     app.add_js_file(table_preview_js_file)
 
+    # Store list of datasets in app
+    # to make them accessible in `docs/conf.py`.
+    # "dfs" holds the datasets of each section,
+    # with the folder of the section as key.
+    # "df" holds the datasets of the last section
+    app.audbcards = {"dfs": {}}
+
     # Gather and build data cards for each requested section
     for section, datacard_path in zip(sections, datacard_paths):
         path = section["folder"]
@@ -107,10 +114,8 @@ def builder_inited(app: sphinx.application.Sphinx):
             df = df.sort_index()
             print("done")
 
-            # Store list of datasets in app
-            # to make them accessible in `docs/conf.py`
-            app.audbcards = {}
             app.audbcards["df"] = df
+            app.audbcards["dfs"][path] = df
 
             # Iterate datasets and create data card pages
             names = list(df.index)
