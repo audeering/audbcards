@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sphinx_autodoc_typehints.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                v0.4.6
+                v0.5.0
               </div>
             
           
@@ -171,7 +172,7 @@
 <div class="viewcode-block" id="Datacard">
 <a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Datacard</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Datacard of a dataset.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Datacard of a dataset.</span>
 
 <span class="sd">    The datacard object</span>
 <span class="sd">    writes a RST file</span>
@@ -185,9 +186,18 @@
 <span class="sd">        path: path to folder</span>
 <span class="sd">            that store datacard files</span>
 <span class="sd">        example: if ``True``,</span>
-<span class="sd">            include an audio or video example in the data card</span>
+<span class="sd">            include an example section in the data card,</span>
 <span class="sd">            showing the waveform of the audio</span>
 <span class="sd">            and an interactive player</span>
+<span class="sd">            for audio or video examples,</span>
+<span class="sd">            and the content of JSON examples.</span>
+<span class="sd">            If ``False``,</span>
+<span class="sd">            the example section is omitted</span>
+<span class="sd">        table_preview: if ``True``,</span>
+<span class="sd">            the rows of the tables overview</span>
+<span class="sd">            in the data card can be clicked</span>
+<span class="sd">            to show a preview of the content</span>
+<span class="sd">            of each table</span>
 <span class="sd">        sphinx_build_dir: build dir of sphinx.</span>
 <span class="sd">            If not ``None``</span>
 <span class="sd">            and ``example`` is ``True``,</span>
@@ -217,53 +227,57 @@
 <span class="sd">            or :attr:`audbcards.config.CACHE_ROOT`</span>
 <span class="sd">            is used</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"datasets"</span><span class="p">,</span>
         <span class="n">example</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">table_preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sphinx_build_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sphinx_src_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">template_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Dataset object."""</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Folder to store datacard.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Folder to store datacard."""</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">example</span> <span class="o">=</span> <span class="n">example</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;If an audio example should be included.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""If the example section with media or JSON examples should be included."""</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_preview</span> <span class="o">=</span> <span class="n">table_preview</span>
+<span class="w">        </span><span class="sd">"""If a preview of the content of each table should be included."""</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span> <span class="o">=</span> <span class="n">sphinx_build_dir</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sphinx build dir.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sphinx build dir."""</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="o">=</span> <span class="n">sphinx_src_dir</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sphinx source dir.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sphinx source dir."""</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">template_dir</span> <span class="o">=</span> <span class="n">template_dir</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;User defined template dir.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""User defined template dir."""</span>
 
         <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cache_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDBCARDS_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+            <span class="n">cache_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AUDBCARDS_CACHE_ROOT"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;RST code added at top of data card.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="w">        </span><span class="sd">"""RST code added at top of data card."""</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Property Accessor for rendered jinja2 content.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Property Accessor for rendered jinja2 content."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">file_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of files durations, and plotted distribution.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Minimum and maximum of files durations, and plotted distribution.</span>
 
 <span class="sd">        This generates a single line</span>
 <span class="sd">        containing the mininimum and maximum values</span>
@@ -284,9 +298,9 @@
 <span class="sd">        If all duration values are the same,</span>
 <span class="sd">        no distribution plot is created.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-file-duration-distribution.png&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-file-duration-distribution.png"</span>
         <span class="p">)</span>
         <span class="c1"># Cache is organized as `&lt;cache_root&gt;/&lt;name&gt;/&lt;version&gt;/`</span>
         <span class="n">cache_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
@@ -298,7 +312,7 @@
 
         <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="s2">"s"</span>
         <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_durations</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">min_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
@@ -307,9 +321,9 @@
         <span class="c1"># Skip creating a distribution plot,</span>
         <span class="c1"># if all durations are the same</span>
         <span class="k">if</span> <span class="n">min_</span> <span class="o">==</span> <span class="n">max_</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;each file is </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"each file is </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
 
-        <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="c1"># Save distribution plot</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -330,9 +344,9 @@
             <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
             <span class="n">distribution_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inline_image</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">distribution_str</span>
@@ -340,12 +354,12 @@
 <div class="viewcode-block" id="Datacard.json">
 <a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.json">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Show content of a json file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Show content of a json file.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            String containing RST code to include the json content as code</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Load chosen json file</span>
         <span class="n">json_file</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_media</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -354,17 +368,17 @@
             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># Read json content and format with consistent indentation</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># String holding the RST code to include the json</span>
-        <span class="k">return</span> <span class="s2">&quot;.. code:: json</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">textwrap</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;  &#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span></div>
+        <span class="k">return</span> <span class="s2">".. code:: json</span><span class="se">\n</span><span class="s2">"</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">textwrap</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="s1">'  '</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span></div>
 
 
 <div class="viewcode-block" id="Datacard.player">
 <a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.player">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">player</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an audio/video player showing the waveform.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Create an audio/video player showing the waveform.</span>
 
 <span class="sd">        If :attr:`audbcards.Datacard.sphinx_build_dir`</span>
 <span class="sd">        or :attr:`audbcards.Datacard.sphinx_src_dir`</span>
@@ -402,7 +416,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            String containing RST code to include the player</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Cache is organized as `&lt;cache_root&gt;/&lt;name&gt;/&lt;version&gt;/`</span>
         <span class="n">cache_folder</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="p">,</span>
@@ -411,7 +425,7 @@
         <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">load_media_to_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load media file with audb and copy to audbcards cache.</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">"""Load media file with audb and copy to audbcards cache.</span>
 
 <span class="sd">            Load example media file to cache,</span>
 <span class="sd">            if not existent.</span>
@@ -419,10 +433,10 @@
 <span class="sd">            Returns:</span>
 <span class="sd">                full path to media file in cache</span>
 
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="sd">            """</span>
             <span class="n">cache_example_media</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="n">cache_folder</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-media&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-media"</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">):</span>
@@ -437,7 +451,7 @@
             <span class="k">return</span> <span class="n">cache_example_media</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">plot_waveform_to_cache</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot waveform of example media to cache.</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">"""Plot waveform of example media to cache.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                cache_example_media: full path to media file in cache</span>
@@ -445,10 +459,10 @@
 <span class="sd">            Returns:</span>
 <span class="sd">                full path to waveform file in cache</span>
 
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="sd">            """</span>
             <span class="n">cache_waveform_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="n">cache_folder</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-waveform.png&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-player-waveform.png"</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">):</span>
                 <span class="n">signal</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
@@ -465,7 +479,7 @@
             <span class="k">return</span> <span class="n">cache_waveform_file</span>
 
         <span class="c1"># String holding the RST code to include the player</span>
-        <span class="n">player_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">player_str</span> <span class="o">=</span> <span class="s2">""</span>
 
         <span class="c1"># Add plot of waveform to Sphinx source folder (e.g. docs/)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -482,9 +496,9 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plot_dst_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)),</span>
             <span class="p">)</span>
             <span class="n">waveform_src</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cache_waveform_file</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
-            <span class="n">player_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;.. image:: </span><span class="si">{</span><span class="n">waveform_src</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="n">player_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">".. image:: </span><span class="si">{</span><span class="n">waveform_src</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
 
         <span class="c1"># Copy media file to Sphinx build folder (e.g. build/)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_build_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -500,14 +514,14 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">media_dst_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">audiofile</span><span class="o">.</span><span class="n">has_video</span><span class="p">(</span><span class="n">cache_example_media</span><span class="p">):</span>
-                <span class="n">media_tag</span> <span class="o">=</span> <span class="s2">&quot;video&quot;</span>
+                <span class="n">media_tag</span> <span class="o">=</span> <span class="s2">"video"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">media_tag</span> <span class="o">=</span> <span class="s2">&quot;audio&quot;</span>
-            <span class="n">player_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">media_tag</span> <span class="o">=</span> <span class="s2">"audio"</span>
+            <span class="n">player_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span><span class="si">}</span><span class="s2">"</span>
             <span class="n">player_str</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="s2">&quot;.. raw:: html</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s1">&#39;    &lt;p&gt;&lt;</span><span class="si">{</span><span class="n">media_tag</span><span class="si">}</span><span class="s1"> controls src=&quot;</span><span class="si">{</span><span class="n">player_src</span><span class="si">}</span><span class="s1">&quot;&gt;&lt;/</span><span class="si">{</span><span class="n">media_tag</span><span class="si">}</span><span class="s1">&gt;&lt;/p&gt;&#39;</span>
+                <span class="s2">".. raw:: html</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s1">'    &lt;p&gt;&lt;</span><span class="si">{</span><span class="n">media_tag</span><span class="si">}</span><span class="s1"> controls src="</span><span class="si">{</span><span class="n">player_src</span><span class="si">}</span><span class="s1">"&gt;&lt;/</span><span class="si">{</span><span class="n">media_tag</span><span class="si">}</span><span class="s1">&gt;&lt;/p&gt;'</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">player_str</span></div>
@@ -516,7 +530,7 @@
 <div class="viewcode-block" id="Datacard.save">
 <a class="viewcode-back" href="../../../api/audbcards.Datacard.html#audbcards.Datacard.save">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save content of rendered template to rst.</span>
+<span class="w">        </span><span class="sd">"""Save content of rendered template to rst.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file: name of output RST file.</span>
@@ -526,21 +540,21 @@
 <span class="sd">                the RST file will be stored</span>
 <span class="sd">                as ``&lt;sphinx_src_dir&gt;/&lt;path&gt;/&lt;dataset&gt;.rst``</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.rst&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.rst"</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
                 <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">segment_duration_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum and maximum of segment durations, and plotted distribution.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Minimum and maximum of segment durations, and plotted distribution.</span>
 
 <span class="sd">        This generates a single line</span>
 <span class="sd">        containing the mininimum and maximum values</span>
@@ -561,10 +575,10 @@
 <span class="sd">        If all duration values are the same,</span>
 <span class="sd">        no distribution plot is created.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;-segment-duration-distribution.png&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span>
+            <span class="s2">"-segment-duration-distribution.png"</span>
         <span class="p">)</span>
         <span class="c1"># Cache is organized as `&lt;cache_root&gt;/&lt;name&gt;/&lt;version&gt;/`</span>
         <span class="n">cache_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
@@ -576,7 +590,7 @@
 
         <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="s2">"s"</span>
         <span class="n">durations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">segment_durations</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">min_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
@@ -585,9 +599,9 @@
         <span class="c1"># Skip creating a distribution plot,</span>
         <span class="c1"># if all durations are the same</span>
         <span class="k">if</span> <span class="n">min_</span> <span class="o">==</span> <span class="n">max_</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;each file is </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"each file is </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
 
-        <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">distribution_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="c1"># Save distribution plot</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sphinx_src_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -608,9 +622,9 @@
             <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">image_file</span><span class="p">))</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
             <span class="n">distribution_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inline_image</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">min_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"./</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">max_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">distribution_str</span>
@@ -621,7 +635,7 @@
         <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">text2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;RST string for rendering inline image between text.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""RST string for rendering inline image between text.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            text1: text to the left of the image</span>
@@ -631,7 +645,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            RST code to generate the desired inline image</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># In RST there is no easy way to insert inline images.</span>
         <span class="c1"># We use the following workaround:</span>
         <span class="c1">#</span>
@@ -640,19 +654,19 @@
         <span class="c1"># text1 |ref| text2</span>
         <span class="c1">#</span>
         <span class="n">ref</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">basename_wo_ext</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;.. |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| image:: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text1</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">text2</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">".. |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| image:: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">text1</span><span class="si">}</span><span class="s2"> |</span><span class="si">{</span><span class="n">ref</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">text2</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_plot_distribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot inline distribution.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Plot inline distribution.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            values: sequence of values</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">min_</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">max_</span> <span class="o">=</span> <span class="mi">0</span>
@@ -678,26 +692,26 @@
             <span class="n">clip</span><span class="o">=</span><span class="p">(</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">),</span>
             <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#d54239&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">"#d54239"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Remove all tiks, labels</span>
         <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span>
-            <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
-            <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span>
+            <span class="n">which</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span>
             <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_expand_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Expand dataset dict by additional entries.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Expand dataset dict by additional entries.</span>
 
 <span class="sd">        Additional properties are added</span>
 <span class="sd">        that are only part of the data card,</span>
@@ -710,21 +724,30 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            extended datasets dictionary</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Add path of datacard folder</span>
-        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">"path"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">example</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_media</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">()</span>
-                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">player</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">"player"</span><span class="p">]</span> <span class="o">=</span> <span class="n">player</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">example_json</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;file_duration_distribution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_duration_distribution</span>
-        <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;segment_duration_distribution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_duration_distribution</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="s2">"json"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Hide examples from all templates,</span>
+            <span class="c1"># including user provided ones</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">"example_media"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">"example_json"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_preview</span><span class="p">:</span>
+            <span class="c1"># Hide table previews from all templates,</span>
+            <span class="c1"># including user provided ones</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">"tables_preview"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">"file_duration_distribution"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_duration_distribution</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="s2">"segment_duration_distribution"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segment_duration_distribution</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Render content of data card with Jinja2.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Render content of data card with Jinja2.</span>
 
 <span class="sd">        It uses the dictionary representation</span>
 <span class="sd">        :attr:`audbcards.Datacard._dataset_dict`</span>
@@ -733,8 +756,8 @@
 <span class="sd">        depending if :meth:`audbcards.Datacard._expand_dataset`</span>
 <span class="sd">        was called before or not.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">template_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">template_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">"templates"</span><span class="p">)</span>
         <span class="n">loaders</span> <span class="o">=</span> <span class="p">[</span><span class="n">jinja2</span><span class="o">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">template_dir</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -742,15 +765,15 @@
                 <span class="n">loaders</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">template_dir</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Template directory &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">template_dir</span><span class="si">}</span><span class="s2">&#39; does not exist. &quot;</span>
-                    <span class="s2">&quot;Using default templates only.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Template directory '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">template_dir</span><span class="si">}</span><span class="s2">' does not exist. "</span>
+                    <span class="s2">"Using default templates only."</span>
                 <span class="p">)</span>
 
         <span class="n">environment</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span>
             <span class="n">loader</span><span class="o">=</span><span class="n">jinja2</span><span class="o">.</span><span class="n">ChoiceLoader</span><span class="p">(</span><span class="n">loaders</span><span class="p">),</span>
             <span class="n">trim_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;datacard.j2&quot;</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">"datacard.j2"</span><span class="p">)</span>
 
         <span class="c1"># Convert dataset object to dictionary</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">()</span>
@@ -762,7 +785,7 @@
 
         <span class="c1"># Add RST preamble</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">content</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rst_preamble</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">content</span>
 
         <span class="k">return</span> <span class="n">content</span></div>
 
@@ -781,7 +804,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/28 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -814,8 +837,8 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
         <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../../../_static/copybutton.js?v=f281be69"></script>
         <script src="../../../_static/table-preview.js?v=a02f8c22"></script>

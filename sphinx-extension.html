@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_autodoc_typehints.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -69,7 +70,7 @@
             
             
               <div class="version">
-                v0.4.6
+                v0.5.0
               </div>
             
           
@@ -161,7 +162,7 @@ you need to include the extension inside
 the sphinx configuration file <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># ...</span>
-    <span class="s2">&quot;audbcards.sphinx&quot;</span><span class="p">,</span>
+    <span class="s2">"audbcards.sphinx"</span><span class="p">,</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -184,59 +185,94 @@ E.g. you can list it in a TOC inside <code class="docutils literal notranslate">
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
 <p>You can configure the extension
-to use only certain <a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb vv1.14.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a>
-to look for datasets,
-select a name for the folder
-the data cards are stored,
-and select if an audio example should be integrated
-on the data cards.
-All of those options are handled
 by the <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> entry
 inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>.
-For example,
+It is a list of dictionaries,
+each describing a separate list of datasets
+and their data cards.
+The following keys are supported:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code></dt><dd><p>Name of the folder
+the data cards are stored in,
+and of the datasets overview page.
+It needs to be a sub folder
+of the sphinx source folder,
+as it is deleted
+before and after building the documentation.
+This key is required.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;header&quot;</span></code></dt><dd><p>Header of the datasets overview page.
+Defaults to the value of <code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;repositories&quot;</span></code></dt><dd><p><a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb v1.15.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audb.Repository</span></code></a> or list of repositories
+to look for datasets.
+Defaults to <a class="reference external" href="https://audeering.github.io/audb/api/audb.config.html#audb.config.REPOSITORIES" title="(in audb v1.15.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;example&quot;</span></code></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+an example section is integrated on the data cards.
+It shows an audio or video player
+for media examples,
+and the content of JSON examples.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+the whole example section is omitted.
+Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;table_preview&quot;</span></code></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+a preview of the content of each table
+is shown when clicking on a row
+of the tables overview
+of a data card.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+the tables overview is still shown,
+but its rows cannot be clicked.
+Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+<p>If <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> is not set,
+it uses the folder <code class="docutils literal notranslate"><span class="pre">datasets</span></code>
+with the header <code class="docutils literal notranslate"><span class="pre">Datasets</span></code>.</p>
+<p>For example,
 to restrict to a single repository
 and name the folder
 and header to the repository name:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audbcards_datasets</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span>
-        <span class="s2">&quot;data-public&quot;</span><span class="p">,</span>  <span class="c1"># folder name</span>
-        <span class="s2">&quot;data-public&quot;</span><span class="p">,</span>  <span class="c1"># datasets overview page header</span>
-        <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>  <span class="c1"># repository to use, can be a list of repos</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data-public&quot;</span><span class="p">,</span>
-            <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://audeering.jfrog.io/artifactory&quot;</span><span class="p">,</span>
-            <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;artifactory&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">"folder"</span><span class="p">:</span> <span class="s2">"data-public"</span><span class="p">,</span>
+        <span class="s2">"repositories"</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"data-public"</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="s2">"https://audeering.jfrog.io/artifactory"</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="s2">"artifactory"</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="kc">True</span><span class="p">,</span>  <span class="c1"># show audio examples</span>
-    <span class="p">),</span>
+    <span class="p">},</span>
 <span class="p">]</span>
 </pre></div>
 </div>
 <p>You would then need to include <code class="docutils literal notranslate"><span class="pre">data-public</span></code>
 in your TOC instead of the default <code class="docutils literal notranslate"><span class="pre">datasets</span></code> name.</p>
 <p>You can even create several separated lists of datasets
-and corresponding data cards.
-In <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code> you provide a list of entries:</p>
+and corresponding data cards,
+by providing several entries:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audbcards_datasets</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span>
-        <span class="s2">&quot;data-public&quot;</span><span class="p">,</span>  <span class="c1"># folder name</span>
-        <span class="s2">&quot;data-public&quot;</span><span class="p">,</span>  <span class="c1"># datasets overview page header</span>
-        <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>  <span class="c1"># repository to use, can be a list of repos</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data-public&quot;</span><span class="p">,</span>
-            <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://audeering.jfrog.io/artifactory&quot;</span><span class="p">,</span>
-            <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;artifactory&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">"folder"</span><span class="p">:</span> <span class="s2">"data-public"</span><span class="p">,</span>
+        <span class="s2">"header"</span><span class="p">:</span> <span class="s2">"Public datasets"</span><span class="p">,</span>
+        <span class="s2">"repositories"</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"data-public"</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="s2">"https://audeering.jfrog.io/artifactory"</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="s2">"artifactory"</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="kc">True</span><span class="p">,</span>  <span class="c1"># show audio examples</span>
-    <span class="p">),</span>
-    <span class="p">(</span>
-        <span class="s2">&quot;data-private&quot;</span><span class="p">,</span>  <span class="c1"># folder name</span>
-        <span class="s2">&quot;data-private&quot;</span><span class="p">,</span>  <span class="c1"># datasets overview page header</span>
-        <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>  <span class="c1"># repository to use, can be a list of repos</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data-private&quot;</span><span class="p">,</span>
-            <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://audeering.jfrog.io/artifactory&quot;</span><span class="p">,</span>
-            <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;artifactory&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">"folder"</span><span class="p">:</span> <span class="s2">"data-private"</span><span class="p">,</span>
+        <span class="s2">"header"</span><span class="p">:</span> <span class="s2">"Private datasets"</span><span class="p">,</span>
+        <span class="s2">"repositories"</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"data-private"</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="s2">"https://audeering.jfrog.io/artifactory"</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="s2">"artifactory"</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="kc">False</span><span class="p">,</span>  <span class="c1"># don&#39;t show audio examples</span>
-    <span class="p">),</span>
+        <span class="s2">"example"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"table_preview"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -252,6 +288,13 @@ e.g. in <code class="docutils literal notranslate"><span class="pre">docs/index.
     data-private
 </pre></div>
 </div>
+<p>Entries given as tuples
+with the values
+<code class="docutils literal notranslate"><span class="pre">(folder,</span> <span class="pre">header,</span> <span class="pre">repositories,</span> <span class="pre">example)</span></code>
+or <code class="docutils literal notranslate"><span class="pre">(folder,</span> <span class="pre">header,</span> <span class="pre">repositories,</span> <span class="pre">example,</span> <span class="pre">table_preview)</span></code>
+are still supported,
+but deprecated
+and will be removed in a future version.</p>
 <p>A user can also influence
 how the resulting datacard appears,
 by setting the config the <code class="docutils literal notranslate"><span class="pre">audbcards_templates</span></code> folder.
@@ -284,13 +327,13 @@ e.g.</p>
 </section>
 <section id="list-of-available-datasets">
 <h2>List of available datasets<a class="headerlink" href="#list-of-available-datasets" title="Link to this heading">¶</a></h2>
-<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb vv1.14.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
+<p>The sphinx extension calls <a class="reference external" href="https://audeering.github.io/audb/api/audb.available.html#audb.available" title="(in audb v1.15.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.available()</span></code></a>
 to get an overview of all available datasets.
 This information can be reused inside <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code>
 as it is stored in the <code class="docutils literal notranslate"><span class="pre">app.audbcards</span></code> dictionary
 under the <code class="docutils literal notranslate"><span class="pre">&quot;df&quot;</span></code> key, e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">sphinx</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">Sphinx</span><span class="p">):</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">audbcards</span><span class="p">[</span><span class="s2">&quot;df&quot;</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">audbcards</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span>
     <span class="c1"># ...</span>
 </pre></div>
 </div>
@@ -320,7 +363,7 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/28 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -353,8 +396,8 @@ under the <code class="docutils literal notranslate"><span class="pre">&quot;df&
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=9bcbadda"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script src="_static/table-preview.js?v=a02f8c22"></script>

@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sphinx_autodoc_typehints.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                v0.4.6
+                v0.5.0
               </div>
             
           
@@ -171,13 +172,13 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Dataset</span><span class="p">:</span>
     <span class="n">_table_related_cached_properties</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;segment_durations&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;segments&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;tables_columns&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;tables_preview&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;tables_rows&quot;</span><span class="p">,</span>
+        <span class="s2">"segment_durations"</span><span class="p">,</span>
+        <span class="s2">"segments"</span><span class="p">,</span>
+        <span class="s2">"tables_columns"</span><span class="p">,</span>
+        <span class="s2">"tables_preview"</span><span class="p">,</span>
+        <span class="s2">"tables_rows"</span><span class="p">,</span>
     <span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cached properties relying on table data.</span>
+<span class="w">    </span><span class="sd">"""Cached properties relying on table data.</span>
 
 <span class="sd">    Most of the cached properties</span>
 <span class="sd">    rely on the dependency table,</span>
@@ -206,7 +207,7 @@
 <span class="sd">    with ``load_tables`` is ``True``,</span>
 <span class="sd">    will update the cache.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
@@ -217,16 +218,16 @@
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Instantiate Dataset Object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Instantiate Dataset Object."""</span>
         <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cache_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUDBCARDS_CACHE_ROOT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+            <span class="n">cache_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"AUDBCARDS_CACHE_ROOT"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
         <span class="n">dataset_cache_filename</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_pickled</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">)</span>
             <span class="c1"># Load cached properties,</span>
             <span class="c1"># that require to load filewise or segmented tables,</span>
-            <span class="c1"># if they haven&#39;t been cached before.</span>
+            <span class="c1"># if they haven't been cached before.</span>
             <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
                 <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span><span class="p">:</span>
@@ -261,7 +262,7 @@
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
 
         <span class="c1"># Define `__getstate__()` method,</span>
         <span class="c1"># which selects the cached attributes</span>
@@ -302,27 +303,27 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the name of the cache file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Generate the name of the cache file."""</span>
         <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
         <span class="n">cache_filename</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span>
             <span class="n">cache_dir</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.pkl&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.pkl"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">cache_filename</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_pickled</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load pickled object instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load pickled object instance."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">()</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_parse_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove unsupported characters and restrict length.</span>
+<span class="w">        </span><span class="sd">"""Remove unsupported characters and restrict length.</span>
 
 <span class="sd">        The text is stripped from HTML tags or newlines,</span>
 <span class="sd">        and limited to a maximum length of 100 characters.</span>
@@ -333,69 +334,69 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            parsed text</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Missing text</span>
         <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">return</span> <span class="s2">""</span>
         <span class="c1"># Remove newlines</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"</span><span class="se">\\</span><span class="s2">n"</span><span class="p">)</span>
         <span class="c1"># Remove HTML tags</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&lt;[^&lt;]+?&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">"&lt;[^&lt;]+?&gt;"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
         <span class="c1"># Limit length</span>
         <span class="n">max_characters_per_entry</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_characters_per_entry</span><span class="p">:</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span> <span class="n">max_characters_per_entry</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span> <span class="n">max_characters_per_entry</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
         <span class="k">return</span> <span class="n">text</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save object instance to path as pickle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save object instance to path as pickle."""</span>
         <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset backend object.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_backend&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Dataset backend object."""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_backend"</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">deps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset dependency table.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_deps&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Dataset dependency table."""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_deps"</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dependencies</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deps</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset header.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_header&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Dataset header."""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_header"</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_header</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object containing dataset.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_repository_object&quot;</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository object containing dataset."""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_repository_object"</span><span class="p">):</span>  <span class="c1"># when loaded from cache</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_repository_object</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">archives</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of archives of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Number of archives of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">]))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">author</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Authors of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Authors of the database."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">author</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bit_depths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bit depths of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Bit depths of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
                 <span class="nb">set</span><span class="p">(</span>
@@ -410,7 +411,7 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Channels of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Channels of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
                 <span class="nb">set</span><span class="p">(</span>
@@ -425,21 +426,21 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Source of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Source of the database."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">description</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Total duration of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Total duration of media files in dataset."""</span>
         <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span>
             <span class="nb">sum</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">durations</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]),</span>
-            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">"s"</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">example_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Example json file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Example json file.</span>
 
 <span class="sd">        Path to example json file from dataset.</span>
 <span class="sd">        The json file needs to be stored in an archive</span>
@@ -448,8 +449,8 @@
 <span class="sd">        or no json file is part of the dataset,</span>
 <span class="sd">        ``None`` is returned instead.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">json_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ext</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">format</span><span class="p">)</span> <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="n">json_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">ext</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">format</span><span class="p">)</span> <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">"json"</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">json_idx</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">json_idx</span><span class="p">)</span>
@@ -458,7 +459,7 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">example_media</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Example media file.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Example media file.</span>
 
 <span class="sd">        The media file is selected</span>
 <span class="sd">        by its median duration</span>
@@ -471,7 +472,7 @@
 <span class="sd">        If no media file meets this criterium,</span>
 <span class="sd">        ``None`` is returned instead.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Pick a meaningful duration for the example audio file</span>
         <span class="n">min_dur</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">max_dur</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 min</span>
@@ -495,66 +496,66 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Number of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_media_with_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Media files paired with their durations.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Media files paired with their durations.</span>
 
 <span class="sd">        Non media files,</span>
 <span class="sd">        or media files containing 0 samples</span>
 <span class="sd">        are excluded from this list.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dur</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span> <span class="k">if</span> <span class="p">(</span><span class="n">dur</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
         <span class="p">]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">file_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File durations in dataset in seconds.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""File durations in dataset in seconds.</span>
 
 <span class="sd">        Non media files,</span>
 <span class="sd">        or media files containing 0 samples</span>
 <span class="sd">        are excluded from this list.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">dur</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_with_durations</span><span class="p">]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;File formats of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""File formats of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">media</span><span class="p">])))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Languages of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Languages of the database."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">languages</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">iso_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Languages of the database as ISO 639-3 if possible.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Languages of the database as ISO 639-3 if possible."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_iso_languages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">languages</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;License of dataset.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""License of dataset.</span>
 
 <span class="sd">        If no license is given,</span>
-<span class="sd">        ``&#39;Unknown&#39;`` is returned.</span>
+<span class="sd">        ``'Unknown'`` is returned.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license</span> <span class="ow">or</span> <span class="s2">"Unknown"</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">license_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link to license of dataset.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Link to license of dataset.</span>
 
 <span class="sd">        If no link is available</span>
 <span class="sd">        ``None`` is returned.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license_url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">license_url</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
@@ -562,43 +563,43 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Name of dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Name of dataset."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">publication_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Date dataset was uploaded to repository.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Date dataset was uploaded to repository."""</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"db.yaml"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">publication_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;User who uploaded dataset to repository.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""User who uploaded dataset to repository."""</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;db.yaml&quot;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"db.yaml"</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">owner</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository containing the dataset.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository containing the dataset."""</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">repository_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link to repository in Artifactory web UI.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Link to repository in Artifactory web UI."""</span>
         <span class="c1"># NOTE: this needs to be changed</span>
         <span class="c1"># as we want to support different backends</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">/&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;webapp/#/artifacts/browse/tree/General/&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="si">}</span><span class="s2">/&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">/"</span>
+            <span class="sa">f</span><span class="s2">"webapp/#/artifacts/browse/tree/General/"</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="si">}</span><span class="s2">/"</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sampling_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sampling rates of media files in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Sampling rates of media files in dataset."""</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span>
                 <span class="nb">set</span><span class="p">(</span>
@@ -613,29 +614,29 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">schemes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schemes of dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Schemes of dataset."""</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">schemes_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Summary of dataset schemes.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Summary of dataset schemes.</span>
 
 <span class="sd">        It lists all schemes in a string,</span>
 <span class="sd">        showing additional information</span>
-<span class="sd">        on schemes named ``&#39;emotion&#39;`` and ``&#39;speaker&#39;``,</span>
-<span class="sd">        e.g. ``&#39;speaker: [age, gender, language]&#39;``.</span>
+<span class="sd">        on schemes named ``'emotion'`` and ``'speaker'``,</span>
+<span class="sd">        e.g. ``'speaker: [age, gender, language]'``.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">format_schemes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">schemes_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Schemes table with name, type, min, max, labels, mappings.</span>
+<span class="w">        </span><span class="sd">"""Schemes table with name, type, min, max, labels, mappings.</span>
 
 <span class="sd">        The table is represented as a dictionary</span>
 <span class="sd">        with column names as keys.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="n">dataset_schemes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scheme_id</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="p">:</span>
@@ -645,7 +646,7 @@
         <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheme_table_columns</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dataset_schemes</span><span class="p">)[</span><span class="n">cols</span><span class="p">]</span>
         <span class="nb">filter</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span> <span class="o">==</span> <span class="p">[])</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">scheme_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="c1"># Add column names</span>
         <span class="n">scheme_data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
@@ -653,17 +654,17 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Number of segments in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Number of segments in dataset."""</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Segment durations in dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Segment durations in dataset."""</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span>
-            <span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">)</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"start"</span><span class="p">)</span>
+            <span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"end"</span><span class="p">)</span>
             <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
             <span class="p">]</span>
@@ -671,46 +672,46 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">short_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Description of dataset shortened to 150 chars.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Description of dataset shortened to 150 chars."""</span>
         <span class="n">length</span> <span class="o">=</span> <span class="mi">150</span>
-        <span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">""</span>
         <span class="c1"># Fix RST used signs</span>
-        <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;`&quot;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"`"</span><span class="p">,</span> <span class="s2">"'"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">description</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">:</span>
-            <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">description</span><span class="p">[:</span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">description</span><span class="p">[:</span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span>
         <span class="k">return</span> <span class="n">description</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Source of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Source of the database."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">source</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tables of the dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Tables of the dataset."""</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tables_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns for each table of the dataset.</span>
+<span class="w">        </span><span class="sd">"""Number of columns for each table of the dataset.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dictionary with table IDs as keys</span>
 <span class="sd">            and number of columns as values</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; ds = Dataset(&quot;emodb&quot;, &quot;1.4.1&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; ds.tables_columns[&quot;speaker&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; ds = Dataset("emodb", "1.4.1")</span>
+<span class="sd">            &gt;&gt;&gt; ds.tables_columns["speaker"]</span>
 <span class="sd">            3</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">"columns"</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tables_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Table preview for each table of the dataset.</span>
+<span class="w">        </span><span class="sd">"""Table preview for each table of the dataset.</span>
 
 <span class="sd">        Shows the header</span>
 <span class="sd">        and the first 5 lines for each table</span>
@@ -725,9 +726,9 @@
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from tabulate import tabulate</span>
-<span class="sd">            &gt;&gt;&gt; ds = Dataset(&quot;emodb&quot;, &quot;1.4.1&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; preview = ds.tables_preview[&quot;speaker&quot;]</span>
-<span class="sd">            &gt;&gt;&gt; print(tabulate(preview, headers=&quot;firstrow&quot;, tablefmt=&quot;github&quot;))</span>
+<span class="sd">            &gt;&gt;&gt; ds = Dataset("emodb", "1.4.1")</span>
+<span class="sd">            &gt;&gt;&gt; preview = ds.tables_preview["speaker"]</span>
+<span class="sd">            &gt;&gt;&gt; print(tabulate(preview, headers="firstrow", tablefmt="github"))</span>
 <span class="sd">            |   speaker |   age | gender   | language   |</span>
 <span class="sd">            |-----------|-------|----------|------------|</span>
 <span class="sd">            |         3 |    31 | male     | deu        |</span>
@@ -736,13 +737,18 @@
 <span class="sd">            |        10 |    32 | male     | deu        |</span>
 <span class="sd">            |        11 |    26 | male     | deu        |</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">preview</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;preview&quot;</span><span class="p">]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">"preview"</span><span class="p">]</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
             <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
-            <span class="n">body</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="c1"># Convert timedelta columns with str(),</span>
+            <span class="c1"># as astype("string") includes microseconds</span>
+            <span class="c1"># for all entries since pandas 3.0</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="s2">"timedelta"</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">na_action</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"string"</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="c1"># Remove unwanted chars and limit length of each entry</span>
             <span class="n">body</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_text</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">body</span><span class="p">]</span>
             <span class="n">preview</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="n">body</span>
@@ -750,44 +756,44 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tables_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of rows for each table of the dataset.</span>
+<span class="w">        </span><span class="sd">"""Number of rows for each table of the dataset.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dictionary with table IDs as keys</span>
 <span class="sd">            and number of rows as values</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; ds = Dataset(&quot;emodb&quot;, &quot;1.4.1&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; ds.tables_rows[&quot;speaker&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; ds = Dataset("emodb", "1.4.1")</span>
+<span class="sd">            &gt;&gt;&gt; ds.tables_rows["speaker"]</span>
 <span class="sd">            10</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;rows&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="n">stats</span><span class="p">[</span><span class="s2">"rows"</span><span class="p">]</span> <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tables_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tables of the dataset.&quot;&quot;&quot;</span>
-        <span class="n">table_list</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Columns&quot;</span><span class="p">]]</span>
+<span class="w">        </span><span class="sd">"""Tables of the dataset."""</span>
+        <span class="n">table_list</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">"ID"</span><span class="p">,</span> <span class="s2">"Type"</span><span class="p">,</span> <span class="s2">"Columns"</span><span class="p">]]</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span>
         <span class="k">for</span> <span class="n">table_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="n">table</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">table_id</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">audformat</span><span class="o">.</span><span class="n">MiscTable</span><span class="p">):</span>
-                <span class="n">table_type</span> <span class="o">=</span> <span class="s2">&quot;misc&quot;</span>
+                <span class="n">table_type</span> <span class="o">=</span> <span class="s2">"misc"</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">table_type</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">type</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
             <span class="n">table_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">table_id</span><span class="p">,</span> <span class="n">table_type</span><span class="p">,</span> <span class="n">columns</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">table_list</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Usage of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Usage of the database."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">usage</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Version of dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Version of dataset."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_cached_properties</span><span class="p">(</span>
@@ -795,7 +801,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">exclude</span><span class="p">:</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of cached properties of the object.</span>
+<span class="w">        </span><span class="sd">"""Get list of cached properties of the object.</span>
 
 <span class="sd">        When collecting the cached properties,</span>
 <span class="sd">        it also executes their code</span>
@@ -808,7 +814,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dictionary with property name and value</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">class_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="n">props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
@@ -816,13 +822,13 @@
             <span class="k">if</span> <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">cached_property</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">props</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_files_in_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of files in archive for given file index.</span>
+<span class="w">        </span><span class="sd">"""Number of files in archive for given file index.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file: file in dependency table</span>
@@ -830,57 +836,57 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            number of files stored in the archive for given file</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">archives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">()</span><span class="o">.</span><span class="n">archive</span>
         <span class="n">file_archive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">archive</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">archives</span> <span class="o">==</span> <span class="n">file_archive</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load backend object containing dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load backend object containing dataset."""</span>
         <span class="n">backend_interface</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">create_backend_interface</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">backend_interface</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load dataset dependencies.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load dataset dependencies."""</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_header</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load dataset header.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load dataset header."""</span>
         <span class="c1"># Ensure misc tables are loaded</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">load_tables</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load repository object containing dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load repository object containing dataset."""</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">repository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_scheme_table_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Column names for the scheme table.</span>
+<span class="w">        </span><span class="sd">"""Column names for the scheme table.</span>
 
-<span class="sd">        Column names always include ``&#39;ID&#39;`` and ``&#39;Dtype&#39;``,</span>
+<span class="sd">        Column names always include ``'ID'`` and ``'Dtype'``,</span>
 <span class="sd">        and if defined in any scheme</span>
-<span class="sd">        ``&#39;Min&#39;``,</span>
-<span class="sd">        ``&#39;Max&#39;``,</span>
-<span class="sd">        ``&#39;Labels&#39;``,</span>
-<span class="sd">        ``&#39;Mappings&#39;``.</span>
+<span class="sd">        ``'Min'``,</span>
+<span class="sd">        ``'Max'``,</span>
+<span class="sd">        ``'Labels'``,</span>
+<span class="sd">        ``'Mappings'``.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">schemes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">schemes</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schemes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Dtype&quot;</span><span class="p">]</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ID"</span><span class="p">,</span> <span class="s2">"Dtype"</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schemes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">schemes</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">minimum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">schemes</span><span class="p">]):</span>
-                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Min&quot;</span><span class="p">)</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Min"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">schemes</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">maximum</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">schemes</span><span class="p">]):</span>
-                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Max&quot;</span><span class="p">)</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Max"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">schemes</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">schemes</span><span class="p">]):</span>
-                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Labels&quot;</span><span class="p">)</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Labels"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">schemes</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">schemes</span><span class="p">]):</span>
-                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Mappings&quot;</span><span class="p">)</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Mappings"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">columns</span>
 
@@ -891,26 +897,26 @@
         <span class="n">scheme</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">schemes</span><span class="p">[</span><span class="n">scheme_id</span><span class="p">]</span>
 
         <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="n">scheme_id</span><span class="p">,</span>
-            <span class="s2">&quot;Dtype&quot;</span><span class="p">:</span> <span class="n">scheme</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="s2">"ID"</span><span class="p">:</span> <span class="n">scheme_id</span><span class="p">,</span>
+            <span class="s2">"Dtype"</span><span class="p">:</span> <span class="n">scheme</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">scheme_id</span><span class="p">,</span> <span class="n">scheme</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
-        <span class="c1">#  minimum, maximum, labels, mappings = &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;</span>
+        <span class="c1">#  minimum, maximum, labels, mappings = "", "", "", ""</span>
 
         <span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="s2">&quot;Min&quot;</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"Min"</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
             <span class="n">minimum</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">minimum</span>
             <span class="k">if</span> <span class="n">minimum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">minimum</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;Min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum</span>
-        <span class="k">if</span> <span class="s2">&quot;Max&quot;</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
+                <span class="n">minimum</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="s2">"Min"</span><span class="p">]</span> <span class="o">=</span> <span class="n">minimum</span>
+        <span class="k">if</span> <span class="s2">"Max"</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
             <span class="n">maximum</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">maximum</span>
             <span class="k">if</span> <span class="n">maximum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">maximum</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;Max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maximum</span>
-        <span class="k">if</span> <span class="s2">&quot;Labels&quot;</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
+                <span class="n">maximum</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="s2">"Max"</span><span class="p">]</span> <span class="o">=</span> <span class="n">maximum</span>
+        <span class="k">if</span> <span class="s2">"Labels"</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">scheme</span><span class="o">.</span><span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -919,49 +925,49 @@
                 <span class="c1"># Avoid `_` at end of label,</span>
                 <span class="c1"># as this has special meaning in RST (link)</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\_&quot;</span> <span class="k">if</span> <span class="n">label</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">label</span>
+                    <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">"\_"</span> <span class="k">if</span> <span class="n">label</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="k">else</span> <span class="n">label</span>
                     <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span>
                 <span class="p">]</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">limit_presented_samples</span><span class="p">(</span>
                     <span class="n">labels</span><span class="p">,</span>
                     <span class="mi">15</span><span class="p">,</span>
-                    <span class="n">replacement_text</span><span class="o">=</span><span class="s2">&quot;[...]&quot;</span><span class="p">,</span>
+                    <span class="n">replacement_text</span><span class="o">=</span><span class="s2">"[...]"</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">labels</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;Labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="s2">"Labels"</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
 
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">minimum</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maximum</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;Mappings&quot;</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"Mappings"</span> <span class="ow">in</span> <span class="n">scheme_info</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scheme</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
-                <span class="n">mappings</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">mappings</span> <span class="o">=</span> <span class="s2">""</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">_labels_to_dict</span><span class="p">()</span>
                 <span class="c1"># Mappings can contain a single mapping</span>
                 <span class="c1"># or a deeper nestings.</span>
                 <span class="c1"># In the first case we just present ✓,</span>
                 <span class="c1"># in the second case the keys of the nested dict.</span>
-                <span class="c1"># {&#39;f&#39;: &#39;female&#39;, &#39;m&#39;: &#39;male&#39;}</span>
+                <span class="c1"># {'f': 'female', 'm': 'male'}</span>
                 <span class="c1"># or</span>
-                <span class="c1"># {&#39;s1&#39;: {&#39;gender&#39;: &#39;male&#39;, &#39;age&#39;: 21}}</span>
+                <span class="c1"># {'s1': {'gender': 'male', 'age': 21}}</span>
                 <span class="n">mappings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="c1"># e.g. {&#39;s1&#39;: {&#39;gender&#39;: &#39;male&#39;, &#39;age&#39;: 21}}</span>
+                    <span class="c1"># e.g. {'s1': {'gender': 'male', 'age': 21}}</span>
                     <span class="n">mappings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                    <span class="n">mappings</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">mappings</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># e.g. {&#39;f&#39;: &#39;female&#39;, &#39;m&#39;: &#39;male&#39;}</span>
-                    <span class="n">mappings</span> <span class="o">=</span> <span class="s2">&quot;✓&quot;</span>
+                    <span class="c1"># e.g. {'f': 'female', 'm': 'male'}</span>
+                    <span class="n">mappings</span> <span class="o">=</span> <span class="s2">"✓"</span>
 
             <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;Mappings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mappings</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="s2">"Mappings"</span><span class="p">]</span> <span class="o">=</span> <span class="n">mappings</span>
 
         <span class="k">return</span> <span class="n">data_dict</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Segments of dataset as combined index.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Segments of dataset as combined index."""</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span>
@@ -976,7 +982,7 @@
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_tables_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Table information of tables in the dataset.</span>
+<span class="w">        </span><span class="sd">"""Table information of tables in the dataset.</span>
 
 <span class="sd">        Caches table information to improve performance</span>
 <span class="sd">        of multiple table-related properties.</span>
@@ -987,11 +993,11 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary with table names as keys and dictionaries containing:</span>
-<span class="sd">            - &quot;columns&quot;: number of columns</span>
-<span class="sd">            - &quot;rows&quot;: number of rows</span>
-<span class="sd">            - &quot;preview&quot;: dataframe preview (first 5 rows)</span>
+<span class="sd">            - "columns": number of columns</span>
+<span class="sd">            - "rows": number of rows</span>
+<span class="sd">            - "preview": dataframe preview (first 5 rows)</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
@@ -1001,15 +1007,15 @@
                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">stats</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
-                <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
-                <span class="s2">&quot;preview&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+                <span class="s2">"columns"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
+                <span class="s2">"rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
+                <span class="s2">"preview"</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="n">stats</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_map_iso_languages</span><span class="p">(</span><span class="n">languages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate ISO languages for a list of languages.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Calculate ISO languages for a list of languages.</span>
 
 <span class="sd">        Leaves languages intact if :func:`audformat.utils.map_language`</span>
 <span class="sd">        raises :exception:`ValueError`.</span>
@@ -1020,7 +1026,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list of languages</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">iso_languages</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1036,7 +1042,7 @@
 <div class="viewcode-block" id="Dataset">
 <a class="viewcode-back" href="../../../api/audbcards.Dataset.html#audbcards.Dataset">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dataset representation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Dataset representation.</span>
 
 <span class="sd">    Dataset object that represents a dataset</span>
 <span class="sd">    that can be loaded with :func:`audb.load()`.</span>
@@ -1055,7 +1061,7 @@
 <span class="sd">            if loading the tables takes too long,</span>
 <span class="sd">            or does not fit into memory</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -1065,7 +1071,7 @@
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create Dataset Instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Create Dataset Instance."""</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
@@ -1085,14 +1091,14 @@
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cache root folder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
 
     <span class="c1"># Copy attributes and methods</span>
     <span class="c1"># to include in documentation</span>
     <span class="k">for</span> <span class="n">_prop</span> <span class="ow">in</span> <span class="p">[</span>  <span class="c1"># use private variable `_prop` to avoid inclusion in API doc</span>
         <span class="n">name</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">_Dataset</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;create&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"create"</span><span class="p">]</span>
     <span class="p">]:</span>
         <span class="nb">vars</span><span class="p">()[</span><span class="n">_prop</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_Dataset</span><span class="p">,</span> <span class="n">_prop</span><span class="p">)</span>
 
@@ -1116,19 +1122,19 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save object instance to path as pickle.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save object instance to path as pickle."""</span>
         <span class="k">return</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">create_datasets_page</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Dataset</span><span class="p">],</span>
-    <span class="n">rst_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./datasets.rst&quot;</span><span class="p">,</span>
+    <span class="n">rst_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"./datasets.rst"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">datacards_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./datasets&quot;</span><span class="p">,</span>
-    <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Datasets&quot;</span><span class="p">,</span>
+    <span class="n">datacards_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"./datasets"</span><span class="p">,</span>
+    <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Datasets"</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create overview page of datasets.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Create overview page of datasets.</span>
 
 <span class="sd">    Writes the RST file ``rst_file`` to disk</span>
 <span class="sd">    accompanied by a CSV with the same basename.</span>
@@ -1153,12 +1159,12 @@
 <span class="sd">            data cards for the given datasets</span>
 <span class="sd">        header: header of the created RST file</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tuples</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">datacards_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.html&gt;`__&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">datacards_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.html&gt;`__"</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">.</span><span class="n">short_description</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license_link</span><span class="si">}</span><span class="s2">&gt;`__&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license_link</span><span class="si">}</span><span class="s2">&gt;`__"</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">.</span><span class="n">schemes_summary</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1166,18 +1172,18 @@
     <span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
         <span class="n">tuples</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;license&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="s2">&quot;schemes&quot;</span><span class="p">],</span>
-        <span class="n">index</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">,</span> <span class="s2">"license"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">,</span> <span class="s2">"schemes"</span><span class="p">],</span>
+        <span class="n">index</span><span class="o">=</span><span class="s2">"name"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">csv_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">rst_file</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">)</span>
+    <span class="n">csv_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">rst_file</span><span class="p">,</span> <span class="s2">"csv"</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_file</span><span class="p">)</span>
 
-    <span class="n">template_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+    <span class="n">template_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">"templates"</span><span class="p">)</span>
     <span class="n">environment</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span>
         <span class="n">loader</span><span class="o">=</span><span class="n">jinja2</span><span class="o">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">template_dir</span><span class="p">),</span>
         <span class="n">trim_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;datasets.j2&quot;</span><span class="p">)</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">"datasets.j2"</span><span class="p">)</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span>
@@ -1186,17 +1192,17 @@
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span>
     <span class="p">]</span>
-    <span class="n">repositories</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">]</span>
+    <span class="n">repositories</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">audb</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">]</span>
     <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">audeer</span><span class="o">.</span><span class="n">basename_wo_ext</span><span class="p">(</span><span class="n">rst_file</span><span class="p">),</span>
-        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">datacards_path</span><span class="p">,</span>
-        <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">header</span><span class="p">,</span>
-        <span class="s2">&quot;repositories&quot;</span><span class="p">:</span> <span class="n">repositories</span><span class="p">,</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">audeer</span><span class="o">.</span><span class="n">basename_wo_ext</span><span class="p">(</span><span class="n">rst_file</span><span class="p">),</span>
+        <span class="s2">"path"</span><span class="p">:</span> <span class="n">datacards_path</span><span class="p">,</span>
+        <span class="s2">"header"</span><span class="p">:</span> <span class="n">header</span><span class="p">,</span>
+        <span class="s2">"repositories"</span><span class="p">:</span> <span class="n">repositories</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">content</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rst_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rst_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
         <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 </pre></div>
 
@@ -1213,7 +1219,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/28 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -1246,8 +1252,8 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
         <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../../../_static/copybutton.js?v=f281be69"></script>
         <script src="../../../_static/table-preview.js?v=a02f8c22"></script>

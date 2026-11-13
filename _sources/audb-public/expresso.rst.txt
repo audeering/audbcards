@@ -76,7 +76,7 @@ Click on a row to toggle a preview.
     <tbody>
                     <tr>
         <td><p>audio_48khz/read/ex01/default/longform/ex01_default_longform_00001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:16.490000</p></td>
         <td><p>ex01</p></td>
         <td><p>default</p></td>
@@ -84,7 +84,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/read/ex01/narration/longform/ex01_narration_longform_00001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:16.990000</p></td>
         <td><p>ex01</p></td>
         <td><p>narration</p></td>
@@ -92,7 +92,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/read/ex02/default/longform/ex02_default_longform_00001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:14.070000</p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -100,7 +100,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/read/ex02/narration/longform/ex02_narration_longform_00001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:18.590000</p></td>
         <td><p>ex02</p></td>
         <td><p>narration</p></td>
@@ -108,7 +108,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/read/ex03/default/longform/ex03_default_longform_00001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:13.390000</p></td>
         <td><p>ex03</p></td>
         <td><p>default</p></td>
@@ -142,7 +142,7 @@ Click on a row to toggle a preview.
     <tbody>
                     <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_007.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:01:00</p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -150,7 +150,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/enunciated/ex01-ex02_enunciated_001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:00:50.270000</p></td>
         <td><p>ex02</p></td>
         <td><p>enunciated</p></td>
@@ -158,7 +158,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/fast/ex01-ex02_fast_004.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:01:00</p></td>
         <td><p>ex02</p></td>
         <td><p>fast</p></td>
@@ -166,7 +166,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/projected/ex01-ex02_projected_006.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:01:00</p></td>
         <td><p>ex02</p></td>
         <td><p>projected</p></td>
@@ -174,7 +174,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/whisper/ex01-ex02_whisper_001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p>0 days 00:01:00</p></td>
         <td><p>ex02</p></td>
         <td><p>whisper</p></td>
@@ -454,7 +454,7 @@ Click on a row to toggle a preview.
     <tbody>
                     <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_001.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p></p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -462,7 +462,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_002.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p></p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -470,7 +470,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_003.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p></p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -478,7 +478,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_004.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p></p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>
@@ -486,7 +486,7 @@ Click on a row to toggle a preview.
         </tr>
                 <tr>
         <td><p>audio_48khz/conversational/ex01-ex02/default/ex01-ex02_default_005.wav</p></td>
-        <td><p>0 days</p></td>
+        <td><p>0 days 00:00:00</p></td>
         <td><p></p></td>
         <td><p>ex02</p></td>
         <td><p>default</p></td>

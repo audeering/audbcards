@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_autodoc_typehints.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/table-preview.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v0.4.6
+                v0.5.0
               </div>
             
           
@@ -110,6 +111,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-0-2026-11-13">Version 0.5.0 (2026-11-13)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-6-2026-07-28">Version 0.4.6 (2026-07-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-5-2026-06-09">Version 0.4.5 (2026-06-09)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-4-2026-06-02">Version 0.4.4 (2026-06-02)</a></li>
@@ -169,6 +171,42 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<section id="version-0-5-0-2026-11-13">
+<h2>Version 0.5.0 (2026-11-13)<a class="headerlink" href="#version-0-5-0-2026-11-13" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">table_preview</span></code> argument to <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard</span></code>
+to disable the preview of the content of each table
+on the data card</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">&quot;table_preview&quot;</span></code> key
+to entries of the <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> config
+of the sphinx extension</p></li>
+<li><p>Added: support for Python 3.15</p></li>
+<li><p>Changed: entries of the <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> config
+of the sphinx extension are dictionaries
+with the keys
+<code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;header&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;repositories&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;example&quot;</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">&quot;table_preview&quot;</span></code>,
+where only <code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code> is required</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">&quot;folder&quot;</span></code> of an <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> entry
+needs to be a sub folder of the sphinx source folder</p></li>
+<li><p>Changed: hide the whole example section
+of a data card,
+if <code class="docutils literal notranslate"><span class="pre">example</span></code> of <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p>Deprecated: tuple entries
+of the <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> config
+of the sphinx extension</p></li>
+<li><p>Fixed: show durations in table previews
+without microseconds for <code class="docutils literal notranslate"><span class="pre">pandas&gt;=3.0</span></code></p></li>
+<li><p>Fixed: use <code class="docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code>
+in the default <code class="docutils literal notranslate"><span class="pre">audbcards_datasets</span></code> config
+of the sphinx extension</p></li>
+<li><p>Removed: support for Python 3.10</p></li>
+<li><p>Removed: dependency on <code class="docutils literal notranslate"><span class="pre">toml</span></code></p></li>
+</ul>
+</section>
 <section id="version-0-4-6-2026-07-28">
 <h2>Version 0.4.6 (2026-07-28)<a class="headerlink" href="#version-0-4-6-2026-07-28" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -355,7 +393,7 @@ and the <code class="docutils literal notranslate"><span class="pre">audbcards.s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/28 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -388,8 +426,8 @@ and the <code class="docutils literal notranslate"><span class="pre">audbcards.s
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=9bcbadda"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script src="_static/table-preview.js?v=a02f8c22"></script>

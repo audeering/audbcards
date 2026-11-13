@@ -58,6 +58,10 @@ sphinx\_src\_dir
 ----------------
 .. autoattribute:: Datacard.sphinx_src_dir
     
+table\_preview
+--------------
+.. autoattribute:: Datacard.table_preview
+    
 template\_dir
 -------------
 .. autoattribute:: Datacard.template_dir
