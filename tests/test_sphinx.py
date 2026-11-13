@@ -29,27 +29,46 @@ def sphinx_app(src_dir, build_dir, sections):
 
 
 @pytest.mark.parametrize(
-    "sections",
+    "sections, folders",
     [
-        [{"folder": "data-a"}],
-        [{"folder": "data-a"}, {"folder": "data-b", "table_preview": False}],
+        ([{"folder": "data-a"}], ["data-a"]),
+        (
+            [{"folder": "data-a"}, {"folder": "data-b", "table_preview": False}],
+            ["data-a", "data-b"],
+        ),
         # deprecated tuple entries
-        [("data-a", "A", [], True)],
-        [("data-a", "A", [], True, False)],
+        ([("data-a", "A", [], True)], ["data-a"]),
+        ([("data-a", "A", [], True, False)], ["data-a"]),
         # mixed entries
-        [("data-a", "A", [], True), {"folder": "data-b"}],
+        ([("data-a", "A", [], True), {"folder": "data-b"}], ["data-a", "data-b"]),
     ],
 )
-def test_builder_finished(tmpdir, sections):
-    r"""Test cleanup of generated files for all section formats."""
+def test_builder_finished(tmpdir, sections, folders):
+    r"""Test cleanup of generated files for all section formats.
+
+    ``folders`` lists the configured folders explicitly,
+    to not rely on the helper functions
+    used by ``builder_finished()``
+    to determine them.
+    Other files and folders
+    in the sphinx source folder
+    should not be removed.
+
+    """
     src_dir = audeer.mkdir(tmpdir, "docs")
-    folders = [audbcards.sphinx.section_folder(section) for section in sections]
     files = []
     for folder in folders:
         audeer.mkdir(src_dir, folder)
         audeer.touch(src_dir, folder, "db.rst")
         files.append(audeer.touch(src_dir, f"{folder}.rst"))
         files.append(audeer.touch(src_dir, f"{folder}.csv"))
+    # Files and folders that should not be removed,
+    # e.g. named after the header of the tuple entries
+    keep = [
+        audeer.touch(src_dir, "index.rst"),
+        audeer.touch(audeer.mkdir(src_dir, "A"), "file.rst"),
+        audeer.touch(src_dir, "A.rst"),
+    ]
 
     app = sphinx_app(src_dir, None, sections)
     audbcards.sphinx.builder_finished(app, None)
@@ -58,6 +77,8 @@ def test_builder_finished(tmpdir, sections):
         assert not os.path.exists(os.path.join(src_dir, folder))
     for file in files:
         assert not os.path.exists(file)
+    for file in keep:
+        assert os.path.exists(file)
 
 
 def test_builder_finished_invalid_sections(tmpdir):
