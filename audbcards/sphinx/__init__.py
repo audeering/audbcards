@@ -154,7 +154,7 @@ def builder_finished(
     """
     # Delete auto-generated data card output folder
     sections = app.config.audbcards_datasets
-    for path, _, _, _ in sections:
+    for path, *_ in sections:
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
         for ext in ["rst", "csv"]:
