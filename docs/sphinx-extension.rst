@@ -41,14 +41,25 @@ to use only certain :class:`audb.Repository`
 to look for datasets,
 select a name for the folder
 the data cards are stored,
-and select if an example section should be integrated
-on the data cards.
+select if an example section should be integrated
+on the data cards,
+and select if a preview of the content
+of each table should be shown.
 The example section shows
 an audio or video player
 for media examples,
 and the content of JSON examples.
 If disabled,
 the whole example section is omitted.
+The table preview is shown
+when clicking on a row
+of the tables overview
+of a data card.
+If disabled,
+the tables overview is still shown,
+but its rows cannot be clicked.
+The table preview setting is optional
+and defaults to ``True``.
 All of those options are handled
 by the ``audbcards_datasets`` entry
 inside ``docs/conf.py``.
@@ -69,6 +80,7 @@ and header to the repository name:
                 backend="artifactory",
             ),
             True,  # show example section
+            True,  # show table preview
         ),  
     ]
 
@@ -91,6 +103,7 @@ In ``docs/conf.py`` you provide a list of entries:
                 backend="artifactory",
             ),
             True,  # show example section
+            True,  # show table preview
         ),  
         (   
             "data-private",  # folder name
@@ -101,6 +114,7 @@ In ``docs/conf.py`` you provide a list of entries:
                 backend="artifactory",
             ),
             False,  # don't show example section
+            False,  # don't show table preview
         ),  
     ]
 

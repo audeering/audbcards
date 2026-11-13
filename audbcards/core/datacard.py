@@ -43,6 +43,11 @@ class Datacard(object):
             and the content of JSON examples.
             If ``False``,
             the example section is omitted
+        table_preview: if ``True``,
+            the rows of the tables overview
+            in the data card can be clicked
+            to show a preview of the content
+            of each table
         sphinx_build_dir: build dir of sphinx.
             If not ``None``
             and ``example`` is ``True``,
@@ -80,6 +85,7 @@ class Datacard(object):
         *,
         path: str = "datasets",
         example: bool = True,
+        table_preview: bool = True,
         sphinx_build_dir: str | None = None,
         sphinx_src_dir: str | None = None,
         template_dir: str | None = None,
@@ -93,6 +99,9 @@ class Datacard(object):
 
         self.example = example
         """If the example section with media or JSON examples should be included."""
+
+        self.table_preview = table_preview
+        """If a preview of the content of each table should be included."""
 
         self.sphinx_build_dir = sphinx_build_dir
         """Sphinx build dir."""
@@ -570,6 +579,10 @@ class Datacard(object):
             # including user provided ones
             dataset["example_media"] = None
             dataset["example_json"] = None
+        if not self.table_preview:
+            # Hide table previews from all templates,
+            # including user provided ones
+            dataset["tables_preview"] = None
         dataset["file_duration_distribution"] = self.file_duration_distribution
         dataset["segment_duration_distribution"] = self.segment_duration_distribution
         return dataset
