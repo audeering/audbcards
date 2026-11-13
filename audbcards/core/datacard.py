@@ -92,7 +92,7 @@ class Datacard(object):
         """Folder to store datacard."""
 
         self.example = example
-        """If an audio example should be included."""
+        """If the example section with media or JSON examples should be included."""
 
         self.sphinx_build_dir = sphinx_build_dir
         """Sphinx build dir."""
