@@ -559,7 +559,6 @@ class Datacard(object):
         """
         # Add path of datacard folder
         dataset["path"] = self.path
-        dataset["example"] = self.example
         if self.example:
             if self.dataset.example_media is not None:
                 player = self.player()
