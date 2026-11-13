@@ -325,25 +325,37 @@ def test_parse_section_tuple(section, expected):
 
 
 @pytest.mark.parametrize(
-    "section, error, match",
+    "section, error, match, tuple_info",
     [
-        ({}, ValueError, "needs to have the key 'folder'"),
-        ({"header": "Data"}, ValueError, "needs to have the key 'folder'"),
+        ({}, ValueError, "needs to have the key 'folder'", False),
+        ({"header": "Data"}, ValueError, "needs to have the key 'folder'", False),
         (
             {"folder": "data", "table_previews": False},
             ValueError,
             r"Unknown key\(s\) \['table_previews'\]",
+            False,
         ),
-        (("data", "Data", REPOSITORY), ValueError, "four or five values"),
+        (("data", "Data", REPOSITORY), ValueError, "four or five values", True),
         (
-            ("data", "Data", REPOSITORY, True, True, True),
+            ["data", "Data", REPOSITORY, True, True, True],
             ValueError,
             "four or five values",
+            True,
         ),
-        ("data", TypeError, "needs to be a dictionary"),
+        ("data", TypeError, "needs to be a dictionary", True),
+        (1, TypeError, "needs to be a dictionary", True),
     ],
 )
-def test_parse_section_errors(section, error, match):
-    r"""Test errors for invalid config entries."""
-    with pytest.raises(error, match=match):
+def test_parse_section_errors(section, error, match, tuple_info):
+    r"""Test errors for invalid config entries.
+
+    All errors should list the supported keys,
+    errors related to the entry type
+    should also describe the deprecated tuple format.
+
+    """
+    with pytest.raises(error, match=match) as excinfo:
         audbcards.sphinx.parse_section(section)
+    message = str(excinfo.value)
+    assert audbcards.sphinx.section_keys_info in message
+    assert (audbcards.sphinx.section_tuple_info in message) == tuple_info

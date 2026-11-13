@@ -21,6 +21,13 @@ table_preview_js_file = "table-preview.js"
 # Supported keys of an entry in the audbcards_datasets config,
 # the order is used to convert old tuple entries
 section_keys = ["folder", "header", "repositories", "example", "table_preview"]
+section_keys_info = f"Supported keys are {section_keys}, where 'folder' is required."
+section_tuple_info = (
+    "Entries given as tuple or list are deprecated, "
+    "but still supported with the values "
+    "(folder, header, repositories, example) "
+    "or (folder, header, repositories, example, table_preview)."
+)
 
 
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
@@ -253,8 +260,10 @@ def parse_section(section: dict | Sequence) -> dict:
     if isinstance(section, (tuple, list)):
         if len(section) not in [4, 5]:
             raise ValueError(
-                "A tuple entry in 'audbcards_datasets' needs to have "
-                f"four or five values, but {section} has {len(section)}."
+                "A tuple or list entry in 'audbcards_datasets' needs to have "
+                f"four or five values, but {section} has {len(section)}. "
+                f"{section_tuple_info} "
+                f"Use a dictionary instead. {section_keys_info}"
             )
         warnings.warn(
             "Using tuples as entries of 'audbcards_datasets' is deprecated "
@@ -268,18 +277,20 @@ def parse_section(section: dict | Sequence) -> dict:
     elif not isinstance(section, dict):
         raise TypeError(
             "An entry in 'audbcards_datasets' needs to be a dictionary, "
-            f"but got {type(section).__name__}: {section}."
+            f"but got {type(section).__name__}: {section!r}. "
+            f"{section_keys_info} {section_tuple_info}"
         )
 
     unknown_keys = [key for key in section if key not in section_keys]
     if unknown_keys:
         raise ValueError(
             f"Unknown key(s) {unknown_keys} in 'audbcards_datasets' entry "
-            f"{section}. Supported keys are {section_keys}."
+            f"{section}. {section_keys_info}"
         )
     if "folder" not in section:
         raise ValueError(
-            f"The 'audbcards_datasets' entry {section} needs to have the key 'folder'."
+            f"The 'audbcards_datasets' entry {section} "
+            f"needs to have the key 'folder'. {section_keys_info}"
         )
 
     folder = section["folder"]
