@@ -37,32 +37,53 @@ Configuration
 -------------
 
 You can configure the extension
-to use only certain :class:`audb.Repository`
-to look for datasets,
-select a name for the folder
-the data cards are stored,
-select if an example section should be integrated
-on the data cards,
-and select if a preview of the content
-of each table should be shown.
-The example section shows
-an audio or video player
-for media examples,
-and the content of JSON examples.
-If disabled,
-the whole example section is omitted.
-The table preview is shown
-when clicking on a row
-of the tables overview
-of a data card.
-If disabled,
-the tables overview is still shown,
-but its rows cannot be clicked.
-The table preview setting is optional
-and defaults to ``True``.
-All of those options are handled
 by the ``audbcards_datasets`` entry
 inside ``docs/conf.py``.
+It is a list of dictionaries,
+each describing a separate list of datasets
+and their data cards.
+The following keys are supported:
+
+``"folder"``
+    Name of the folder
+    the data cards are stored in,
+    and of the datasets overview page.
+    This key is required.
+
+``"header"``
+    Header of the datasets overview page.
+    Defaults to the value of ``"folder"``.
+
+``"repositories"``
+    :class:`audb.Repository` or list of repositories
+    to look for datasets.
+    Defaults to :attr:`audb.config.REPOSITORIES`.
+
+``"example"``
+    If ``True``,
+    an example section is integrated on the data cards.
+    It shows an audio or video player
+    for media examples,
+    and the content of JSON examples.
+    If ``False``,
+    the whole example section is omitted.
+    Defaults to ``True``.
+
+``"table_preview"``
+    If ``True``,
+    a preview of the content of each table
+    is shown when clicking on a row
+    of the tables overview
+    of a data card.
+    If ``False``,
+    the tables overview is still shown,
+    but its rows cannot be clicked.
+    Defaults to ``True``.
+
+If ``audbcards_datasets`` is not set,
+it uses the folder ``datasets``
+with the header ``Datasets``.
+
 For example,
 to restrict to a single repository
 and name the folder
@@ -71,51 +92,46 @@ and header to the repository name:
 .. code-block:: python
 
     audbcards_datasets = [
-        (   
-            "data-public",  # folder name
-            "data-public",  # datasets overview page header
-            audb.Repository(  # repository to use, can be a list of repos
+        {
+            "folder": "data-public",
+            "repositories": audb.Repository(
                 name="data-public",
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            True,  # show example section
-            True,  # show table preview
-        ),  
+        },
     ]
 
 You would then need to include ``data-public``
 in your TOC instead of the default ``datasets`` name.
 
 You can even create several separated lists of datasets
-and corresponding data cards.
-In ``docs/conf.py`` you provide a list of entries:
+and corresponding data cards,
+by providing several entries:
 
 .. code-block:: python
 
     audbcards_datasets = [
-        (   
-            "data-public",  # folder name
-            "data-public",  # datasets overview page header
-            audb.Repository(  # repository to use, can be a list of repos
+        {
+            "folder": "data-public",
+            "header": "Public datasets",
+            "repositories": audb.Repository(
                 name="data-public",
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            True,  # show example section
-            True,  # show table preview
-        ),  
-        (   
-            "data-private",  # folder name
-            "data-private",  # datasets overview page header
-            audb.Repository(  # repository to use, can be a list of repos
+        },
+        {
+            "folder": "data-private",
+            "header": "Private datasets",
+            "repositories": audb.Repository(
                 name="data-private",
                 host="https://audeering.jfrog.io/artifactory",
                 backend="artifactory",
             ),
-            False,  # don't show example section
-            False,  # don't show table preview
-        ),  
+            "example": False,
+            "table_preview": False,
+        },
     ]
 
 This will produce two distinct RST overview pages,
@@ -131,6 +147,14 @@ e.g. in ``docs/index.rst`` you could then write:
 
         data-public
         data-private
+
+Entries given as tuples
+with the values
+``(folder, header, repositories, example)``
+or ``(folder, header, repositories, example, table_preview)``
+are still supported,
+but deprecated
+and will be removed in a future version.
 
 A user can also influence
 how the resulting datacard appears,

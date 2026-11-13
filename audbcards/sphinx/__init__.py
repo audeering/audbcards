@@ -1,5 +1,7 @@
+from collections.abc import Sequence
 import os
 import shutil
+import warnings
 
 import sphinx
 import sphinx.application
@@ -16,6 +18,10 @@ __version__ = "0.3.1"
 table_preview_css_file = "table-preview.css"
 table_preview_js_file = "table-preview.js"
 
+# Supported keys of an entry in the audbcards_datasets config,
+# the order is used to convert old tuple entries
+section_keys = ["folder", "header", "repositories", "example", "table_preview"]
+
 
 # ===== MAIN FUNCTION SPHINX EXTENSION ====================================
 def setup(app: sphinx.application.Sphinx):
@@ -23,10 +29,7 @@ def setup(app: sphinx.application.Sphinx):
     # Config values
     app.add_config_value(
         "audbcards_datasets",
-        [
-            # folder/name, header, repositories, example, table preview
-            ("datasets", "Datasets", [audb.config.REPOSITORIES], True, True),
-        ],
+        [{"folder": "datasets", "header": "Datasets"}],
         False,
     )
     app.add_config_value("audbcards_templates", None, "html")
@@ -71,9 +74,12 @@ def builder_inited(app: sphinx.application.Sphinx):
 
     # Gather and build data cards for each requested section
     for section in sections:
-        # Table preview entry is optional
-        path, header, repositories, example, *table_preview = section
-        table_preview = table_preview[0] if table_preview else True
+        section = parse_section(section)
+        path = section["folder"]
+        header = section["header"]
+        repositories = section["repositories"]
+        example = section["example"]
+        table_preview = section["table_preview"]
 
         # Clear existing data cards
         datacard_path = audeer.path(app.srcdir, path)
@@ -159,10 +165,106 @@ def builder_finished(
     """
     # Delete auto-generated data card output folder
     sections = app.config.audbcards_datasets
-    for path, *_ in sections:
+    for section in sections:
+        path = section_folder(section)
+        if path is None:
+            continue
         datacard_path = audeer.path(app.srcdir, path)
         audeer.rmdir(datacard_path)
         for ext in ["rst", "csv"]:
             file = audeer.path(app.srcdir, f"{path}.{ext}")
             if os.path.exists(file):
                 os.remove(file)
+
+
+# ===== HELPER FUNCTIONS ==================================================
+#
+def parse_section(section: dict | Sequence) -> dict:
+    r"""Parse entry of the ``audbcards_datasets`` config.
+
+    Args:
+        section: entry of the ``audbcards_datasets`` config.
+            A dictionary with the keys
+            ``"folder"`` (required),
+            ``"header"``,
+            ``"repositories"``,
+            ``"example"``,
+            and ``"table_preview"``.
+            A tuple with the same entries in that order
+            is supported as well,
+            where ``"table_preview"`` is optional
+
+    Returns:
+        dictionary with all keys,
+        missing keys are set to their default values
+
+    Raises:
+        TypeError: if ``section`` is not a dictionary or tuple
+        ValueError: if ``section`` contains unknown keys,
+            misses the ``"folder"`` key,
+            or the tuple has not four or five entries
+
+    """
+    if isinstance(section, (tuple, list)):
+        if len(section) not in [4, 5]:
+            raise ValueError(
+                "A tuple entry in 'audbcards_datasets' needs to have "
+                f"four or five values, but {section} has {len(section)}."
+            )
+        warnings.warn(
+            "Using tuples as entries of 'audbcards_datasets' is deprecated "
+            "and will be removed in a future version. "
+            "Use a dictionary instead, e.g. "
+            f"{dict(zip(section_keys, section))}.",
+            category=FutureWarning,
+            stacklevel=2,
+        )
+        section = dict(zip(section_keys, section))
+    elif not isinstance(section, dict):
+        raise TypeError(
+            "An entry in 'audbcards_datasets' needs to be a dictionary, "
+            f"but got {type(section).__name__}: {section}."
+        )
+
+    unknown_keys = [key for key in section if key not in section_keys]
+    if unknown_keys:
+        raise ValueError(
+            f"Unknown key(s) {unknown_keys} in 'audbcards_datasets' entry "
+            f"{section}. Supported keys are {section_keys}."
+        )
+    if "folder" not in section:
+        raise ValueError(
+            f"The 'audbcards_datasets' entry {section} needs to have the key 'folder'."
+        )
+
+    folder = section["folder"]
+    return {
+        "folder": folder,
+        "header": section.get("header", folder),
+        "repositories": section.get("repositories", audb.config.REPOSITORIES),
+        "example": section.get("example", True),
+        "table_preview": section.get("table_preview", True),
+    }
+
+
+def section_folder(section: dict | Sequence) -> str | None:
+    r"""Folder of entry of the ``audbcards_datasets`` config.
+
+    In contrast to :func:`parse_section`,
+    it does not raise an error or warning
+    for an invalid entry,
+    as it is used during cleanup,
+    which runs also after an error.
+
+    Args:
+        section: entry of the ``audbcards_datasets`` config
+
+    Returns:
+        folder of entry or ``None`` if it cannot be determined
+
+    """
+    if isinstance(section, dict):
+        return section.get("folder")
+    if isinstance(section, (tuple, list)) and len(section) > 0:
+        return section[0]
+    return None

@@ -41,16 +41,14 @@ intersphinx_mapping = {
 }
 # Configure audbcards extension
 audbcards_datasets = [
-    (
-        "audb-public",
-        "audb-public",
-        audb.Repository(
+    {
+        "folder": "audb-public",
+        "repositories": audb.Repository(
             name="audb-public",
             host="s3.dualstack.eu-north-1.amazonaws.com",
             backend="s3",
         ),
-        True,
-    ),
+    },
 ]
 audbcards_templates = "_templates"
 
