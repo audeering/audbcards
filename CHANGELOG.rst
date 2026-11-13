@@ -7,6 +7,42 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.5.0 (2026-11-13)
+--------------------------
+
+* Added: ``table_preview`` argument to ``audbcards.Datacard``
+  to disable the preview of the content of each table
+  on the data card
+* Added: ``"table_preview"`` key
+  to entries of the ``audbcards_datasets`` config
+  of the sphinx extension
+* Added: support for Python 3.15
+* Changed: entries of the ``audbcards_datasets`` config
+  of the sphinx extension are dictionaries
+  with the keys
+  ``"folder"``,
+  ``"header"``,
+  ``"repositories"``,
+  ``"example"``,
+  and ``"table_preview"``,
+  where only ``"folder"`` is required
+* Changed: ``"folder"`` of an ``audbcards_datasets`` entry
+  needs to be a sub folder of the sphinx source folder
+* Changed: hide the whole example section
+  of a data card,
+  if ``example`` of ``audbcards.Datacard`` is ``False``
+* Deprecated: tuple entries
+  of the ``audbcards_datasets`` config
+  of the sphinx extension
+* Fixed: show durations in table previews
+  without microseconds for ``pandas>=3.0``
+* Fixed: use ``audb.config.REPOSITORIES``
+  in the default ``audbcards_datasets`` config
+  of the sphinx extension
+* Removed: support for Python 3.10
+* Removed: dependency on ``toml``
+
+
 Version 0.4.6 (2026-07-28)
 --------------------------
 
