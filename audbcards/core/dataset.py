@@ -595,6 +595,11 @@ class _Dataset:
             df = stats["preview"]
             df = df.reset_index()
             header = [df.columns.tolist()]
+            # Convert timedelta columns with str(),
+            # as astype("string") includes microseconds
+            # for all entries since pandas 3.0
+            for column in df.select_dtypes("timedelta").columns:
+                df[column] = df[column].map(str, na_action="ignore")
             body = df.astype("string").values.tolist()
             # Remove unwanted chars and limit length of each entry
             body = [[self._parse_text(column) for column in row] for row in body]
