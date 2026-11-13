@@ -7,6 +7,20 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.5.1 (2026-11-13)
+--------------------------
+
+* Added: ``"dfs"`` key to ``app.audbcards``
+  of the sphinx extension,
+  storing the list of datasets
+  for the folder of each entry
+  of the ``audbcards_datasets`` config
+* Changed: raise ``ValueError``
+  if entries of the ``audbcards_datasets`` config
+  of the sphinx extension
+  share the same folder
+
+
 Version 0.5.0 (2026-11-13)
 --------------------------
 
