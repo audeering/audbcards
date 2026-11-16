@@ -731,11 +731,18 @@ def test_dataset_tables_stats(
     db.save(db_path, storage_format=storage_format)
     audb.publish(db_path, pytest.VERSION, repository)
 
-    ds = audbcards.Dataset(
-        name,
-        pytest.VERSION,
-        cache_root=audeer.mkdir(tmpdir, "cache"),
-    )
+    with monkeypatch.context() as m:
+        if storage_format == audformat.define.TableStorageFormat.PARQUET:
+            # Ensure PARQUET tables are not loaded completely
+            def load_table(*args, **kwargs):
+                raise AssertionError("PARQUET table was loaded completely")
+
+            m.setattr(audb, "load_table", load_table)
+        ds = audbcards.Dataset(
+            name,
+            pytest.VERSION,
+            cache_root=audeer.mkdir(tmpdir, "cache"),
+        )
     for table in ["speaker", "files", "segments", "segments2", "empty"]:
         df = audb.load_table(name, table, version=pytest.VERSION, verbose=False)
         stats = ds._tables_stats[table]
