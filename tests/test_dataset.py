@@ -640,13 +640,20 @@ def test_dataset_scheme_summary(tmpdir, repository, audb_cache):
 
 
 @pytest.mark.parametrize(
-    "storage_format",
+    "storage_format, random_access",
     [
-        audformat.define.TableStorageFormat.CSV,
-        audformat.define.TableStorageFormat.PARQUET,
+        (audformat.define.TableStorageFormat.CSV, True),
+        (audformat.define.TableStorageFormat.PARQUET, True),
+        (audformat.define.TableStorageFormat.PARQUET, False),
     ],
 )
-def test_dataset_tables_stats(tmpdir, repository, storage_format):
+def test_dataset_tables_stats(
+    tmpdir,
+    monkeypatch,
+    repository,
+    storage_format,
+    random_access,
+):
     r"""Test table statistics and preview.
 
     Tables stored as PARQUET files
@@ -656,8 +663,19 @@ def test_dataset_tables_stats(tmpdir, repository, storage_format):
     This test ensures that the results
     are identical to loading the complete tables.
 
+    If ``random_access`` is ``False``,
+    the backend is treated as not supporting
+    random access to files,
+    and PARQUET tables are downloaded to the audb cache.
+
     """
-    name = f"tables-stats-{storage_format}"
+    if not random_access:
+        monkeypatch.setattr(
+            audbcards.core.utils,
+            "open_backend_file",
+            lambda *args: None,
+        )
+    name = f"tables-stats-{storage_format}-{random_access}"
     db_path = audeer.mkdir(tmpdir, name)
     db = audformat.Database(name=name)
 

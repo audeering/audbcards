@@ -1,9 +1,160 @@
 from collections.abc import Sequence
+import io
+import typing
 
 import matplotlib.pyplot as plt
+import pyarrow as pa
+import pyarrow.parquet as pq
 
+import audbackend
 import audeer
 import audformat
+
+
+class _RangeFile(io.RawIOBase):
+    r"""Read-only, seekable file object of a file on a MinIO/S3 backend.
+
+    Each read is a range request,
+    which allows reading parts of a file
+    without downloading it completely.
+
+    Args:
+        client: MinIO client
+        bucket: bucket name
+        path: path of file inside bucket
+
+    """
+
+    def __init__(self, client, bucket: str, path: str):
+        self._client = client
+        self._bucket = bucket
+        self._path = path
+        self._size = client.stat_object(bucket, path).size
+        self._pos = 0
+
+    def readable(self) -> bool:
+        r"""File is readable."""
+        return True
+
+    def seekable(self) -> bool:
+        r"""File is seekable."""
+        return True
+
+    def tell(self) -> int:
+        r"""Current position in file."""
+        return self._pos
+
+    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
+        r"""Change position in file."""
+        if whence == io.SEEK_SET:
+            pos = offset
+        elif whence == io.SEEK_CUR:
+            pos = self._pos + offset
+        elif whence == io.SEEK_END:
+            pos = self._size + offset
+        else:
+            raise ValueError(f"Invalid whence: {whence}")
+        if pos < 0:
+            raise ValueError(f"Negative seek position: {pos}")
+        self._pos = pos
+        return self._pos
+
+    def readinto(self, buffer) -> int:
+        r"""Read bytes into buffer, using a single range request."""
+        length = min(len(buffer), self._size - self._pos)
+        if length <= 0:
+            return 0
+        response = self._client.get_object(
+            self._bucket,
+            self._path,
+            offset=self._pos,
+            length=length,
+        )
+        try:
+            data = response.read()
+        finally:
+            response.close()
+            response.release_conn()
+        buffer[: len(data)] = data
+        self._pos += len(data)
+        return len(data)
+
+
+def open_backend_file(
+    interface: audbackend.interface.Base,
+    path: str,
+    version: str,
+) -> typing.BinaryIO | None:
+    r"""Open file on backend for random access reading.
+
+    Supports versioned interfaces
+    of the MinIO/S3 and file-system backends,
+    which allow to read parts of a file
+    without downloading it.
+
+    This relies on private attributes of :mod:`audbackend`,
+    and should be replaced,
+    when :mod:`audbackend` provides a public API
+    (https://github.com/audeering/audbackend/issues/317).
+    The backend connection needs to be open
+    while reading the file.
+
+    Args:
+        interface: backend interface
+        path: path of file on backend
+        version: version of file
+
+    Returns:
+        binary file object,
+        or ``None`` if backend or interface are not supported
+
+    """
+    if not isinstance(interface, audbackend.interface.Versioned):
+        return None
+    backend = interface.backend
+    path = interface._path_with_version(path, version)
+    minio = getattr(audbackend.backend, "Minio", None)
+    if minio is not None and isinstance(backend, minio):
+        return _RangeFile(backend._client, backend.repository, backend.path(path))
+    if isinstance(backend, audbackend.backend.FileSystem):
+        return open(backend._expand(path), "rb")
+    return None
+
+
+def parquet_preview(
+    file: str | typing.BinaryIO,
+    preview_rows: int,
+) -> tuple[int, pa.Table]:
+    r"""Number of rows and first rows of a PARQUET file.
+
+    Reads only the footer
+    and the first pages of the first row group,
+    without loading the complete file into memory.
+
+    Args:
+        file: path to PARQUET file or binary file object
+        preview_rows: maximum number of rows of the preview
+
+    Returns:
+        number of rows of the file,
+        and table holding the first ``preview_rows`` rows
+
+    """
+    # Small buffer and no pre-buffering,
+    # to read only the first pages of each column
+    parquet_file = pq.ParquetFile(
+        file,
+        buffer_size=1024 * 1024,
+        pre_buffer=False,
+    )
+    rows = parquet_file.metadata.num_rows
+    schema = parquet_file.schema_arrow
+    batch = next(parquet_file.iter_batches(batch_size=preview_rows), None)
+    if batch is None:
+        preview = schema.empty_table()
+    else:
+        preview = pa.Table.from_batches([batch], schema=schema)
+    return rows, preview
 
 
 def format_schemes(
