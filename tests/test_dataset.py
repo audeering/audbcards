@@ -708,6 +708,19 @@ def test_dataset_tables_stats(
     db["segments"]["value"] = audformat.Column()
     db["segments"]["value"].set([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 
+    # Second segmented table,
+    # sharing segments with the first one,
+    # and containing a segment without end
+    db["segments2"] = audformat.Table(
+        audformat.segmented_index(
+            files=[files[7], files[0], files[8]],
+            starts=[0.5, 0, 0.1],
+            ends=[0.6, 0.1, pd.NaT],
+        )
+    )
+    db["segments2"]["value"] = audformat.Column()
+    db["segments2"]["value"].set([0.7, 0.8, 0.9])
+
     # Empty table
     db["empty"] = audformat.Table(audformat.filewise_index())
     db["empty"]["value"] = audformat.Column()
@@ -723,13 +736,37 @@ def test_dataset_tables_stats(
         pytest.VERSION,
         cache_root=audeer.mkdir(tmpdir, "cache"),
     )
-    for table in ["speaker", "files", "segments", "empty"]:
+    for table in ["speaker", "files", "segments", "segments2", "empty"]:
         df = audb.load_table(name, table, version=pytest.VERSION, verbose=False)
         stats = ds._tables_stats[table]
         assert stats["rows"] == len(df)
         assert stats["columns"] == len(df.columns)
         pd.testing.assert_frame_equal(stats["preview"], df.head(5))
-    assert ds.tables_rows == {"speaker": 3, "files": 12, "segments": 6, "empty": 0}
+    assert ds.tables_rows == {
+        "speaker": 3,
+        "files": 12,
+        "segments": 6,
+        "segments2": 3,
+        "empty": 0,
+    }
+
+    # Segments are identical to union of complete segmented tables
+    index = audformat.utils.union(
+        [
+            audb.load_table(name, table, version=pytest.VERSION, verbose=False).index
+            for table in ["segments", "segments2"]
+        ]
+    )
+    expected_durations = [
+        (end - start).total_seconds()
+        for start, end in zip(
+            index.get_level_values("start"),
+            index.get_level_values("end"),
+        )
+    ]
+    assert ds.segments == str(len(index)) == "8"
+    np.testing.assert_equal(ds.segment_durations, expected_durations)
+    assert np.isnan(ds.segment_durations[-1])
 
     # Header still holds complete misc table
     assert list(ds.header["speaker"].index) == speakers

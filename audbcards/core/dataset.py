@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+import contextlib
 import functools
 import inspect
 import os
@@ -6,10 +7,13 @@ import pickle
 import random
 import re
 import tempfile
+import typing
 
 import jinja2
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
 import audb
@@ -509,20 +513,17 @@ class _Dataset:
     @functools.cached_property
     def segments(self) -> str:
         r"""Number of segments in dataset."""
-        return str(len(self._segments))
+        return str(self._segments.num_rows)
 
     @functools.cached_property
     def segment_durations(self) -> list[float]:
         r"""Segment durations in dataset."""
-        if len(self._segments) == 0:
-            durations = []
-        else:
-            starts = self._segments.get_level_values("start")
-            ends = self._segments.get_level_values("end")
-            durations = [
-                (end - start).total_seconds() for start, end in zip(starts, ends)
-            ]
-        return durations
+        if self._segments.num_rows == 0:
+            return []
+        durations = pc.subtract(self._segments["end"], self._segments["start"])
+        seconds = pc.divide(pc.cast(durations, pa.int64()), 1e9)
+        # Segments without end result in NaN
+        return seconds.to_numpy(zero_copy_only=False).tolist()
 
     @functools.cached_property
     def short_description(self) -> str:
@@ -820,19 +821,68 @@ class _Dataset:
         return data_dict
 
     @functools.cached_property
-    def _segments(self) -> pd.MultiIndex:
-        """Segments of dataset as combined index."""
-        index = audformat.segmented_index()
+    def _segments(self) -> pa.Table:
+        """Unique segments of all segmented tables of dataset.
+
+        For tables stored as PARQUET files,
+        only the index columns are read,
+        and the tables are not downloaded
+        for MinIO/S3 and file-system backends.
+        Tables stored as CSV files
+        are loaded completely.
+
+        Returns:
+            table with columns ``"file"``, ``"start"``, ``"end"``,
+            holding every segment once,
+            in order of first occurrence
+
+        """
+        index_columns = [
+            audformat.define.IndexField.FILE,
+            audformat.define.IndexField.START,
+            audformat.define.IndexField.END,
+        ]
+        schema = pa.schema(
+            [
+                (audformat.define.IndexField.FILE, pa.string()),
+                (audformat.define.IndexField.START, pa.duration("ns")),
+                (audformat.define.IndexField.END, pa.duration("ns")),
+            ]
+        )
+        segments = [schema.empty_table()]
         for table in self.header.tables:
-            if self.header.tables[table].is_segmented:
+            if not self.header.tables[table].is_segmented:
+                continue
+            if f"db.{table}.parquet" in self.deps.tables:
+                with self._open_parquet_table(table) as file:
+                    parquet_file = pq.ParquetFile(file)
+                    index = parquet_file.read(columns=index_columns)
+            else:
                 df = audb.load_table(
                     self.name,
                     table,
                     version=self.version,
                     verbose=False,
                 )
-                index = audformat.utils.union([index, df.index])
-        return index
+                index = pa.Table.from_pandas(
+                    df.index.to_frame(index=False),
+                    preserve_index=False,
+                )
+            segments.append(index.select(index_columns).cast(schema))
+        segments = pa.concat_tables(segments)
+        # Remove duplicates,
+        # and keep order of first occurrence
+        # by sorting by the first position of each segment
+        segments = segments.append_column(
+            "position",
+            pa.array(np.arange(segments.num_rows, dtype="int64")),
+        )
+        segments = (
+            segments.group_by(index_columns)
+            .aggregate([("position", "min")])
+            .sort_by("position_min")
+        )
+        return segments.select(index_columns)
 
     @functools.cached_property
     def _tables_stats(self) -> dict[str, dict]:
@@ -897,31 +947,24 @@ class _Dataset:
             }
         return stats
 
-    def _parquet_table_preview(
+    @contextlib.contextmanager
+    def _open_parquet_table(
         self,
-        db: audformat.Database,
         table: str,
-        preview_rows: int,
-    ) -> tuple[int, pd.DataFrame]:
-        r"""Number of rows and preview of a table stored as PARQUET file.
+    ) -> typing.Iterator[str | typing.BinaryIO]:
+        r"""Open PARQUET file of table for random access reading.
 
         For MinIO/S3 and file-system backends
-        only the footer
-        and the first pages of the PARQUET file
-        are read from the backend.
+        the file is accessed directly on the backend,
+        without downloading it.
         For other backends,
         the PARQUET file is downloaded to the audb cache.
-        In both cases,
-        only the first rows are loaded into memory.
 
         Args:
-            db: database header without loaded tables
             table: table ID
-            preview_rows: number of rows of the preview
 
-        Returns:
-            number of rows of table,
-            and dataframe holding the first ``preview_rows`` rows
+        Yields:
+            binary file object or path to file
 
         """
         table_file = f"db.{table}.parquet"
@@ -934,18 +977,43 @@ class _Dataset:
             )
             if file is not None:
                 with file:
-                    rows, preview = utils.parquet_preview(file, preview_rows)
-        if file is None:
-            # Download table to audb cache
-            stream = audb.stream(
-                self.name,
-                table,
-                version=self.version,
-                only_metadata=True,
-                full_path=False,
-                verbose=False,
-            )
-            file = os.path.join(stream.root, table_file)
+                    yield file
+                return
+        # Download table to audb cache
+        stream = audb.stream(
+            self.name,
+            table,
+            version=self.version,
+            only_metadata=True,
+            full_path=False,
+            verbose=False,
+        )
+        yield os.path.join(stream.root, table_file)
+
+    def _parquet_table_preview(
+        self,
+        db: audformat.Database,
+        table: str,
+        preview_rows: int,
+    ) -> tuple[int, pd.DataFrame]:
+        r"""Number of rows and preview of a table stored as PARQUET file.
+
+        Only the footer
+        and the first pages of the PARQUET file
+        are read,
+        see :meth:`_open_parquet_table`.
+
+        Args:
+            db: database header without loaded tables
+            table: table ID
+            preview_rows: number of rows of the preview
+
+        Returns:
+            number of rows of table,
+            and dataframe holding the first ``preview_rows`` rows
+
+        """
+        with self._open_parquet_table(table) as file:
             rows, preview = utils.parquet_preview(file, preview_rows)
         # Store preview as PARQUET file
         # and load it with audformat,
