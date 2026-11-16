@@ -8,6 +8,7 @@ import pytest
 import audb
 import audeer
 import audformat
+import audiofile
 
 import audbcards
 
@@ -636,6 +637,84 @@ def test_dataset_scheme_summary(tmpdir, repository, audb_cache):
 
     ds = audbcards.Dataset(name, version)
     assert ds.schemes_summary == "speaker"
+
+
+@pytest.mark.parametrize(
+    "storage_format",
+    [
+        audformat.define.TableStorageFormat.CSV,
+        audformat.define.TableStorageFormat.PARQUET,
+    ],
+)
+def test_dataset_tables_stats(tmpdir, repository, storage_format):
+    r"""Test table statistics and preview.
+
+    Tables stored as PARQUET files
+    are not loaded completely into memory
+    to gather the number of rows
+    and the table preview.
+    This test ensures that the results
+    are identical to loading the complete tables.
+
+    """
+    name = f"tables-stats-{storage_format}"
+    db_path = audeer.mkdir(tmpdir, name)
+    db = audformat.Database(name=name)
+
+    # Misc table, used as scheme labels
+    speakers = ["s0", "s1", "s2"]
+    db.schemes["age"] = audformat.Scheme("int", minimum=0)
+    db["speaker"] = audformat.MiscTable(
+        pd.Index(speakers, dtype="string", name="speaker")
+    )
+    db["speaker"]["age"] = audformat.Column(scheme_id="age")
+    db["speaker"]["age"].set([20, 31, 42])
+    db.schemes["speaker"] = audformat.Scheme("str", labels="speaker")
+
+    # Filewise table with more rows than shown in the preview
+    files = [f"f{n:02d}.wav" for n in range(12)]
+    db["files"] = audformat.Table(audformat.filewise_index(files))
+    db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
+    db["files"]["speaker"].set([speakers[n % 3] for n in range(12)])
+    db["files"]["text"] = audformat.Column()
+    db["files"]["text"].set([f"text {n}" for n in range(12)])
+
+    # Segmented table
+    db["segments"] = audformat.Table(
+        audformat.segmented_index(
+            files=files[:6],
+            starts=[0, 0.1, 0.2, 0, 0.1, 0.2],
+            ends=[0.1, 0.2, 0.3, 0.1, 0.2, 0.3],
+        )
+    )
+    db["segments"]["value"] = audformat.Column()
+    db["segments"]["value"].set([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+
+    # Empty table
+    db["empty"] = audformat.Table(audformat.filewise_index())
+    db["empty"]["value"] = audformat.Column()
+
+    for file in files:
+        signal = np.zeros((1, 2000))
+        audiofile.write(audeer.path(db_path, file), signal, 8000)
+    db.save(db_path, storage_format=storage_format)
+    audb.publish(db_path, pytest.VERSION, repository)
+
+    ds = audbcards.Dataset(
+        name,
+        pytest.VERSION,
+        cache_root=audeer.mkdir(tmpdir, "cache"),
+    )
+    for table in ["speaker", "files", "segments", "empty"]:
+        df = audb.load_table(name, table, version=pytest.VERSION, verbose=False)
+        stats = ds._tables_stats[table]
+        assert stats["rows"] == len(df)
+        assert stats["columns"] == len(df.columns)
+        pd.testing.assert_frame_equal(stats["preview"], df.head(5))
+    assert ds.tables_rows == {"speaker": 3, "files": 12, "segments": 6, "empty": 0}
+
+    # Header still holds complete misc table
+    assert list(ds.header["speaker"].index) == speakers
 
 
 class TestDatasetLoadTables:

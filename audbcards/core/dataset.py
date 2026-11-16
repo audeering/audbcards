@@ -5,10 +5,13 @@ import os
 import pickle
 import random
 import re
+import tempfile
 
 import jinja2
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 import audb
 import audbackend
@@ -843,6 +846,15 @@ class _Dataset:
         It significantly improves performance
         when accessing multiple table properties frequently.
 
+        Tables stored as PARQUET files
+        are not loaded completely into memory,
+        as they might be too large.
+        Instead,
+        the number of rows is read from the file metadata,
+        and only the first rows are read for the preview.
+        Tables stored as CSV files
+        are loaded completely.
+
         Returns:
             A dictionary with table names as keys and dictionaries containing:
             - "columns": number of columns
@@ -850,20 +862,90 @@ class _Dataset:
             - "preview": dataframe preview (first 5 rows)
 
         """
+        preview_rows = 5
         stats = {}
+        # Header without loaded tables,
+        # used to convert the preview of PARQUET tables
+        # to a dataframe.
+        # We cannot use `self.header` here,
+        # as it holds already loaded misc tables,
+        # which would be replaced by their preview.
+        db = None
         for table in list(self.header):
-            df = audb.load_table(
-                self.name,
-                table,
-                version=self.version,
-                verbose=False,
-            )
+            if f"db.{table}.parquet" in self.deps.tables:
+                if db is None:
+                    db = audb.info.header(
+                        self.name,
+                        version=self.version,
+                        load_tables=False,
+                    )
+                rows, df = self._parquet_table_preview(db, table, preview_rows)
+            else:
+                df = audb.load_table(
+                    self.name,
+                    table,
+                    version=self.version,
+                    verbose=False,
+                )
+                rows = len(df)
+                df = df.head(preview_rows)
             stats[table] = {
                 "columns": len(df.columns),
-                "rows": len(df),
-                "preview": df.head(5),
+                "rows": rows,
+                "preview": df,
             }
         return stats
+
+    def _parquet_table_preview(
+        self,
+        db: audformat.Database,
+        table: str,
+        preview_rows: int,
+    ) -> tuple[int, pd.DataFrame]:
+        r"""Number of rows and preview of a table stored as PARQUET file.
+
+        The PARQUET file of the table is downloaded
+        to a temporary folder,
+        but only its first rows are loaded into memory.
+
+        Args:
+            db: database header without loaded tables
+            table: table ID
+            preview_rows: number of rows of the preview
+
+        Returns:
+            number of rows of table,
+            and dataframe holding the first ``preview_rows`` rows
+
+        """
+        table_file = f"db.{table}.parquet"
+        remote_file = self.backend.join("/", self.name, "meta", f"{table}.parquet")
+        with tempfile.TemporaryDirectory() as tmp_root:
+            full_file = os.path.join(tmp_root, "full", table_file)
+            audeer.mkdir(os.path.dirname(full_file))
+            with self.backend.backend:
+                self.backend.get_file(
+                    remote_file,
+                    full_file,
+                    self.deps.version(table_file),
+                )
+            parquet_file = pq.ParquetFile(full_file)
+            rows = parquet_file.metadata.num_rows
+            schema = parquet_file.schema_arrow
+            batch = next(parquet_file.iter_batches(batch_size=preview_rows), None)
+            if batch is None:
+                preview = schema.empty_table()
+            else:
+                preview = pa.Table.from_batches([batch], schema=schema)
+            parquet_file.close()
+            # Store preview as PARQUET file
+            # and load it with audformat,
+            # to ensure the dataframe has the correct index and dtypes
+            preview_file = os.path.join(tmp_root, f"db.{table}")
+            pq.write_table(preview, f"{preview_file}.parquet")
+            db[table].load(preview_file)
+            df = db[table].df.head(preview_rows)
+        return rows, df
 
     @staticmethod
     def _map_iso_languages(languages: list[str]) -> list[str]:
