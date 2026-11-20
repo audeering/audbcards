@@ -279,11 +279,29 @@ class _Dataset:
 
     @staticmethod
     def _save_pickled(obj, path: str):
-        """Save object instance to path as pickle."""
-        audeer.mkdir(os.path.dirname(path))
+        """Save object instance to path as pickle.
 
-        with open(path, "wb") as f:
-            pickle.dump(obj, f, protocol=4)
+        The object is first written to a temporary file,
+        which then replaces ``path`` atomically.
+        This ensures ``path`` never contains a truncated pickle,
+        if the process is interrupted while writing,
+        or several processes write the same cache file.
+
+        """
+        audeer.mkdir(os.path.dirname(path))
+        # Use unique name in same folder,
+        # as `os.replace()` is only atomic on the same file system.
+        # `tempfile.mkstemp()` is not used,
+        # as it would restrict file permissions to the current user
+        tmp_path = f"{path}.{os.getpid()}.{audeer.uid()[:8]}.tmp"
+        try:
+            with open(tmp_path, "xb") as f:
+                pickle.dump(obj, f, protocol=4)
+            os.replace(tmp_path, path)
+        except BaseException:
+            with contextlib.suppress(FileNotFoundError):
+                os.remove(tmp_path)
+            raise
 
     @property
     def backend(self) -> type[audbackend.interface.Base]:

@@ -726,6 +726,51 @@ def test_dataset_cache_root_loaded(tmpdir, medium_db):
     assert os.path.getmtime(cache_file) == mtime
 
 
+def test_dataset_save_pickled_atomic(tmpdir, monkeypatch):
+    """Test cache file is not corrupted by interrupted write.
+
+    If writing the cache file fails,
+    an existing cache file should stay unchanged,
+    and no temporary file should be left behind.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+
+    """
+    save_pickled = audbcards.core.dataset._Dataset._save_pickled
+    cache_dir = audeer.mkdir(tmpdir, "cache")
+    cache_file = audeer.path(cache_dir, "db.pkl")
+
+    # Write valid cache file
+    save_pickled({"a": 1}, cache_file)
+    with open(cache_file, "rb") as fp:
+        assert pickle.load(fp) == {"a": 1}
+
+    # Simulate interrupted write,
+    # that has already written part of the pickle
+    def interrupted_dump(obj, f, protocol=None):
+        f.write(b"\x80\x04incomplete")
+        raise KeyboardInterrupt()
+
+    with monkeypatch.context() as m:
+        m.setattr(pickle, "dump", interrupted_dump)
+        with pytest.raises(KeyboardInterrupt):
+            save_pickled({"a": 2}, cache_file)
+
+    # Existing cache file is unchanged
+    with open(cache_file, "rb") as fp:
+        assert pickle.load(fp) == {"a": 1}
+    # No temporary files are left
+    assert audeer.list_file_names(cache_dir, basenames=True) == ["db.pkl"]
+
+    # Overwrite cache file
+    save_pickled({"a": 3}, cache_file)
+    with open(cache_file, "rb") as fp:
+        assert pickle.load(fp) == {"a": 3}
+    assert audeer.list_file_names(cache_dir, basenames=True) == ["db.pkl"]
+
+
 @pytest.mark.parametrize(
     "text, expected",
     [
