@@ -289,8 +289,13 @@ class Datacard(object):
                 # Load media file into a temporary audb cache,
                 # as audb extracts all files
                 # stored in the same archive as the media file,
-                # which might require a lot of disk space
-                with tempfile.TemporaryDirectory() as audb_cache_root:
+                # which might require a lot of disk space.
+                # The temporary folder is created inside the audbcards cache,
+                # as the system temp folder might not provide enough space
+                with tempfile.TemporaryDirectory(
+                    prefix=".tmp-",
+                    dir=self.cache_root,
+                ) as audb_cache_root:
                     media = audb.load_media(
                         self.dataset.name,
                         self.dataset.example_media,
