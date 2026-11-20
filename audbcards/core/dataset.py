@@ -1030,6 +1030,7 @@ class _Dataset:
             for index in indices
             for chunk in index[file_column].chunks
         ]
+        files = None
         if len(dictionaries) > 0:
             files = pc.unique(pa.concat_arrays(dictionaries))
         codes, starts, ends = [], [], []
@@ -1039,7 +1040,7 @@ class _Dataset:
                 codes.append(pc.take(mapping, chunk.indices).to_numpy())
             starts.append(self._duration_to_int(index[start_column]))
             ends.append(self._duration_to_int(index[end_column]))
-        del indices
+        del indices, dictionaries, files
         codes = np.concatenate(codes or [np.array([], dtype=np.int32)])
         starts = np.concatenate(starts or [np.array([], dtype=np.int64)])
         ends = np.concatenate(ends or [np.array([], dtype=np.int64)])
