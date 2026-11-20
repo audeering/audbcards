@@ -954,7 +954,9 @@ class _Dataset:
     ) -> typing.Iterator[str | typing.BinaryIO]:
         r"""Open PARQUET file of table for random access reading.
 
-        For MinIO/S3 and file-system backends
+        For backends supporting
+        :meth:`audbackend.interface.Versioned.open_file`,
+        e.g. MinIO/S3 and file-system backends,
         the file is accessed directly on the backend,
         without downloading it.
         For other backends,
@@ -968,17 +970,22 @@ class _Dataset:
 
         """
         table_file = f"db.{table}.parquet"
-        remote_file = self.backend.join("/", self.name, "meta", f"{table}.parquet")
-        with self.backend.backend:
-            file = utils.open_backend_file(
-                self.backend,
-                remote_file,
-                self.deps.version(table_file),
-            )
-            if file is not None:
-                with file:
-                    yield file
-                return
+        if isinstance(self.backend, audbackend.interface.Versioned):
+            remote_file = self.backend.join("/", self.name, "meta", f"{table}.parquet")
+            with self.backend.backend:
+                try:
+                    file = self.backend.open_file(
+                        remote_file,
+                        self.deps.version(table_file),
+                    )
+                except audbackend.BackendError as ex:
+                    # Backend does not support random access to files
+                    if not isinstance(ex.exception, NotImplementedError):
+                        raise
+                else:
+                    with file:
+                        yield file
+                    return
         # Download table to audb cache
         stream = audb.stream(
             self.name,

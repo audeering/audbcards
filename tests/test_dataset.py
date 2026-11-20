@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 import audb
+import audbackend
 import audeer
 import audformat
 import audiofile
@@ -670,11 +671,11 @@ def test_dataset_tables_stats(
 
     """
     if not random_access:
-        monkeypatch.setattr(
-            audbcards.core.utils,
-            "open_backend_file",
-            lambda *args: None,
-        )
+
+        def open_file(*args, **kwargs):
+            raise audbackend.BackendError(NotImplementedError())
+
+        monkeypatch.setattr(audbackend.interface.Versioned, "open_file", open_file)
     name = f"tables-stats-{storage_format}-{random_access}"
     db_path = audeer.mkdir(tmpdir, name)
     db = audformat.Database(name=name)
