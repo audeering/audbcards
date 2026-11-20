@@ -101,6 +101,11 @@ class _Dataset:
                         getattr(obj, cached_property)
             if cache_again:
                 cls._save_pickled(obj, dataset_cache_filename)
+            # Cache root is not stored in the cache file,
+            # as the cache folder might have been moved.
+            # It is set after checking for `cache_again`,
+            # as `__getstate__()` excludes it
+            obj.cache_root = audeer.mkdir(cache_root)
             obj._release_memory()
             return obj
 

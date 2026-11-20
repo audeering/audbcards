@@ -688,6 +688,44 @@ def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first
     assert "segment_durations" not in dataset.__dict__
 
 
+def test_dataset_cache_root_loaded(tmpdir, medium_db):
+    """Test cache root of dataset loaded from cache.
+
+    The cache root is not stored in the cache file,
+    but has to be available
+    when the dataset is loaded from cache.
+    Loading from cache should not rewrite the cache file.
+
+    Args:
+        tmpdir: tmpdir fixture
+        medium_db: medium_db fixture
+
+    """
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = audbcards.core.dataset._Dataset._dataset_cache_path(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+
+    def load_dataset():
+        return audbcards.Dataset(
+            medium_db.name,
+            pytest.VERSION,
+            cache_root=cache_root,
+        )
+
+    # Create dataset and cache file
+    dataset = load_dataset()
+    assert dataset.cache_root == cache_root
+    mtime = os.path.getmtime(cache_file)
+
+    # Load from cache
+    dataset = load_dataset()
+    assert dataset.cache_root == cache_root
+    assert os.path.getmtime(cache_file) == mtime
+
+
 @pytest.mark.parametrize(
     "text, expected",
     [
