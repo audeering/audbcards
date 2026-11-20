@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v0.5.1
+                v1.0.0
               </div>
             
           
@@ -111,6 +111,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-2026-11-20">Version 1.0.0 (2026-11-20)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-5-1-2026-11-13">Version 0.5.1 (2026-11-13)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-5-0-2026-11-13">Version 0.5.0 (2026-11-13)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-6-2026-07-28">Version 0.4.6 (2026-07-28)</a></li>
@@ -172,6 +173,41 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<section id="version-1-0-0-2026-11-20">
+<h2>Version 1.0.0 (2026-11-20)<a class="headerlink" href="#version-1-0-0-2026-11-20" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.file_duration_histogram</span></code>
+holding minimum, maximum,
+and a histogram with 1000 bins
+of the file durations</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.segment_duration_histogram</span></code>
+holding minimum, maximum,
+and a histogram with 1000 bins
+of the segment durations</p></li>
+<li><p>Added: dependency on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=3.1.0</span></code></p></li>
+<li><p>Added: dependency on <code class="docutils literal notranslate"><span class="pre">pyarrow&gt;=13.0.0</span></code></p></li>
+<li><p>Changed: tables stored as PARQUET files
+are no longer downloaded completely
+to get their number of rows,
+their preview,
+and the segments of a dataset</p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">audbcards.Datacard.player()</span></code>
+only caches the required example file
+and not the whole media archive</p></li>
+<li><p>Changed: release memory of data
+no longer needed
+after a dataset is cached
+and after a data card is written
+by the sphinx extension</p></li>
+<li><p>Fixed: store only public cached properties
+in the cache file of a dataset.
+Existing cache files are updated automatically</p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.file_durations</span></code>,
+use <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.file_duration_histogram</span></code> instead</p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.segment_durations</span></code>,
+use <code class="docutils literal notranslate"><span class="pre">audbcards.Dataset.segment_duration_histogram</span></code> instead</p></li>
+</ul>
+</section>
 <section id="version-0-5-1-2026-11-13">
 <h2>Version 0.5.1 (2026-11-13)<a class="headerlink" href="#version-0-5-1-2026-11-13" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -408,7 +444,7 @@ and the <code class="docutils literal notranslate"><span class="pre">audbcards.s
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

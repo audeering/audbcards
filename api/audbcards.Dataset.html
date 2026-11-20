@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v0.5.1
+                v1.0.0
               </div>
             
           
@@ -119,7 +119,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#duration">duration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-json">example_json</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-media">example_media</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#file-durations">file_durations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-duration-histogram">file_duration_histogram</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#files">files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#formats">formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#header">header</a></li>
@@ -137,7 +137,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes-summary">schemes_summary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes-table">schemes_table</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#segment-durations">segment_durations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segment-duration-histogram">segment_duration_histogram</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#segments">segments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#short-description">short_description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#source">source</a></li>
@@ -338,15 +338,29 @@ If no media file meets this criterium,
 </dd></dl>
 
 </section>
-<section id="file-durations">
-<h2>file_durations<a class="headerlink" href="#file-durations" title="Link to this heading">¶</a></h2>
+<section id="file-duration-histogram">
+<h2>file_duration_histogram<a class="headerlink" href="#file-duration-histogram" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="audbcards.Dataset.file_durations">
-<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">file_durations</span></span><a class="headerlink" href="#audbcards.Dataset.file_durations" title="Link to this definition">¶</a></dt>
-<dd><p>File durations in dataset in seconds.</p>
+<dt class="sig sig-object py" id="audbcards.Dataset.file_duration_histogram">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">file_duration_histogram</span></span><a class="headerlink" href="#audbcards.Dataset.file_duration_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum, maximum, and histogram of file durations in seconds.</p>
 <p>Non media files,
 or media files containing 0 samples
-are excluded from this list.</p>
+are excluded.
+The histogram uses 1000 bins,
+spaced linearly between minimum and maximum duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary with the entries
+<code class="docutils literal notranslate"><span class="pre">&quot;min&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;bin_edges&quot;</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">&quot;counts&quot;</span></code>.
+If the dataset contains no media files,
+minimum and maximum are <code class="docutils literal notranslate"><span class="pre">0</span></code>
+and the arrays are empty</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -513,12 +527,27 @@ with column names as keys.</p>
 </dd></dl>
 
 </section>
-<section id="segment-durations">
-<h2>segment_durations<a class="headerlink" href="#segment-durations" title="Link to this heading">¶</a></h2>
+<section id="segment-duration-histogram">
+<h2>segment_duration_histogram<a class="headerlink" href="#segment-duration-histogram" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="audbcards.Dataset.segment_durations">
-<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">segment_durations</span></span><a class="headerlink" href="#audbcards.Dataset.segment_durations" title="Link to this definition">¶</a></dt>
-<dd><p>Segment durations in dataset.</p>
+<dt class="sig sig-object py" id="audbcards.Dataset.segment_duration_histogram">
+<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">segment_duration_histogram</span></span><a class="headerlink" href="#audbcards.Dataset.segment_duration_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Minimum, maximum, and histogram of segment durations in seconds.</p>
+<p>Segments without end are excluded.
+The histogram uses 1000 bins,
+spaced linearly between minimum and maximum duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary with the entries
+<code class="docutils literal notranslate"><span class="pre">&quot;min&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;bin_edges&quot;</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">&quot;counts&quot;</span></code>.
+If the dataset contains no segments,
+minimum and maximum are <code class="docutils literal notranslate"><span class="pre">0</span></code>
+and the arrays are empty</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -685,7 +714,7 @@ and number of rows as values</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

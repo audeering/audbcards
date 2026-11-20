@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v0.5.1
+                v1.0.0
               </div>
             
           
@@ -147,16 +147,22 @@
             
   <h1>Source code for audbcards.core.dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">jinja2</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.compute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.parquet</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pq</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">audb</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
@@ -172,7 +178,7 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Dataset</span><span class="p">:</span>
     <span class="n">_table_related_cached_properties</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"segment_durations"</span><span class="p">,</span>
+        <span class="s2">"segment_duration_histogram"</span><span class="p">,</span>
         <span class="s2">"segments"</span><span class="p">,</span>
         <span class="s2">"tables_columns"</span><span class="p">,</span>
         <span class="s2">"tables_preview"</span><span class="p">,</span>
@@ -225,11 +231,20 @@
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load_pickled</span><span class="p">(</span><span class="n">dataset_cache_filename</span><span class="p">)</span>
+            <span class="c1"># Cache files written by older versions of audbcards</span>
+            <span class="c1"># might contain private attributes,</span>
+            <span class="c1"># like the header or all segments of the dataset,</span>
+            <span class="c1"># which are removed by storing the cache again</span>
+            <span class="n">cache_again</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="c1"># Remove those attributes from the loaded object as well,</span>
+            <span class="c1"># including obsolete properties of older versions,</span>
+            <span class="c1"># e.g. `file_durations`,</span>
+            <span class="c1"># which might require a lot of memory</span>
+            <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
             <span class="c1"># Load cached properties,</span>
             <span class="c1"># that require to load filewise or segmented tables,</span>
             <span class="c1"># if they haven't been cached before.</span>
             <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
-                <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span><span class="p">:</span>
                     <span class="c1"># Check if property has been cached,</span>
                     <span class="c1"># see https://stackoverflow.com/a/59740750</span>
@@ -237,10 +252,14 @@
                         <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="c1"># Request property to fill their cached value</span>
                         <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">cache_again</span><span class="p">:</span>
-                    <span class="c1"># Update cache to store the table related cached properties</span>
-                    <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
-
+            <span class="k">if</span> <span class="n">cache_again</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
+            <span class="c1"># Cache root is not stored in the cache file,</span>
+            <span class="c1"># as the cache folder might have been moved.</span>
+            <span class="c1"># It is set after checking for `cache_again`,</span>
+            <span class="c1"># as `__getstate__()` excludes it</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">_release_memory</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">obj</span>
 
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">load_tables</span><span class="p">)</span>
@@ -252,6 +271,7 @@
         <span class="n">obj</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_release_memory</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -263,19 +283,6 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
-
-        <span class="c1"># Define `__getstate__()` method,</span>
-        <span class="c1"># which selects the cached attributes</span>
-        <span class="c1"># to include in the pickled cache file</span>
-        <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
-            <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">exclude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="nf">getstate</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span> <span class="o">=</span> <span class="n">getstate</span>
 
         <span class="c1"># Store name and version in private attributes here,</span>
         <span class="c1"># ``self.name`` and ``self.version``</span>
@@ -300,6 +307,84 @@
         <span class="n">other_versions</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">versions</span> <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="n">version</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">other_version</span> <span class="ow">in</span> <span class="n">other_versions</span><span class="p">:</span>
             <span class="n">audeer</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">other_version</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Select attributes stored in the pickled cache file.</span>
+
+<span class="sd">        Only public cached properties,</span>
+<span class="sd">        that have already been computed,</span>
+<span class="sd">        are stored.</span>
+<span class="sd">        Private attributes,</span>
+<span class="sd">        like the header,</span>
+<span class="sd">        the dependency table,</span>
+<span class="sd">        or the backend,</span>
+<span class="sd">        are not stored,</span>
+<span class="sd">        as they might require a lot of memory.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary with property name and value</span>
+
+<span class="sd">        """</span>
+        <span class="n">public_cached_properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_property_names</span><span class="p">(</span><span class="n">private</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">public_cached_properties</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cached_property_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">private</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Names of public or private cached properties.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            private: if ``True``,</span>
+<span class="sd">                return names of private cached properties,</span>
+<span class="sd">                otherwise of public ones</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            names of cached properties</span>
+
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">cached_property</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="o">==</span> <span class="n">private</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_release_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cached_properties</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">()):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Release memory of attributes not needed after caching.</span>
+
+<span class="sd">        Removes header,</span>
+<span class="sd">        dependency table,</span>
+<span class="sd">        backend,</span>
+<span class="sd">        and all private cached properties</span>
+<span class="sd">        from the object.</span>
+<span class="sd">        They are loaded or computed again</span>
+<span class="sd">        when accessed.</span>
+<span class="sd">        The repository object is kept,</span>
+<span class="sd">        as it requires only little memory,</span>
+<span class="sd">        and ensures the backend is loaded again</span>
+<span class="sd">        from the same repository,</span>
+<span class="sd">        even if :attr:`audb.config.REPOSITORIES`</span>
+<span class="sd">        has changed in the meantime.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cached_properties: public cached properties</span>
+<span class="sd">                that should be removed as well,</span>
+<span class="sd">                e.g. ``"tables_preview"``,</span>
+<span class="sd">                that are not needed anymore</span>
+
+<span class="sd">        """</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"_backend"</span><span class="p">,</span>
+            <span class="s2">"_deps"</span><span class="p">,</span>
+            <span class="s2">"_header"</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">attributes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_property_names</span><span class="p">(</span><span class="n">private</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cached_properties</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_cache_path</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -350,11 +435,29 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Save object instance to path as pickle."""</span>
-        <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+<span class="w">        </span><span class="sd">"""Save object instance to path as pickle.</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="sd">        The object is first written to a temporary file,</span>
+<span class="sd">        which then replaces ``path`` atomically.</span>
+<span class="sd">        This ensures ``path`` never contains a truncated pickle,</span>
+<span class="sd">        if the process is interrupted while writing,</span>
+<span class="sd">        or several processes write the same cache file.</span>
+
+<span class="sd">        """</span>
+        <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="c1"># Use unique name in same folder,</span>
+        <span class="c1"># as `os.replace()` is only atomic on the same file system.</span>
+        <span class="c1"># `tempfile.mkstemp()` is not used,</span>
+        <span class="c1"># as it would restrict file permissions to the current user</span>
+        <span class="n">tmp_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">audeer</span><span class="o">.</span><span class="n">uid</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.tmp"</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s2">"xb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+            <span class="k">raise</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
@@ -513,15 +616,32 @@
         <span class="p">]</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">file_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">"""File durations in dataset in seconds.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file_duration_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Minimum, maximum, and histogram of file durations in seconds.</span>
 
 <span class="sd">        Non media files,</span>
 <span class="sd">        or media files containing 0 samples</span>
-<span class="sd">        are excluded from this list.</span>
+<span class="sd">        are excluded.</span>
+<span class="sd">        The histogram uses 1000 bins,</span>
+<span class="sd">        spaced linearly between minimum and maximum duration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary with the entries</span>
+<span class="sd">            ``"min"``,</span>
+<span class="sd">            ``"max"``,</span>
+<span class="sd">            ``"bin_edges"``,</span>
+<span class="sd">            and ``"counts"``.</span>
+<span class="sd">            If the dataset contains no media files,</span>
+<span class="sd">            minimum and maximum are ``0``</span>
+<span class="sd">            and the arrays are empty</span>
 
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">dur</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_with_durations</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">dur</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_with_durations</span><span class="p">),</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">formats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -655,20 +775,43 @@
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Number of segments in dataset."""</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">num_rows</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">"""Segment durations in dataset."""</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"start"</span><span class="p">)</span>
-            <span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s2">"end"</span><span class="p">)</span>
-            <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
-            <span class="p">]</span>
-        <span class="k">return</span> <span class="n">durations</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_duration_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Minimum, maximum, and histogram of segment durations in seconds.</span>
+
+<span class="sd">        Segments without end are excluded.</span>
+<span class="sd">        The histogram uses 1000 bins,</span>
+<span class="sd">        spaced linearly between minimum and maximum duration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dictionary with the entries</span>
+<span class="sd">            ``"min"``,</span>
+<span class="sd">            ``"max"``,</span>
+<span class="sd">            ``"bin_edges"``,</span>
+<span class="sd">            and ``"counts"``.</span>
+<span class="sd">            If the dataset contains no segments,</span>
+<span class="sd">            minimum and maximum are ``0``</span>
+<span class="sd">            and the arrays are empty</span>
+
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segment_durations</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_segment_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Segment durations in seconds.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array of segment durations,</span>
+<span class="sd">            ``NaN`` for segments without end</span>
+
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="s2">"end"</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="s2">"start"</span><span class="p">])</span>
+        <span class="n">seconds</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">durations</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">int64</span><span class="p">()),</span> <span class="mf">1e9</span><span class="p">)</span>
+        <span class="c1"># Segments without end result in NaN</span>
+        <span class="k">return</span> <span class="n">seconds</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">zero_copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">short_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -855,6 +998,10 @@
         <span class="c1"># Ensure misc tables are loaded</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">load_tables</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_header_without_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Load header without loading misc tables."""</span>
+        <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">load_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_repository_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Load repository object containing dataset."""</span>
         <span class="k">return</span> <span class="n">audb</span><span class="o">.</span><span class="n">repository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
@@ -966,19 +1113,68 @@
         <span class="k">return</span> <span class="n">data_dict</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Segments of dataset as combined index."""</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">segmented_index</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Unique segments of all segmented tables of dataset.</span>
+
+<span class="sd">        For tables stored as PARQUET files,</span>
+<span class="sd">        only the index columns are read,</span>
+<span class="sd">        and the tables are not downloaded</span>
+<span class="sd">        for MinIO/S3 and file-system backends.</span>
+<span class="sd">        Tables stored as CSV files</span>
+<span class="sd">        are loaded completely.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            table with columns ``"file"``, ``"start"``, ``"end"``,</span>
+<span class="sd">            holding every segment once,</span>
+<span class="sd">            in order of first occurrence</span>
+
+<span class="sd">        """</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
+            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">START</span><span class="p">,</span>
+            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">END</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
+                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">START</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
+                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">empty_table</span><span class="p">()]</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_parquet_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">parquet_file</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">parquet_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">index_columns</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">table</span><span class="p">,</span>
                     <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
                     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">index</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">index</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                    <span class="n">preserve_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">schema</span><span class="p">))</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">concat_tables</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span>
+        <span class="c1"># Remove duplicates,</span>
+        <span class="c1"># and keep order of first occurrence</span>
+        <span class="c1"># by sorting by the first position of each segment</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">append_column</span><span class="p">(</span>
+            <span class="s2">"position"</span><span class="p">,</span>
+            <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"int64"</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">segments</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">aggregate</span><span class="p">([(</span><span class="s2">"position"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">)])</span>
+            <span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s2">"position_min"</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">segments</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_tables_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
@@ -991,6 +1187,17 @@
 <span class="sd">        It significantly improves performance</span>
 <span class="sd">        when accessing multiple table properties frequently.</span>
 
+<span class="sd">        Tables stored as PARQUET files</span>
+<span class="sd">        are not loaded completely into memory,</span>
+<span class="sd">        and are not downloaded</span>
+<span class="sd">        for MinIO/S3 and file-system backends,</span>
+<span class="sd">        as they might be too large.</span>
+<span class="sd">        Instead,</span>
+<span class="sd">        the number of rows is read from the file metadata,</span>
+<span class="sd">        and only the first rows are read for the preview.</span>
+<span class="sd">        Tables stored as CSV files</span>
+<span class="sd">        are loaded completely.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary with table names as keys and dictionaries containing:</span>
 <span class="sd">            - "columns": number of columns</span>
@@ -998,20 +1205,128 @@
 <span class="sd">            - "preview": dataframe preview (first 5 rows)</span>
 
 <span class="sd">        """</span>
+        <span class="n">preview_rows</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Header without loaded tables,</span>
+        <span class="c1"># used to convert the preview of PARQUET tables</span>
+        <span class="c1"># to a dataframe.</span>
+        <span class="c1"># We cannot use `self.header` here,</span>
+        <span class="c1"># as it holds already loaded misc tables,</span>
+        <span class="c1"># which would be replaced by their preview.</span>
+        <span class="c1"># For the same reason,</span>
+        <span class="c1"># the previews of misc tables are loaded into their own header,</span>
+        <span class="c1"># as other tables might use them as scheme labels,</span>
+        <span class="c1"># and replacing them by their preview</span>
+        <span class="c1"># would set all labels not contained in the preview to NaN.</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">):</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">table</span><span class="p">,</span>
-                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">misc_tables</span><span class="p">:</span>
+                    <span class="n">table_db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header_without_tables</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header_without_tables</span><span class="p">()</span>
+                    <span class="n">table_db</span> <span class="o">=</span> <span class="n">db</span>
+                <span class="n">rows</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parquet_table_preview</span><span class="p">(</span><span class="n">table_db</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">preview_rows</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">table</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">preview_rows</span><span class="p">)</span>
             <span class="n">stats</span><span class="p">[</span><span class="n">table</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">"columns"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
-                <span class="s2">"rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
-                <span class="s2">"preview"</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+                <span class="s2">"rows"</span><span class="p">:</span> <span class="n">rows</span><span class="p">,</span>
+                <span class="s2">"preview"</span><span class="p">:</span> <span class="n">df</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="n">stats</span>
+
+    <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_open_parquet_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">typing</span><span class="o">.</span><span class="n">BinaryIO</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Open PARQUET file of table for random access reading.</span>
+
+<span class="sd">        For backends supporting</span>
+<span class="sd">        :meth:`audbackend.interface.Versioned.open_file`,</span>
+<span class="sd">        e.g. MinIO/S3 and file-system backends,</span>
+<span class="sd">        the file is accessed directly on the backend,</span>
+<span class="sd">        without downloading it.</span>
+<span class="sd">        For other backends,</span>
+<span class="sd">        the PARQUET file is downloaded to the audb cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            table: table ID</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            binary file object or path to file</span>
+
+<span class="sd">        """</span>
+        <span class="n">table_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Versioned</span><span class="p">):</span>
+            <span class="n">remote_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span>
+                        <span class="n">remote_file</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">table_file</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">BackendError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="c1"># Backend does not support random access to files</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">exception</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                        <span class="k">raise</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">file</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">file</span>
+                    <span class="k">return</span>
+        <span class="c1"># Download table to audb cache</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">table</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+            <span class="n">only_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">table_file</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parquet_table_preview</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">db</span><span class="p">:</span> <span class="n">audformat</span><span class="o">.</span><span class="n">Database</span><span class="p">,</span>
+        <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">preview_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Number of rows and preview of a table stored as PARQUET file.</span>
+
+<span class="sd">        Only the footer</span>
+<span class="sd">        and the first pages of the PARQUET file</span>
+<span class="sd">        are read,</span>
+<span class="sd">        see :meth:`_open_parquet_table`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db: database header without loaded tables</span>
+<span class="sd">            table: table ID</span>
+<span class="sd">            preview_rows: number of rows of the preview</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            number of rows of table,</span>
+<span class="sd">            and dataframe holding the first ``preview_rows`` rows</span>
+
+<span class="sd">        """</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_parquet_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">rows</span><span class="p">,</span> <span class="n">preview</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">parquet_preview</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">preview_rows</span><span class="p">)</span>
+        <span class="c1"># Store preview as PARQUET file</span>
+        <span class="c1"># and load it with audformat,</span>
+        <span class="c1"># to ensure the dataframe has the correct index and dtypes</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_root</span><span class="p">:</span>
+            <span class="n">preview_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">pq</span><span class="o">.</span><span class="n">write_table</span><span class="p">(</span><span class="n">preview</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">preview_file</span><span class="si">}</span><span class="s2">.parquet"</span><span class="p">)</span>
+            <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">preview_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rows</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">df</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_map_iso_languages</span><span class="p">(</span><span class="n">languages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1219,7 +1534,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

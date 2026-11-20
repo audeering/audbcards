@@ -19,7 +19,7 @@ sampling rate 16000
 bit depth     16
 duration      0 days 04:01:39.517937500
 files         93, duration distribution: 54.9 s |cmu-mosi-1.1.1-file-duration-distribution| 180.1 s
-segments      185263, duration distribution: nan s |cmu-mosi-1.1.1-segment-duration-distribution| nan s
+segments      185263, duration distribution: 0.0 s |cmu-mosi-1.1.1-segment-duration-distribution| 38.8 s
 repository    audb-public
 ============= ======================
 

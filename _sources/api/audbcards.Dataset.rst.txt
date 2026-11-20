@@ -50,9 +50,9 @@ example\_media
 --------------
 .. autoattribute:: Dataset.example_media
     
-file\_durations
----------------
-.. autoattribute:: Dataset.file_durations
+file\_duration\_histogram
+-------------------------
+.. autoattribute:: Dataset.file_duration_histogram
     
 files
 -----
@@ -122,9 +122,9 @@ schemes\_table
 --------------
 .. autoattribute:: Dataset.schemes_table
     
-segment\_durations
-------------------
-.. autoattribute:: Dataset.segment_durations
+segment\_duration\_histogram
+----------------------------
+.. autoattribute:: Dataset.segment_duration_histogram
     
 segments
 --------
