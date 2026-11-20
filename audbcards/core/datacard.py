@@ -3,6 +3,7 @@ import functools
 import json
 import os
 import shutil
+import tempfile
 import textwrap
 import warnings
 
@@ -19,6 +20,10 @@ import audplot
 from audbcards.core.config import config
 from audbcards.core.dataset import Dataset
 from audbcards.core.utils import set_plot_margins
+
+
+# Prefix of temporary folders created inside the audbcards cache
+TMP_DIR_PREFIX = ".tmp-"
 
 
 class Datacard(object):
@@ -284,15 +289,46 @@ class Datacard(object):
                 f"{self.dataset.name}-{self.dataset.version}-player-media",
                 self.dataset.example_media,
             )
-            if not os.path.exists(cache_example_media):
+            if os.path.exists(cache_example_media):
+                return cache_example_media
+
+            audeer.mkdir(os.path.dirname(cache_example_media))
+
+            # Reuse media file from the configured audb caches,
+            # if it is already stored there.
+            # As audb, we look into the shared cache first.
+            flavor_path = audb.Flavor().path(
+                self.dataset.name,
+                self.dataset.version,
+            )
+            for shared in [True, False]:
+                audb_cache_media = os.path.join(
+                    audb.default_cache_root(shared=shared),
+                    flavor_path,
+                    self.dataset.example_media,
+                )
+                if os.path.exists(audb_cache_media):
+                    _copy_atomic(audb_cache_media, cache_example_media)
+                    return cache_example_media
+
+            # Otherwise, load media file into a temporary audb cache,
+            # as audb extracts all files
+            # stored in the same archive as the media file,
+            # which might require a lot of disk space.
+            # The temporary folder is created inside the audbcards cache,
+            # as the system temp folder might not provide enough space
+            with tempfile.TemporaryDirectory(
+                prefix=TMP_DIR_PREFIX,
+                dir=self.cache_root,
+            ) as audb_cache_root:
                 media = audb.load_media(
                     self.dataset.name,
                     self.dataset.example_media,
                     version=self.dataset.version,
+                    cache_root=audb_cache_root,
                     verbose=False,
                 )[0]
-                audeer.mkdir(os.path.dirname(cache_example_media))
-                shutil.copy(media, cache_example_media)
+                _copy_atomic(media, cache_example_media)
             return cache_example_media
 
         def plot_waveform_to_cache(cache_example_media: str) -> str:
@@ -629,3 +665,68 @@ class Datacard(object):
             content = self.rst_preamble + "\n" + content
 
         return content
+
+
+def _copy_atomic(src: str, dst: str):
+    r"""Copy file atomically.
+
+    The file is first copied
+    to a temporary file
+    in the folder of the destination,
+    and then renamed to the destination.
+    This ensures the destination
+    is never a partially written file,
+    e.g. if the copy is interrupted.
+
+    Args:
+        src: source file
+        dst: destination file
+
+    """
+    fd, tmp_file = tempfile.mkstemp(
+        prefix=TMP_DIR_PREFIX,
+        dir=os.path.dirname(dst),
+    )
+    os.close(fd)
+    try:
+        shutil.copy(src, tmp_file)
+        os.replace(tmp_file, dst)
+    except BaseException:
+        if os.path.exists(tmp_file):
+            os.remove(tmp_file)
+        raise
+
+
+def remove_tmp_dirs(cache_root: str | None = None):
+    r"""Remove temporary folders from the audbcards cache.
+
+    :meth:`audbcards.Datacard.player`
+    loads media files into temporary folders
+    inside the audbcards cache.
+    If a build is interrupted,
+    those folders are not removed
+    and might contain large extracted archives.
+    This removes all temporary folders
+    in the root of the audbcards cache.
+    It should not be called
+    while another build
+    uses the same cache.
+
+    Args:
+        cache_root: cache folder.
+            If ``None``,
+            the environmental variable ``AUDBCARDS_CACHE_ROOT``,
+            or :attr:`audbcards.config.CACHE_ROOT`
+            is used
+
+    """
+    if cache_root is None:
+        cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
+    cache_root = audeer.path(cache_root)
+    if not os.path.isdir(cache_root):
+        return
+    for entry in os.scandir(cache_root):
+        if entry.name.startswith(TMP_DIR_PREFIX) and entry.is_dir(
+            follow_symlinks=False
+        ):
+            shutil.rmtree(entry.path, ignore_errors=True)

@@ -303,17 +303,25 @@ def test_datacard_file_duration_distribution(
         "medium_db",
     ],
 )
-def test_datacard_player(tmpdir, db, cache, request):
+def test_datacard_player(tmpdir, db, cache, request, monkeypatch):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
     the example audio file is copied to the build folder,
-    and the expected RST string
-    to include the player is returned.
+    the expected RST string
+    to include the player is returned,
+    and the example media file is not stored in the audb cache.
 
     """
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+
+    # Use empty audb caches,
+    # to ensure the player does not store media files in them
+    audb_cache = audeer.mkdir(tmpdir, "audb-cache")
+    audb_shared_cache = audeer.mkdir(tmpdir, "audb-shared-cache")
+    monkeypatch.setattr(audb.config, "CACHE_ROOT", audb_cache)
+    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_shared_cache)
 
     datacard_path = audeer.mkdir(tmpdir, "datasets")
     datacard = audbcards.Datacard(dataset, path=datacard_path, cache_root=cache)
@@ -382,6 +390,10 @@ def test_datacard_player(tmpdir, db, cache, request):
     assert os.path.exists(image_file)
     assert expected_player_str == player_str
 
+    # Example media is not stored in audb caches
+    assert audeer.list_file_names(audb_cache, recursive=True) == []
+    assert audeer.list_file_names(audb_shared_cache, recursive=True) == []
+
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
         media_file,
@@ -398,6 +410,124 @@ def test_datacard_player(tmpdir, db, cache, request):
     # Check if generated images are exactly the same (pixel-wise)
     waveform = open(image_file, "rb").read()
     assert waveform == expected_waveform
+
+
+@pytest.mark.parametrize("db", ["medium_db"])
+@pytest.mark.parametrize("shared", [False, True])
+def test_datacard_player_from_audb_cache(
+    tmpdir,
+    db,
+    shared,
+    cache,
+    request,
+    monkeypatch,
+):
+    r"""Test Datacard.player reuses media from the audb cache.
+
+    If the example media file is already stored
+    in the configured (shared) audb cache,
+    it should be copied from there,
+    without loading it with audb again.
+
+    """
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    example_media = dataset.example_media
+
+    # Store example media in dedicated audb cache
+    audb_cache = audeer.mkdir(tmpdir, "audb-cache")
+    audb_shared_cache = audeer.mkdir(tmpdir, "audb-shared-cache")
+    monkeypatch.setattr(audb.config, "CACHE_ROOT", audb_cache)
+    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_shared_cache)
+    audb.load_media(
+        db.name,
+        example_media,
+        version=pytest.VERSION,
+        cache_root=audb_shared_cache if shared else audb_cache,
+        verbose=False,
+    )
+
+    # Fail if media is loaded with audb,
+    # e.g. simulating an unavailable backend
+    def load_media(*args, **kwargs):
+        raise RuntimeError("audb.load_media() should not be called")
+
+    monkeypatch.setattr(audb, "load_media", load_media)
+
+    build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard_path = audeer.mkdir(tmpdir, "datasets")
+    datacard = audbcards.Datacard(
+        dataset,
+        path=datacard_path,
+        sphinx_build_dir=build_dir,
+        cache_root=cache,
+    )
+    datacard.player()
+    media_file = audeer.path(build_dir, datacard.path, db.name, example_media)
+    assert os.path.exists(media_file)
+
+
+def test_remove_tmp_dirs(tmpdir, monkeypatch):
+    r"""Test removal of temporary folders from the audbcards cache."""
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    tmp_dirs = [
+        audeer.mkdir(cache_root, ".tmp-a"),
+        audeer.mkdir(cache_root, ".tmp-b", "db", "1.0.0"),
+    ]
+    audeer.touch(tmp_dirs[1], "file.wav")
+    keep = [
+        audeer.touch(audeer.mkdir(cache_root, "db", "1.0.0"), "db.pkl"),
+        audeer.touch(audeer.mkdir(cache_root, "db", ".tmp-c"), "file.wav"),
+        audeer.touch(cache_root, ".tmp-file"),
+    ]
+
+    # Cache root from environment variable
+    monkeypatch.setenv("AUDBCARDS_CACHE_ROOT", cache_root)
+    audbcards.core.datacard.remove_tmp_dirs()
+    assert not os.path.exists(audeer.path(cache_root, ".tmp-a"))
+    assert not os.path.exists(audeer.path(cache_root, ".tmp-b"))
+    for file in keep:
+        assert os.path.exists(file)
+
+    # Explicit cache root
+    tmp_dir = audeer.mkdir(cache_root, ".tmp-d")
+    audbcards.core.datacard.remove_tmp_dirs(cache_root)
+    assert not os.path.exists(tmp_dir)
+
+    # Non-existing cache root
+    audbcards.core.datacard.remove_tmp_dirs(audeer.path(tmpdir, "missing"))
+
+
+def test_copy_atomic(tmpdir, monkeypatch):
+    r"""Test atomic copy of files to the audbcards cache."""
+    src = audeer.path(tmpdir, "src.wav")
+    with open(src, "w") as fp:
+        fp.write("content")
+    dst_dir = audeer.mkdir(tmpdir, "dst")
+    dst = audeer.path(dst_dir, "dst.wav")
+
+    audbcards.core.datacard._copy_atomic(src, dst)
+    with open(dst) as fp:
+        assert fp.read() == "content"
+    assert os.listdir(dst_dir) == ["dst.wav"]
+
+    # Interrupted copy leaves neither destination
+    # nor temporary file behind
+    os.remove(dst)
+
+    def interrupted_copy(src, dst):
+        with open(dst, "w") as fp:
+            fp.write("cont")
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(
+        audbcards.core.datacard.shutil,
+        "copy",
+        interrupted_copy,
+    )
+    with pytest.raises(KeyboardInterrupt):
+        audbcards.core.datacard._copy_atomic(src, dst)
+    assert os.listdir(dst_dir) == []
 
 
 @pytest.mark.parametrize(
