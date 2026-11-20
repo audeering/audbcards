@@ -14,6 +14,19 @@ import audbcards.sphinx
 REPOSITORY = audb.Repository("repo", "host", "file-system")
 
 
+@pytest.fixture(autouse=True)
+def audbcards_cache(tmpdir, monkeypatch):
+    r"""Use temporary audbcards cache.
+
+    Ensures ``builder_inited()``
+    does not touch the user's audbcards cache.
+
+    """
+    cache_root = audeer.mkdir(tmpdir, "audbcards-cache")
+    monkeypatch.setenv("AUDBCARDS_CACHE_ROOT", cache_root)
+    return cache_root
+
+
 def sphinx_app(src_dir, build_dir, sections):
     r"""Minimal stand-in for a sphinx application."""
     return types.SimpleNamespace(
@@ -218,6 +231,33 @@ def test_builder_inited(tmpdir, monkeypatch, sections, expected):
             "table_preview": table_preview,
         }
     assert audb.config.REPOSITORIES is current_repos
+
+
+def test_builder_inited_removes_tmp_dirs(tmpdir, monkeypatch, audbcards_cache):
+    r"""Test temporary folders of interrupted builds are removed."""
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    app = sphinx_app(src_dir, build_dir, [{"folder": "data"}])
+
+    # Temporary folder left by an interrupted build
+    tmp_dir = audeer.mkdir(audbcards_cache, ".tmp-abc123")
+    audeer.touch(audeer.mkdir(tmp_dir, "db", "1.0.0"), "archive.wav")
+    # Files and folders that should not be removed
+    keep = [
+        audeer.touch(audeer.mkdir(audbcards_cache, "db", "1.0.0"), "db.pkl"),
+        audeer.touch(audeer.mkdir(audbcards_cache, "db", ".tmp-x"), "f.wav"),
+        audeer.touch(audbcards_cache, ".tmp-file"),
+    ]
+
+    def available(*args, **kwargs):
+        return pd.DataFrame({"version": []}, index=[])
+
+    monkeypatch.setattr(audb, "available", available)
+    audbcards.sphinx.builder_inited(app)
+
+    assert not os.path.exists(tmp_dir)
+    for file in keep:
+        assert os.path.exists(file)
 
 
 def test_builder_inited_restores_repositories(tmpdir, monkeypatch):

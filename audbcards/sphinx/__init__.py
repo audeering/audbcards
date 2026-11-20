@@ -10,6 +10,7 @@ import audb
 import audeer
 
 from audbcards.core.datacard import Datacard
+from audbcards.core.datacard import remove_tmp_dirs
 from audbcards.core.dataset import Dataset
 from audbcards.core.dataset import create_datasets_page
 
@@ -89,6 +90,11 @@ def builder_inited(app: sphinx.application.Sphinx):
     template_dir = app.config.audbcards_templates
     if template_dir is not None:
         template_dir = os.path.join(app.srcdir, template_dir)
+
+    # Remove temporary folders left in the audbcards cache
+    # by an interrupted build,
+    # as they might contain large extracted archives
+    remove_tmp_dirs()
 
     # Add CSS and JS files for table preview feature
     static_dir = audeer.mkdir(app.builder.outdir, "_static")

@@ -22,6 +22,10 @@ from audbcards.core.dataset import Dataset
 from audbcards.core.utils import set_plot_margins
 
 
+# Prefix of temporary folders created inside the audbcards cache
+TMP_DIR_PREFIX = ".tmp-"
+
+
 class Datacard(object):
     r"""Datacard of a dataset.
 
@@ -314,7 +318,7 @@ class Datacard(object):
             # The temporary folder is created inside the audbcards cache,
             # as the system temp folder might not provide enough space
             with tempfile.TemporaryDirectory(
-                prefix=".tmp-",
+                prefix=TMP_DIR_PREFIX,
                 dir=self.cache_root,
             ) as audb_cache_root:
                 media = audb.load_media(
@@ -661,3 +665,38 @@ class Datacard(object):
             content = self.rst_preamble + "\n" + content
 
         return content
+
+
+def remove_tmp_dirs(cache_root: str | None = None):
+    r"""Remove temporary folders from the audbcards cache.
+
+    :meth:`audbcards.Datacard.player`
+    loads media files into temporary folders
+    inside the audbcards cache.
+    If a build is interrupted,
+    those folders are not removed
+    and might contain large extracted archives.
+    This removes all temporary folders
+    in the root of the audbcards cache.
+    It should not be called
+    while another build
+    uses the same cache.
+
+    Args:
+        cache_root: cache folder.
+            If ``None``,
+            the environmental variable ``AUDBCARDS_CACHE_ROOT``,
+            or :attr:`audbcards.config.CACHE_ROOT`
+            is used
+
+    """
+    if cache_root is None:
+        cache_root = os.environ.get("AUDBCARDS_CACHE_ROOT") or config.CACHE_ROOT
+    cache_root = audeer.path(cache_root)
+    if not os.path.isdir(cache_root):
+        return
+    for entry in os.scandir(cache_root):
+        if entry.name.startswith(TMP_DIR_PREFIX) and entry.is_dir(
+            follow_symlinks=False
+        ):
+            shutil.rmtree(entry.path, ignore_errors=True)

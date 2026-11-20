@@ -465,6 +465,37 @@ def test_datacard_player_from_audb_cache(
     assert os.path.exists(media_file)
 
 
+def test_remove_tmp_dirs(tmpdir, monkeypatch):
+    r"""Test removal of temporary folders from the audbcards cache."""
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    tmp_dirs = [
+        audeer.mkdir(cache_root, ".tmp-a"),
+        audeer.mkdir(cache_root, ".tmp-b", "db", "1.0.0"),
+    ]
+    audeer.touch(tmp_dirs[1], "file.wav")
+    keep = [
+        audeer.touch(audeer.mkdir(cache_root, "db", "1.0.0"), "db.pkl"),
+        audeer.touch(audeer.mkdir(cache_root, "db", ".tmp-c"), "file.wav"),
+        audeer.touch(cache_root, ".tmp-file"),
+    ]
+
+    # Cache root from environment variable
+    monkeypatch.setenv("AUDBCARDS_CACHE_ROOT", cache_root)
+    audbcards.core.datacard.remove_tmp_dirs()
+    assert not os.path.exists(audeer.path(cache_root, ".tmp-a"))
+    assert not os.path.exists(audeer.path(cache_root, ".tmp-b"))
+    for file in keep:
+        assert os.path.exists(file)
+
+    # Explicit cache root
+    tmp_dir = audeer.mkdir(cache_root, ".tmp-d")
+    audbcards.core.datacard.remove_tmp_dirs(cache_root)
+    assert not os.path.exists(tmp_dir)
+
+    # Non-existing cache root
+    audbcards.core.datacard.remove_tmp_dirs(audeer.path(tmpdir, "missing"))
+
+
 @pytest.mark.parametrize(
     "dbs",
     [
