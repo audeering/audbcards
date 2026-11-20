@@ -205,11 +205,16 @@ class _Dataset:
         Removes header,
         dependency table,
         backend,
-        repository object,
         and all private cached properties
         from the object.
         They are loaded or computed again
         when accessed.
+        The repository object is kept,
+        as it requires only little memory,
+        and ensures the backend is loaded again
+        from the same repository,
+        even if :attr:`audb.config.REPOSITORIES`
+        has changed in the meantime.
 
         Args:
             cached_properties: public cached properties
@@ -223,7 +228,6 @@ class _Dataset:
             "_backend",
             "_deps",
             "_header",
-            "_repository_object",
         ]
         attributes += self._cached_property_names(private=True)
         attributes += list(cached_properties)

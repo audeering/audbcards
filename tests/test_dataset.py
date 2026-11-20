@@ -688,6 +688,44 @@ def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first
     assert "segment_durations" not in dataset.__dict__
 
 
+def test_dataset_repository_after_release(tmpdir, monkeypatch, repository, medium_db):
+    """Test repository and backend after releasing memory.
+
+    A newly created dataset should keep its repository object,
+    so that the backend is loaded again
+    from the same repository,
+    even if the repository configuration changes.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        repository: repository fixture
+        medium_db: medium_db fixture
+
+    """
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    dataset = audbcards.Dataset(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root=cache_root,
+    )
+    assert "_backend" not in dataset.__dict__
+    assert dataset.__dict__["_repository_object"] == repository
+
+    # Change repository configuration
+    other_repository = audb.Repository(
+        name="data-other",
+        host=audeer.mkdir(tmpdir, "other-repo"),
+        backend="file-system",
+    )
+    monkeypatch.setattr(audb.config, "REPOSITORIES", [other_repository])
+
+    assert dataset.repository_object == repository
+    backend_interface = dataset.backend
+    with backend_interface.backend:
+        assert backend_interface.exists(f"/{medium_db.name}/db.yaml", pytest.VERSION)
+
+
 def test_dataset_cache_root_loaded(tmpdir, medium_db):
     """Test cache root of dataset loaded from cache.
 
