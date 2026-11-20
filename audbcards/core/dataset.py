@@ -1,14 +1,20 @@
 from collections.abc import Sequence
+import contextlib
 import functools
 import inspect
 import os
 import pickle
 import random
 import re
+import tempfile
+import typing
 
 import jinja2
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.compute as pc
+import pyarrow.parquet as pq
 
 import audb
 import audbackend
@@ -507,20 +513,17 @@ class _Dataset:
     @functools.cached_property
     def segments(self) -> str:
         r"""Number of segments in dataset."""
-        return str(len(self._segments))
+        return str(self._segments.num_rows)
 
     @functools.cached_property
     def segment_durations(self) -> list[float]:
         r"""Segment durations in dataset."""
-        if len(self._segments) == 0:
-            durations = []
-        else:
-            starts = self._segments.get_level_values("start")
-            ends = self._segments.get_level_values("end")
-            durations = [
-                (end - start).total_seconds() for start, end in zip(starts, ends)
-            ]
-        return durations
+        if self._segments.num_rows == 0:
+            return []
+        durations = pc.subtract(self._segments["end"], self._segments["start"])
+        seconds = pc.divide(pc.cast(durations, pa.int64()), 1e9)
+        # Segments without end result in NaN
+        return seconds.to_numpy(zero_copy_only=False).tolist()
 
     @functools.cached_property
     def short_description(self) -> str:
@@ -707,6 +710,10 @@ class _Dataset:
         # Ensure misc tables are loaded
         return audb.info.header(self.name, version=self.version, load_tables=True)
 
+    def _header_without_tables(self) -> audformat.Database:
+        r"""Load header without loading misc tables."""
+        return audb.info.header(self.name, version=self.version, load_tables=False)
+
     def _load_repository_object(self) -> audb.Repository:
         r"""Load repository object containing dataset."""
         return audb.repository(self.name, self.version)
@@ -818,19 +825,68 @@ class _Dataset:
         return data_dict
 
     @functools.cached_property
-    def _segments(self) -> pd.MultiIndex:
-        """Segments of dataset as combined index."""
-        index = audformat.segmented_index()
+    def _segments(self) -> pa.Table:
+        """Unique segments of all segmented tables of dataset.
+
+        For tables stored as PARQUET files,
+        only the index columns are read,
+        and the tables are not downloaded
+        for MinIO/S3 and file-system backends.
+        Tables stored as CSV files
+        are loaded completely.
+
+        Returns:
+            table with columns ``"file"``, ``"start"``, ``"end"``,
+            holding every segment once,
+            in order of first occurrence
+
+        """
+        index_columns = [
+            audformat.define.IndexField.FILE,
+            audformat.define.IndexField.START,
+            audformat.define.IndexField.END,
+        ]
+        schema = pa.schema(
+            [
+                (audformat.define.IndexField.FILE, pa.string()),
+                (audformat.define.IndexField.START, pa.duration("ns")),
+                (audformat.define.IndexField.END, pa.duration("ns")),
+            ]
+        )
+        segments = [schema.empty_table()]
         for table in self.header.tables:
-            if self.header.tables[table].is_segmented:
+            if not self.header.tables[table].is_segmented:
+                continue
+            if f"db.{table}.parquet" in self.deps.tables:
+                with self._open_parquet_table(table) as file:
+                    parquet_file = pq.ParquetFile(file)
+                    index = parquet_file.read(columns=index_columns)
+            else:
                 df = audb.load_table(
                     self.name,
                     table,
                     version=self.version,
                     verbose=False,
                 )
-                index = audformat.utils.union([index, df.index])
-        return index
+                index = pa.Table.from_pandas(
+                    df.index.to_frame(index=False),
+                    preserve_index=False,
+                )
+            segments.append(index.select(index_columns).cast(schema))
+        segments = pa.concat_tables(segments)
+        # Remove duplicates,
+        # and keep order of first occurrence
+        # by sorting by the first position of each segment
+        segments = segments.append_column(
+            "position",
+            pa.array(np.arange(segments.num_rows, dtype="int64")),
+        )
+        segments = (
+            segments.group_by(index_columns)
+            .aggregate([("position", "min")])
+            .sort_by("position_min")
+        )
+        return segments.select(index_columns)
 
     @functools.cached_property
     def _tables_stats(self) -> dict[str, dict]:
@@ -843,6 +899,17 @@ class _Dataset:
         It significantly improves performance
         when accessing multiple table properties frequently.
 
+        Tables stored as PARQUET files
+        are not loaded completely into memory,
+        and are not downloaded
+        for MinIO/S3 and file-system backends,
+        as they might be too large.
+        Instead,
+        the number of rows is read from the file metadata,
+        and only the first rows are read for the preview.
+        Tables stored as CSV files
+        are loaded completely.
+
         Returns:
             A dictionary with table names as keys and dictionaries containing:
             - "columns": number of columns
@@ -850,20 +917,128 @@ class _Dataset:
             - "preview": dataframe preview (first 5 rows)
 
         """
+        preview_rows = 5
         stats = {}
+        # Header without loaded tables,
+        # used to convert the preview of PARQUET tables
+        # to a dataframe.
+        # We cannot use `self.header` here,
+        # as it holds already loaded misc tables,
+        # which would be replaced by their preview.
+        # For the same reason,
+        # the previews of misc tables are loaded into their own header,
+        # as other tables might use them as scheme labels,
+        # and replacing them by their preview
+        # would set all labels not contained in the preview to NaN.
+        db = None
         for table in list(self.header):
-            df = audb.load_table(
-                self.name,
-                table,
-                version=self.version,
-                verbose=False,
-            )
+            if f"db.{table}.parquet" in self.deps.tables:
+                if table in self.header.misc_tables:
+                    table_db = self._header_without_tables()
+                else:
+                    if db is None:
+                        db = self._header_without_tables()
+                    table_db = db
+                rows, df = self._parquet_table_preview(table_db, table, preview_rows)
+            else:
+                df = audb.load_table(
+                    self.name,
+                    table,
+                    version=self.version,
+                    verbose=False,
+                )
+                rows = len(df)
+                df = df.head(preview_rows)
             stats[table] = {
                 "columns": len(df.columns),
-                "rows": len(df),
-                "preview": df.head(5),
+                "rows": rows,
+                "preview": df,
             }
         return stats
+
+    @contextlib.contextmanager
+    def _open_parquet_table(
+        self,
+        table: str,
+    ) -> typing.Iterator[str | typing.BinaryIO]:
+        r"""Open PARQUET file of table for random access reading.
+
+        For backends supporting
+        :meth:`audbackend.interface.Versioned.open_file`,
+        e.g. MinIO/S3 and file-system backends,
+        the file is accessed directly on the backend,
+        without downloading it.
+        For other backends,
+        the PARQUET file is downloaded to the audb cache.
+
+        Args:
+            table: table ID
+
+        Yields:
+            binary file object or path to file
+
+        """
+        table_file = f"db.{table}.parquet"
+        if isinstance(self.backend, audbackend.interface.Versioned):
+            remote_file = self.backend.join("/", self.name, "meta", f"{table}.parquet")
+            with self.backend.backend:
+                try:
+                    file = self.backend.open_file(
+                        remote_file,
+                        self.deps.version(table_file),
+                    )
+                except audbackend.BackendError as ex:
+                    # Backend does not support random access to files
+                    if not isinstance(ex.exception, NotImplementedError):
+                        raise
+                else:
+                    with file:
+                        yield file
+                    return
+        # Download table to audb cache
+        stream = audb.stream(
+            self.name,
+            table,
+            version=self.version,
+            only_metadata=True,
+            full_path=False,
+            verbose=False,
+        )
+        yield os.path.join(stream.root, table_file)
+
+    def _parquet_table_preview(
+        self,
+        db: audformat.Database,
+        table: str,
+        preview_rows: int,
+    ) -> tuple[int, pd.DataFrame]:
+        r"""Number of rows and preview of a table stored as PARQUET file.
+
+        Only the footer
+        and the first pages of the PARQUET file
+        are read,
+        see :meth:`_open_parquet_table`.
+
+        Args:
+            db: database header without loaded tables
+            table: table ID
+            preview_rows: number of rows of the preview
+
+        Returns:
+            number of rows of table,
+            and dataframe holding the first ``preview_rows`` rows
+
+        """
+        with self._open_parquet_table(table) as file:
+            rows, preview = utils.parquet_preview(file, preview_rows)
+        # Store preview as PARQUET file
+        # and load it with audformat,
+        # to ensure the dataframe has the correct index and dtypes
+        with tempfile.TemporaryDirectory() as tmp_root:
+            preview_file = os.path.join(tmp_root, f"db.{table}")
+            pq.write_table(preview, f"{preview_file}.parquet")
+            db[table].load(preview_file)
+        return rows, db[table].df
 
     @staticmethod
     def _map_iso_languages(languages: list[str]) -> list[str]:

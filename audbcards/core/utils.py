@@ -1,9 +1,48 @@
 from collections.abc import Sequence
+import typing
 
 import matplotlib.pyplot as plt
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 import audeer
 import audformat
+
+
+def parquet_preview(
+    file: str | typing.BinaryIO,
+    preview_rows: int,
+) -> tuple[int, pa.Table]:
+    r"""Number of rows and first rows of a PARQUET file.
+
+    Reads only the footer
+    and the first pages of the first row group,
+    without loading the complete file into memory.
+
+    Args:
+        file: path to PARQUET file or binary file object
+        preview_rows: maximum number of rows of the preview
+
+    Returns:
+        number of rows of the file,
+        and table holding the first ``preview_rows`` rows
+
+    """
+    # Small buffer and no pre-buffering,
+    # to read only the first pages of each column
+    parquet_file = pq.ParquetFile(
+        file,
+        buffer_size=1024 * 1024,
+        pre_buffer=False,
+    )
+    rows = parquet_file.metadata.num_rows
+    schema = parquet_file.schema_arrow
+    batch = next(parquet_file.iter_batches(batch_size=preview_rows), None)
+    if batch is None:
+        preview = schema.empty_table()
+    else:
+        preview = pa.Table.from_batches([batch], schema=schema)
+    return rows, preview
 
 
 def format_schemes(

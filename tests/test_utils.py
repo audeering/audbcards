@@ -1,6 +1,13 @@
+import io
+import os
+
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 
+import audbackend
+import audeer
 import audformat
 
 import audbcards
@@ -69,3 +76,80 @@ def test_limit_presented_samples(sample, limit, replacement_text, expected):
         sample, limit, replacement_text
     )
     assert limited_sample == expected
+
+
+class CountingFile(io.RawIOBase):
+    r"""Raw file object counting the number of read bytes."""
+
+    def __init__(self, raw):
+        self.raw = raw
+        self.read_bytes = 0
+
+    def readable(self):
+        r"""File is readable."""
+        return True
+
+    def seekable(self):
+        r"""File is seekable."""
+        return True
+
+    def seek(self, offset, whence=io.SEEK_SET):
+        r"""Change position in file."""
+        return self.raw.seek(offset, whence)
+
+    def tell(self):
+        r"""Current position in file."""
+        return self.raw.tell()
+
+    def readinto(self, buffer):
+        r"""Read bytes into buffer and count them."""
+        n = self.raw.readinto(buffer)
+        self.read_bytes += n
+        return n
+
+    def close(self):
+        r"""Close file."""
+        self.raw.close()
+        super().close()
+
+
+@pytest.mark.parametrize("rows", [0, 3, 200_000])
+def test_parquet_preview_backend_file(tmpdir, monkeypatch, rows):
+    r"""Test reading PARQUET preview from file opened on backend."""
+    table = pa.table(
+        {
+            "file": [f"f{n}.wav" for n in range(rows)],
+            # Random strings to avoid compression
+            "text": [os.urandom(16).hex() for _ in range(rows)],
+        }
+    )
+    path = audeer.path(tmpdir, "table.parquet")
+    pq.write_table(table, path, row_group_size=50_000)
+
+    # Track bytes read from backend
+    files = []
+    open_file = audbackend.backend.FileSystem._open_file
+
+    def counting_open_file(self, path):
+        files.append(CountingFile(open_file(self, path)))
+        return files[-1]
+
+    monkeypatch.setattr(
+        audbackend.backend.FileSystem,
+        "_open_file",
+        counting_open_file,
+    )
+
+    host = audeer.mkdir(tmpdir, "host")
+    audbackend.backend.FileSystem.create(host, "repo")
+    backend = audbackend.backend.FileSystem(host, "repo")
+    with backend:
+        interface = audbackend.interface.Versioned(backend)
+        interface.put_file(path, "/table.parquet", "1.0.0")
+        with interface.open_file("/table.parquet", "1.0.0") as fp:
+            num_rows, preview = audbcards.core.utils.parquet_preview(fp, 5)
+    assert num_rows == rows
+    assert preview.equals(table.slice(0, 5))
+    # Only part of the file is read
+    if rows == 200_000:
+        assert files[0].read_bytes < os.path.getsize(path) / 2
