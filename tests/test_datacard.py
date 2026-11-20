@@ -410,6 +410,61 @@ def test_datacard_player(tmpdir, db, cache, request, monkeypatch):
     assert waveform == expected_waveform
 
 
+@pytest.mark.parametrize("db", ["medium_db"])
+@pytest.mark.parametrize("shared", [False, True])
+def test_datacard_player_from_audb_cache(
+    tmpdir,
+    db,
+    shared,
+    cache,
+    request,
+    monkeypatch,
+):
+    r"""Test Datacard.player reuses media from the audb cache.
+
+    If the example media file is already stored
+    in the configured (shared) audb cache,
+    it should be copied from there,
+    without loading it with audb again.
+
+    """
+    db = request.getfixturevalue(db)
+    dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+    example_media = dataset.example_media
+
+    # Store example media in dedicated audb cache
+    audb_cache = audeer.mkdir(tmpdir, "audb-cache")
+    audb_shared_cache = audeer.mkdir(tmpdir, "audb-shared-cache")
+    monkeypatch.setattr(audb.config, "CACHE_ROOT", audb_cache)
+    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_shared_cache)
+    audb.load_media(
+        db.name,
+        example_media,
+        version=pytest.VERSION,
+        cache_root=audb_shared_cache if shared else audb_cache,
+        verbose=False,
+    )
+
+    # Fail if media is loaded with audb,
+    # e.g. simulating an unavailable backend
+    def load_media(*args, **kwargs):
+        raise RuntimeError("audb.load_media() should not be called")
+
+    monkeypatch.setattr(audb, "load_media", load_media)
+
+    build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard_path = audeer.mkdir(tmpdir, "datasets")
+    datacard = audbcards.Datacard(
+        dataset,
+        path=datacard_path,
+        sphinx_build_dir=build_dir,
+        cache_root=cache,
+    )
+    datacard.player()
+    media_file = audeer.path(build_dir, datacard.path, db.name, example_media)
+    assert os.path.exists(media_file)
+
+
 @pytest.mark.parametrize(
     "dbs",
     [

@@ -285,26 +285,46 @@ class Datacard(object):
                 f"{self.dataset.name}-{self.dataset.version}-player-media",
                 self.dataset.example_media,
             )
-            if not os.path.exists(cache_example_media):
-                # Load media file into a temporary audb cache,
-                # as audb extracts all files
-                # stored in the same archive as the media file,
-                # which might require a lot of disk space.
-                # The temporary folder is created inside the audbcards cache,
-                # as the system temp folder might not provide enough space
-                with tempfile.TemporaryDirectory(
-                    prefix=".tmp-",
-                    dir=self.cache_root,
-                ) as audb_cache_root:
-                    media = audb.load_media(
-                        self.dataset.name,
-                        self.dataset.example_media,
-                        version=self.dataset.version,
-                        cache_root=audb_cache_root,
-                        verbose=False,
-                    )[0]
-                    audeer.mkdir(os.path.dirname(cache_example_media))
-                    shutil.copy(media, cache_example_media)
+            if os.path.exists(cache_example_media):
+                return cache_example_media
+
+            audeer.mkdir(os.path.dirname(cache_example_media))
+
+            # Reuse media file from the configured audb caches,
+            # if it is already stored there.
+            # As audb, we look into the shared cache first.
+            flavor_path = audb.Flavor().path(
+                self.dataset.name,
+                self.dataset.version,
+            )
+            for shared in [True, False]:
+                audb_cache_media = os.path.join(
+                    audb.default_cache_root(shared=shared),
+                    flavor_path,
+                    self.dataset.example_media,
+                )
+                if os.path.exists(audb_cache_media):
+                    shutil.copy(audb_cache_media, cache_example_media)
+                    return cache_example_media
+
+            # Otherwise, load media file into a temporary audb cache,
+            # as audb extracts all files
+            # stored in the same archive as the media file,
+            # which might require a lot of disk space.
+            # The temporary folder is created inside the audbcards cache,
+            # as the system temp folder might not provide enough space
+            with tempfile.TemporaryDirectory(
+                prefix=".tmp-",
+                dir=self.cache_root,
+            ) as audb_cache_root:
+                media = audb.load_media(
+                    self.dataset.name,
+                    self.dataset.example_media,
+                    version=self.dataset.version,
+                    cache_root=audb_cache_root,
+                    verbose=False,
+                )[0]
+                shutil.copy(media, cache_example_media)
             return cache_example_media
 
         def plot_waveform_to_cache(cache_example_media: str) -> str:
