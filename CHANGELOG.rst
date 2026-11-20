@@ -7,6 +7,41 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.0 (2026-11-20)
+--------------------------
+
+* Added: ``audbcards.Dataset.file_duration_histogram``
+  holding minimum, maximum,
+  and a histogram with 1000 bins
+  of the file durations
+* Added: ``audbcards.Dataset.segment_duration_histogram``
+  holding minimum, maximum,
+  and a histogram with 1000 bins
+  of the segment durations
+* Added: dependency on ``audbackend>=3.1.0``
+* Added: dependency on ``pyarrow>=13.0.0``
+* Changed: tables stored as PARQUET files
+  are no longer downloaded completely
+  to get their number of rows,
+  their preview,
+  and the segments of a dataset
+* Changed: ``audbcards.Datacard.player()``
+  only caches the required example file
+  and not the whole media archive
+* Changed: release memory of data
+  no longer needed
+  after a dataset is cached
+  and after a data card is written
+  by the sphinx extension
+* Fixed: store only public cached properties
+  in the cache file of a dataset.
+  Existing cache files are updated automatically
+* Removed: ``audbcards.Dataset.file_durations``,
+  use ``audbcards.Dataset.file_duration_histogram`` instead
+* Removed: ``audbcards.Dataset.segment_durations``,
+  use ``audbcards.Dataset.segment_duration_histogram`` instead
+
+
 Version 0.5.1 (2026-11-13)
 --------------------------
 
