@@ -159,6 +159,13 @@ def builder_inited(app: sphinx.application.Sphinx):
                     f"{dataset.name}.rst",
                 )
                 datacard.save(rst_file)
+                # Release memory of data not needed
+                # for the datasets overview page,
+                # as all datasets are kept in memory
+                # until the overview page is created
+                dataset._release_memory(
+                    cached_properties=["file_durations", "segment_durations"]
+                )
                 datasets.append(dataset)
                 out_file = rst_file.replace(
                     str(app.srcdir), os.path.basename(app.srcdir)
