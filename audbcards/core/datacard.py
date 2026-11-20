@@ -308,7 +308,7 @@ class Datacard(object):
                     self.dataset.example_media,
                 )
                 if os.path.exists(audb_cache_media):
-                    shutil.copy(audb_cache_media, cache_example_media)
+                    _copy_atomic(audb_cache_media, cache_example_media)
                     return cache_example_media
 
             # Otherwise, load media file into a temporary audb cache,
@@ -328,7 +328,7 @@ class Datacard(object):
                     cache_root=audb_cache_root,
                     verbose=False,
                 )[0]
-                shutil.copy(media, cache_example_media)
+                _copy_atomic(media, cache_example_media)
             return cache_example_media
 
         def plot_waveform_to_cache(cache_example_media: str) -> str:
@@ -665,6 +665,36 @@ class Datacard(object):
             content = self.rst_preamble + "\n" + content
 
         return content
+
+
+def _copy_atomic(src: str, dst: str):
+    r"""Copy file atomically.
+
+    The file is first copied
+    to a temporary file
+    in the folder of the destination,
+    and then renamed to the destination.
+    This ensures the destination
+    is never a partially written file,
+    e.g. if the copy is interrupted.
+
+    Args:
+        src: source file
+        dst: destination file
+
+    """
+    fd, tmp_file = tempfile.mkstemp(
+        prefix=TMP_DIR_PREFIX,
+        dir=os.path.dirname(dst),
+    )
+    os.close(fd)
+    try:
+        shutil.copy(src, tmp_file)
+        os.replace(tmp_file, dst)
+    except BaseException:
+        if os.path.exists(tmp_file):
+            os.remove(tmp_file)
+        raise
 
 
 def remove_tmp_dirs(cache_root: str | None = None):

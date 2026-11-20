@@ -498,6 +498,38 @@ def test_remove_tmp_dirs(tmpdir, monkeypatch):
     audbcards.core.datacard.remove_tmp_dirs(audeer.path(tmpdir, "missing"))
 
 
+def test_copy_atomic(tmpdir, monkeypatch):
+    r"""Test atomic copy of files to the audbcards cache."""
+    src = audeer.path(tmpdir, "src.wav")
+    with open(src, "w") as fp:
+        fp.write("content")
+    dst_dir = audeer.mkdir(tmpdir, "dst")
+    dst = audeer.path(dst_dir, "dst.wav")
+
+    audbcards.core.datacard._copy_atomic(src, dst)
+    with open(dst) as fp:
+        assert fp.read() == "content"
+    assert os.listdir(dst_dir) == ["dst.wav"]
+
+    # Interrupted copy leaves neither destination
+    # nor temporary file behind
+    os.remove(dst)
+
+    def interrupted_copy(src, dst):
+        with open(dst, "w") as fp:
+            fp.write("cont")
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(
+        audbcards.core.datacard.shutil,
+        "copy",
+        interrupted_copy,
+    )
+    with pytest.raises(KeyboardInterrupt):
+        audbcards.core.datacard._copy_atomic(src, dst)
+    assert os.listdir(dst_dir) == []
+
+
 @pytest.mark.parametrize(
     "dbs",
     [
