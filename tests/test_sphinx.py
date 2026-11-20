@@ -201,7 +201,10 @@ def test_builder_inited(tmpdir, monkeypatch, sections, expected):
     monkeypatch.setattr(
         audbcards.sphinx,
         "Dataset",
-        lambda name, version: types.SimpleNamespace(name=name),
+        lambda name, version: types.SimpleNamespace(
+            name=name,
+            _release_memory=lambda cached_properties=(): None,
+        ),
     )
     monkeypatch.setattr(audbcards.sphinx, "Datacard", Datacard)
     monkeypatch.setattr(
@@ -489,7 +492,10 @@ def test_builder_inited_dfs(tmpdir, monkeypatch):
     monkeypatch.setattr(
         audbcards.sphinx,
         "Dataset",
-        lambda name, version: types.SimpleNamespace(name=name),
+        lambda name, version: types.SimpleNamespace(
+            name=name,
+            _release_memory=lambda cached_properties=(): None,
+        ),
     )
     monkeypatch.setattr(
         audbcards.sphinx,

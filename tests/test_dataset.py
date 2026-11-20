@@ -1,4 +1,5 @@
 import os
+import pickle
 import posixpath
 
 import numpy as np
@@ -605,6 +606,86 @@ def test_dataset_cache_loading(audb_cache, tmpdir, repository, db, request):
         # to compare it.
         assert str(dataset.header) == str(header)
         assert dataset.repository_object == repository
+
+
+@pytest.mark.parametrize("load_tables_first", [True, False])
+def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first):
+    """Test content of cache file and memory release.
+
+    The cache file should only store public cached properties,
+    also when it is stored again
+    to add table related cached properties,
+    or when it contains private attributes,
+    as written by older versions of audbcards.
+    After creating or loading a dataset,
+    its private attributes should be released.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        medium_db: medium_db fixture
+        load_tables_first: if ``True``,
+            the dataset is first created
+            with ``load_tables=True``
+
+    """
+    dataset_cls = audbcards.core.dataset._Dataset
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = dataset_cls._dataset_cache_path(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+    public_cached_properties = dataset_cls._cached_property_names(private=False)
+    private_attributes = ["_backend", "_deps", "_header", "_segments"]
+
+    def load_dataset(load_tables=True):
+        return audbcards.Dataset(
+            medium_db.name,
+            pytest.VERSION,
+            cache_root=cache_root,
+            load_tables=load_tables,
+        )
+
+    def cache_file_content() -> dict:
+        with open(cache_file, "rb") as fp:
+            return pickle.load(fp).__dict__
+
+    def assert_clean(dataset):
+        content = cache_file_content()
+        assert len(content) > 0
+        assert all(name in public_cached_properties for name in content)
+        for name in private_attributes:
+            assert name not in dataset.__dict__
+
+    # Create dataset and cache file
+    dataset = load_dataset(load_tables_first)
+    assert_clean(dataset)
+
+    # Load from cache,
+    # which adds table related properties
+    # if created with load_tables=False
+    dataset = load_dataset()
+    assert_clean(dataset)
+
+    # Private attributes are loaded again when needed
+    assert dataset.header.name == medium_db.name
+    assert len(dataset.deps.media) > 0
+    assert dataset._segments.num_rows > 0
+
+    # Simulate cache file written by older versions of audbcards,
+    # which stored all attributes
+    with monkeypatch.context() as m:
+        m.setattr(dataset_cls, "__getstate__", lambda self: self.__dict__)
+        dataset_cls._save_pickled(dataset, cache_file)
+    assert "_header" in cache_file_content()
+    dataset = load_dataset()
+    assert_clean(dataset)
+
+    # Release public cached properties on request
+    assert "segment_durations" in dataset.__dict__
+    dataset._release_memory(cached_properties=["segment_durations"])
+    assert "segment_durations" not in dataset.__dict__
 
 
 @pytest.mark.parametrize(

@@ -83,11 +83,15 @@ class _Dataset:
 
         if os.path.exists(dataset_cache_filename):
             obj = cls._load_pickled(dataset_cache_filename)
+            # Cache files written by older versions of audbcards
+            # might contain private attributes,
+            # like the header or all segments of the dataset,
+            # which are removed by storing the cache again
+            cache_again = obj.__dict__.keys() != obj.__getstate__().keys()
             # Load cached properties,
             # that require to load filewise or segmented tables,
             # if they haven't been cached before.
             if load_tables:
-                cache_again = False
                 for cached_property in cls._table_related_cached_properties:
                     # Check if property has been cached,
                     # see https://stackoverflow.com/a/59740750
@@ -95,10 +99,9 @@ class _Dataset:
                         cache_again = True
                         # Request property to fill their cached value
                         getattr(obj, cached_property)
-                if cache_again:
-                    # Update cache to store the table related cached properties
-                    cls._save_pickled(obj, dataset_cache_filename)
-
+            if cache_again:
+                cls._save_pickled(obj, dataset_cache_filename)
+            obj._release_memory()
             return obj
 
         obj = cls(name, version, cache_root, load_tables)
@@ -110,6 +113,7 @@ class _Dataset:
         obj._cached_properties(exclude=exclude)
 
         cls._save_pickled(obj, dataset_cache_filename)
+        obj._release_memory()
         return obj
 
     def __init__(
@@ -121,19 +125,6 @@ class _Dataset:
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
-
-        # Define `__getstate__()` method,
-        # which selects the cached attributes
-        # to include in the pickled cache file
-        if load_tables:
-            exclude = []
-        else:
-            exclude = self._table_related_cached_properties
-
-        def getstate():
-            return self._cached_properties(exclude=exclude)
-
-        self.__getstate__ = getstate
 
         # Store name and version in private attributes here,
         # ``self.name`` and ``self.version``
@@ -158,6 +149,81 @@ class _Dataset:
         other_versions = [v for v in versions if v != version]
         for other_version in other_versions:
             audeer.rmdir(cache_root, name, other_version)
+
+    def __getstate__(self) -> dict[str, object]:
+        r"""Select attributes stored in the pickled cache file.
+
+        Only public cached properties,
+        that have already been computed,
+        are stored.
+        Private attributes,
+        like the header,
+        the dependency table,
+        or the backend,
+        are not stored,
+        as they might require a lot of memory.
+
+        Returns:
+            dictionary with property name and value
+
+        """
+        public_cached_properties = self._cached_property_names(private=False)
+        return {
+            name: value
+            for name, value in self.__dict__.items()
+            if name in public_cached_properties
+        }
+
+    @classmethod
+    def _cached_property_names(cls, *, private: bool) -> list[str]:
+        r"""Names of public or private cached properties.
+
+        Args:
+            private: if ``True``,
+                return names of private cached properties,
+                otherwise of public ones
+
+        Returns:
+            names of cached properties
+
+        """
+        return [
+            name
+            for name, value in cls.__dict__.items()
+            if isinstance(value, functools.cached_property)
+            and name.startswith("_") == private
+        ]
+
+    def _release_memory(self, cached_properties: Sequence[str] = ()):
+        r"""Release memory of attributes not needed after caching.
+
+        Removes header,
+        dependency table,
+        backend,
+        repository object,
+        and all private cached properties
+        from the object.
+        They are loaded or computed again
+        when accessed.
+
+        Args:
+            cached_properties: public cached properties
+                that should be removed as well,
+                e.g. ``"segment_durations"``,
+                which might require a lot of memory
+                for large datasets
+
+        """
+        attributes = [
+            "_backend",
+            "_deps",
+            "_header",
+            "_repository_object",
+        ]
+        attributes += self._cached_property_names(private=True)
+        attributes += list(cached_properties)
+        for attribute in attributes:
+            self.__dict__.pop(attribute, None)
 
     @staticmethod
     def _dataset_cache_path(name: str, version: str, cache_root: str) -> str:
