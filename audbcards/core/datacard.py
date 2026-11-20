@@ -3,6 +3,7 @@ import functools
 import json
 import os
 import shutil
+import tempfile
 import textwrap
 import warnings
 
@@ -285,14 +286,20 @@ class Datacard(object):
                 self.dataset.example_media,
             )
             if not os.path.exists(cache_example_media):
-                media = audb.load_media(
-                    self.dataset.name,
-                    self.dataset.example_media,
-                    version=self.dataset.version,
-                    verbose=False,
-                )[0]
-                audeer.mkdir(os.path.dirname(cache_example_media))
-                shutil.copy(media, cache_example_media)
+                # Load media file into a temporary audb cache,
+                # as audb extracts all files
+                # stored in the same archive as the media file,
+                # which might require a lot of disk space
+                with tempfile.TemporaryDirectory() as audb_cache_root:
+                    media = audb.load_media(
+                        self.dataset.name,
+                        self.dataset.example_media,
+                        version=self.dataset.version,
+                        cache_root=audb_cache_root,
+                        verbose=False,
+                    )[0]
+                    audeer.mkdir(os.path.dirname(cache_example_media))
+                    shutil.copy(media, cache_example_media)
             return cache_example_media
 
         def plot_waveform_to_cache(cache_example_media: str) -> str:

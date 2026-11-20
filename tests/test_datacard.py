@@ -303,17 +303,24 @@ def test_datacard_file_duration_distribution(
         "medium_db",
     ],
 )
-def test_datacard_player(tmpdir, db, cache, request):
+def test_datacard_player(tmpdir, db, cache, request, monkeypatch):
     r"""Test the Datacard.player.
 
     It checks if the desired waveplot PNG file is created,
     the example audio file is copied to the build folder,
-    and the expected RST string
-    to include the player is returned.
+    the expected RST string
+    to include the player is returned,
+    and the example media file is not stored in the audb cache.
 
     """
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
+
+    # Use empty audb cache,
+    # to ensure the player does not store media files in it
+    audb_cache = audeer.mkdir(tmpdir, "audb-cache")
+    monkeypatch.setattr(audb.config, "CACHE_ROOT", audb_cache)
+    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_cache)
 
     datacard_path = audeer.mkdir(tmpdir, "datasets")
     datacard = audbcards.Datacard(dataset, path=datacard_path, cache_root=cache)
@@ -381,6 +388,9 @@ def test_datacard_player(tmpdir, db, cache, request):
     assert os.path.exists(media_file)
     assert os.path.exists(image_file)
     assert expected_player_str == player_str
+
+    # Example media is not stored in audb cache
+    assert audeer.list_file_names(audb_cache, recursive=True) == []
 
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
