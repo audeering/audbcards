@@ -30,7 +30,7 @@ rng = random.Random(123)
 
 class _Dataset:
     _table_related_cached_properties = [
-        "segment_durations",
+        "segment_duration_histogram",
         "segments",
         "tables_columns",
         "tables_preview",
@@ -219,9 +219,8 @@ class _Dataset:
         Args:
             cached_properties: public cached properties
                 that should be removed as well,
-                e.g. ``"segment_durations"``,
-                which might require a lot of memory
-                for large datasets
+                e.g. ``"tables_preview"``,
+                that are not needed anymore
 
         """
         attributes = [
@@ -464,15 +463,32 @@ class _Dataset:
         ]
 
     @functools.cached_property
-    def file_durations(self) -> list:
-        r"""File durations in dataset in seconds.
+    def file_duration_histogram(self) -> dict[str, float | np.ndarray]:
+        r"""Minimum, maximum, and histogram of file durations in seconds.
 
         Non media files,
         or media files containing 0 samples
-        are excluded from this list.
+        are excluded.
+        The histogram uses 1000 bins,
+        spaced linearly between minimum and maximum duration.
+
+        Returns:
+            dictionary with the entries
+            ``"min"``,
+            ``"max"``,
+            ``"bin_edges"``,
+            and ``"counts"``.
+            If the dataset contains no media files,
+            minimum and maximum are ``0``
+            and the arrays are empty
 
         """
-        return [dur for _, dur in self._media_with_durations]
+        return utils.histogram(
+            np.fromiter(
+                (dur for _, dur in self._media_with_durations),
+                dtype=np.float64,
+            )
+        )
 
     @functools.cached_property
     def formats(self) -> list[str]:
@@ -609,14 +625,40 @@ class _Dataset:
         return str(self._segments.num_rows)
 
     @functools.cached_property
-    def segment_durations(self) -> list[float]:
-        r"""Segment durations in dataset."""
+    def segment_duration_histogram(self) -> dict[str, float | np.ndarray]:
+        r"""Minimum, maximum, and histogram of segment durations in seconds.
+
+        Segments without end are excluded.
+        The histogram uses 1000 bins,
+        spaced linearly between minimum and maximum duration.
+
+        Returns:
+            dictionary with the entries
+            ``"min"``,
+            ``"max"``,
+            ``"bin_edges"``,
+            and ``"counts"``.
+            If the dataset contains no segments,
+            minimum and maximum are ``0``
+            and the arrays are empty
+
+        """
+        return utils.histogram(self._segment_durations())
+
+    def _segment_durations(self) -> np.ndarray:
+        r"""Segment durations in seconds.
+
+        Returns:
+            array of segment durations,
+            ``NaN`` for segments without end
+
+        """
         if self._segments.num_rows == 0:
-            return []
+            return np.array([], dtype=np.float64)
         durations = pc.subtract(self._segments["end"], self._segments["start"])
         seconds = pc.divide(pc.cast(durations, pa.int64()), 1e9)
         # Segments without end result in NaN
-        return seconds.to_numpy(zero_copy_only=False).tolist()
+        return seconds.to_numpy(zero_copy_only=False)
 
     @functools.cached_property
     def short_description(self) -> str:

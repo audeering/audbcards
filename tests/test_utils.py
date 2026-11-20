@@ -1,6 +1,7 @@
 import io
 import os
 
+import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -60,6 +61,33 @@ def test_format_schemes(scheme_names, scheme_dtypes, labels, expected):
     # Generate scheme str with format_scheme()
     scheme_str = audbcards.core.utils.format_schemes(db.schemes)
     assert scheme_str == expected
+
+
+@pytest.mark.parametrize(
+    "values, bins, expected_min, expected_max, expected_edges, expected_counts",
+    [
+        ([], 4, 0, 0, [], []),
+        ([np.nan], 4, 0, 0, [], []),
+        ([2.0, 2.0, 2.0], 4, 2, 2, [2, 2], [3]),
+        ([0.0, 1.0, 1.5, 4.0], 4, 0, 4, [0, 1, 2, 3, 4], [1, 2, 0, 1]),
+        ([0.0, np.nan, 4.0], 2, 0, 4, [0, 2, 4], [1, 1]),
+        (np.array([1.0, 3.0]), 2, 1, 3, [1, 2, 3], [1, 1]),
+    ],
+)
+def test_histogram(
+    values,
+    bins,
+    expected_min,
+    expected_max,
+    expected_edges,
+    expected_counts,
+):
+    histogram = audbcards.core.utils.histogram(values, bins=bins)
+    assert histogram["min"] == expected_min
+    assert histogram["max"] == expected_max
+    np.testing.assert_equal(histogram["bin_edges"], expected_edges)
+    np.testing.assert_equal(histogram["counts"], expected_counts)
+    assert histogram["counts"].dtype == np.int64
 
 
 @pytest.mark.parametrize("sample", [["a", "b", "c", "d", "e"]])

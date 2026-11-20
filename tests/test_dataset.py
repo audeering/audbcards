@@ -195,12 +195,18 @@ def test_dataset(
     expected_files = len(db.files)
     assert dataset.files == expected_files
 
-    # file_durations
+    # file_duration_histogram
     expected_file_durations = [
         dur for file in expected_deps.media if (dur := expected_deps.duration(file))
     ]
-    assert dataset.file_durations == expected_file_durations
-    assert all([d > 0 for d in dataset.file_durations])
+    assert all([d > 0 for d in expected_file_durations])
+    histogram = dataset.file_duration_histogram
+    assert histogram["counts"].sum() == len(expected_file_durations)
+    if len(expected_file_durations) > 0:
+        assert histogram["min"] == min(expected_file_durations)
+        assert histogram["max"] == max(expected_file_durations)
+    else:
+        assert histogram["min"] == histogram["max"] == 0
 
     # duration
     expected_duration = sum(expected_file_durations)
@@ -262,8 +268,20 @@ def test_dataset(
     # schemes_table
     assert dataset.schemes_table == expected_schemes_table
 
-    # segment_durations
-    assert dataset.segment_durations == expected_segment_durations
+    # segment_duration_histogram
+    histogram = dataset.segment_duration_histogram
+    assert histogram["counts"].sum() == len(expected_segment_durations)
+    if len(expected_segment_durations) > 0:
+        assert histogram["min"] == min(expected_segment_durations)
+        assert histogram["max"] == max(expected_segment_durations)
+        expected_counts, expected_bin_edges = np.histogram(
+            expected_segment_durations,
+            bins=1000,
+        )
+        np.testing.assert_equal(histogram["counts"], expected_counts)
+        np.testing.assert_allclose(histogram["bin_edges"], expected_bin_edges)
+    else:
+        assert histogram["min"] == histogram["max"] == 0
 
     # segments
     expected_segments = str(len(db.segments))
@@ -683,9 +701,9 @@ def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first
     assert_clean(dataset)
 
     # Release public cached properties on request
-    assert "segment_durations" in dataset.__dict__
-    dataset._release_memory(cached_properties=["segment_durations"])
-    assert "segment_durations" not in dataset.__dict__
+    assert "segment_duration_histogram" in dataset.__dict__
+    dataset._release_memory(cached_properties=["segment_duration_histogram"])
+    assert "segment_duration_histogram" not in dataset.__dict__
 
 
 def test_dataset_repository_after_release(tmpdir, monkeypatch, repository, medium_db):
@@ -979,8 +997,13 @@ def test_dataset_tables_stats(
         )
     ]
     assert ds.segments == str(len(index)) == "8"
-    np.testing.assert_equal(ds.segment_durations, expected_durations)
-    assert np.isnan(ds.segment_durations[-1])
+    np.testing.assert_equal(ds._segment_durations(), expected_durations)
+    assert np.isnan(ds._segment_durations()[-1])
+    # Segments without end are ignored in histogram
+    histogram = ds.segment_duration_histogram
+    assert histogram["counts"].sum() == len(expected_durations) - 1
+    assert histogram["min"] == np.nanmin(expected_durations)
+    assert histogram["max"] == np.nanmax(expected_durations)
 
     # Header still holds complete misc table
     assert list(ds.header["actors"].index) == speakers
@@ -1011,7 +1034,7 @@ class TestDatasetLoadTables:
 
         """
         table_related_properties = [
-            "segment_durations",
+            "segment_duration_histogram",
             "segments",
         ]
         for table_related_property in table_related_properties:
