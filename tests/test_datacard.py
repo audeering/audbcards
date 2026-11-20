@@ -316,11 +316,12 @@ def test_datacard_player(tmpdir, db, cache, request, monkeypatch):
     db = request.getfixturevalue(db)
     dataset = audbcards.Dataset(db.name, pytest.VERSION, cache_root=cache)
 
-    # Use empty audb cache,
-    # to ensure the player does not store media files in it
+    # Use empty audb caches,
+    # to ensure the player does not store media files in them
     audb_cache = audeer.mkdir(tmpdir, "audb-cache")
+    audb_shared_cache = audeer.mkdir(tmpdir, "audb-shared-cache")
     monkeypatch.setattr(audb.config, "CACHE_ROOT", audb_cache)
-    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_cache)
+    monkeypatch.setattr(audb.config, "SHARED_CACHE_ROOT", audb_shared_cache)
 
     datacard_path = audeer.mkdir(tmpdir, "datasets")
     datacard = audbcards.Datacard(dataset, path=datacard_path, cache_root=cache)
@@ -389,8 +390,9 @@ def test_datacard_player(tmpdir, db, cache, request, monkeypatch):
     assert os.path.exists(image_file)
     assert expected_player_str == player_str
 
-    # Example media is not stored in audb cache
+    # Example media is not stored in audb caches
     assert audeer.list_file_names(audb_cache, recursive=True) == []
+    assert audeer.list_file_names(audb_shared_cache, recursive=True) == []
 
     # Expected waveform plot
     signal, sampling_rate = audiofile.read(
