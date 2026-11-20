@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 import functools
 import json
 import os
@@ -165,13 +164,10 @@ class Datacard(object):
             file_name,
         )
 
-        min_ = 0
-        max_ = 0
         unit = "s"
-        durations = self.dataset.file_durations
-        if len(durations) > 0:
-            min_ = np.min(durations)
-            max_ = np.max(durations)
+        histogram = self.dataset.file_duration_histogram
+        min_ = histogram["min"]
+        max_ = histogram["max"]
 
         # Skip creating a distribution plot,
         # if all durations are the same
@@ -186,7 +182,7 @@ class Datacard(object):
             # if not found there already.
             if not os.path.exists(cache_file):
                 audeer.mkdir(os.path.dirname(cache_file))
-                self._plot_distribution(durations)
+                self._plot_distribution(histogram)
                 plt.savefig(cache_file, transparent=True)
                 plt.close()
 
@@ -465,13 +461,10 @@ class Datacard(object):
             file_name,
         )
 
-        min_ = 0
-        max_ = 0
         unit = "s"
-        durations = self.dataset.segment_durations
-        if len(durations) > 0:
-            min_ = np.min(durations)
-            max_ = np.max(durations)
+        histogram = self.dataset.segment_duration_histogram
+        min_ = histogram["min"]
+        max_ = histogram["max"]
 
         # Skip creating a distribution plot,
         # if all durations are the same
@@ -486,7 +479,7 @@ class Datacard(object):
             # if not found there already.
             if not os.path.exists(cache_file):
                 audeer.mkdir(os.path.dirname(cache_file))
-                self._plot_distribution(durations)
+                self._plot_distribution(histogram)
                 plt.savefig(cache_file, transparent=True)
                 plt.close()
 
@@ -536,20 +529,42 @@ class Datacard(object):
 
     def _plot_distribution(
         self,
-        values: Sequence,
+        histogram: dict[str, float | np.ndarray],
     ):
         r"""Plot inline distribution.
 
+        The distribution is estimated
+        by a kernel density estimate
+        of the bin centers
+        weighted by the bin counts.
+
         Args:
-            values: sequence of values
+            histogram: histogram as returned by
+                :attr:`audbcards.Dataset.file_duration_histogram`
+                or :attr:`audbcards.Dataset.segment_duration_histogram`
 
         """
-        if len(values) == 0:
-            min_ = 0
-            max_ = 0
-        else:
-            min_ = np.min(values)
-            max_ = np.max(values)
+        min_ = histogram["min"]
+        max_ = histogram["max"]
+        bin_edges = histogram["bin_edges"]
+        counts = histogram["counts"]
+        centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        # Ignore empty bins
+        mask = counts > 0
+        centers = centers[mask]
+        counts = counts[mask]
+        # Use Scott's rule with the number of values
+        # to select the bandwidth,
+        # as the weighted kernel density estimate
+        # would use the effective number of bins instead
+        # and oversmooth the distribution.
+        # The bandwidth is limited to the bin width
+        # to avoid spikes at the bin centers.
+        # The bandwidth factor is relative
+        # to the standard deviation of the values
+        std = np.sqrt(np.cov(centers, aweights=counts))
+        bin_width = bin_edges[1] - bin_edges[0]
+        bw_method = max(counts.sum() ** (-1 / 5), bin_width / std)
         plt.figure(figsize=[0.5, 0.15])
         # Remove all margins besides bottom
         plt.subplot(111)
@@ -563,7 +578,9 @@ class Datacard(object):
         )
         # Plot duration distribution
         sns.kdeplot(
-            values,
+            x=centers,
+            weights=counts,
+            bw_method=bw_method,
             fill=True,
             cut=0,
             clip=(min_, max_),

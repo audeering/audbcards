@@ -2,6 +2,7 @@ from collections.abc import Sequence
 import typing
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -113,6 +114,60 @@ def format_schemes(
     info_str = info_str[:-2]
 
     return info_str
+
+
+def histogram(
+    values: Sequence[float] | np.ndarray,
+    *,
+    bins: int = 1000,
+) -> dict[str, float | np.ndarray]:
+    r"""Summarize values by minimum, maximum, and histogram.
+
+    Non-finite values,
+    e.g. ``NaN``,
+    are ignored.
+    The bins are spaced linearly
+    between the minimum and maximum value.
+
+    Args:
+        values: values
+        bins: number of bins
+
+    Returns:
+        dictionary with the entries
+        ``"min"`` (minimum value),
+        ``"max"`` (maximum value),
+        ``"bin_edges"`` (array of length ``bins + 1``),
+        and ``"counts"`` (array of length ``bins``).
+        If ``values`` contains no finite values,
+        minimum and maximum are ``0``
+        and the arrays are empty.
+        If all values are identical,
+        a single bin is returned
+
+    """
+    values = np.asarray(values, dtype=np.float64)
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return {
+            "min": 0.0,
+            "max": 0.0,
+            "bin_edges": np.array([], dtype=np.float64),
+            "counts": np.array([], dtype=np.int64),
+        }
+    min_ = float(values.min())
+    max_ = float(values.max())
+    if min_ == max_:
+        bin_edges = np.array([min_, max_])
+        counts = np.array([values.size])
+    else:
+        counts, bin_edges = np.histogram(values, bins=bins, range=(min_, max_))
+    return {
+        "min": min_,
+        "max": max_,
+        "bin_edges": bin_edges,
+        "counts": counts.astype(np.int64),
+    }
 
 
 def limit_presented_samples(
