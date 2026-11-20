@@ -693,12 +693,19 @@ def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first
 
     # Simulate cache file written by older versions of audbcards,
     # which stored all attributes
+    # and obsolete properties like file durations
+    obsolete_attributes = ["file_durations", "segment_durations"]
+    for name in obsolete_attributes:
+        dataset.__dict__[name] = [1.0, 2.0]
     with monkeypatch.context() as m:
         m.setattr(dataset_cls, "__getstate__", lambda self: self.__dict__)
         dataset_cls._save_pickled(dataset, cache_file)
     assert "_header" in cache_file_content()
+    assert "file_durations" in cache_file_content()
     dataset = load_dataset()
     assert_clean(dataset)
+    for name in obsolete_attributes:
+        assert name not in dataset.__dict__
 
     # Release public cached properties on request
     assert "segment_duration_histogram" in dataset.__dict__

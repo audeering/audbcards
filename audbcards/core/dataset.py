@@ -88,6 +88,11 @@ class _Dataset:
             # like the header or all segments of the dataset,
             # which are removed by storing the cache again
             cache_again = obj.__dict__.keys() != obj.__getstate__().keys()
+            # Remove those attributes from the loaded object as well,
+            # including obsolete properties of older versions,
+            # e.g. `file_durations`,
+            # which might require a lot of memory
+            obj.__dict__ = obj.__getstate__()
             # Load cached properties,
             # that require to load filewise or segmented tables,
             # if they haven't been cached before.
