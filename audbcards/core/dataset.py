@@ -710,6 +710,10 @@ class _Dataset:
         # Ensure misc tables are loaded
         return audb.info.header(self.name, version=self.version, load_tables=True)
 
+    def _header_without_tables(self) -> audformat.Database:
+        r"""Load header without loading misc tables."""
+        return audb.info.header(self.name, version=self.version, load_tables=False)
+
     def _load_repository_object(self) -> audb.Repository:
         r"""Load repository object containing dataset."""
         return audb.repository(self.name, self.version)
@@ -921,16 +925,21 @@ class _Dataset:
         # We cannot use `self.header` here,
         # as it holds already loaded misc tables,
         # which would be replaced by their preview.
+        # For the same reason,
+        # the previews of misc tables are loaded into their own header,
+        # as other tables might use them as scheme labels,
+        # and replacing them by their preview
+        # would set all labels not contained in the preview to NaN.
         db = None
         for table in list(self.header):
             if f"db.{table}.parquet" in self.deps.tables:
-                if db is None:
-                    db = audb.info.header(
-                        self.name,
-                        version=self.version,
-                        load_tables=False,
-                    )
-                rows, df = self._parquet_table_preview(db, table, preview_rows)
+                if table in self.header.misc_tables:
+                    table_db = self._header_without_tables()
+                else:
+                    if db is None:
+                        db = self._header_without_tables()
+                    table_db = db
+                rows, df = self._parquet_table_preview(table_db, table, preview_rows)
             else:
                 df = audb.load_table(
                     self.name,

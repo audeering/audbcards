@@ -680,21 +680,25 @@ def test_dataset_tables_stats(
     db_path = audeer.mkdir(tmpdir, name)
     db = audformat.Database(name=name)
 
-    # Misc table, used as scheme labels
-    speakers = ["s0", "s1", "s2"]
+    # Misc table, used as scheme labels,
+    # with more rows than shown in the preview,
+    # and an ID sorted before the table using it
+    speakers = [f"s{n}" for n in range(8)]
     db.schemes["age"] = audformat.Scheme("int", minimum=0)
-    db["speaker"] = audformat.MiscTable(
+    db["actors"] = audformat.MiscTable(
         pd.Index(speakers, dtype="string", name="speaker")
     )
-    db["speaker"]["age"] = audformat.Column(scheme_id="age")
-    db["speaker"]["age"].set([20, 31, 42])
-    db.schemes["speaker"] = audformat.Scheme("str", labels="speaker")
+    db["actors"]["age"] = audformat.Column(scheme_id="age")
+    db["actors"]["age"].set([20 + n for n in range(8)])
+    db.schemes["speaker"] = audformat.Scheme("str", labels="actors")
 
-    # Filewise table with more rows than shown in the preview
+    # Filewise table with more rows than shown in the preview,
+    # containing in its preview speakers
+    # not contained in the preview of the misc table
     files = [f"f{n:02d}.wav" for n in range(12)]
     db["files"] = audformat.Table(audformat.filewise_index(files))
     db["files"]["speaker"] = audformat.Column(scheme_id="speaker")
-    db["files"]["speaker"].set([speakers[n % 3] for n in range(12)])
+    db["files"]["speaker"].set([speakers[7 - n % 8] for n in range(12)])
     db["files"]["text"] = audformat.Column()
     db["files"]["text"].set([f"text {n}" for n in range(12)])
 
@@ -744,14 +748,14 @@ def test_dataset_tables_stats(
             pytest.VERSION,
             cache_root=audeer.mkdir(tmpdir, "cache"),
         )
-    for table in ["speaker", "files", "segments", "segments2", "empty"]:
+    for table in ["actors", "files", "segments", "segments2", "empty"]:
         df = audb.load_table(name, table, version=pytest.VERSION, verbose=False)
         stats = ds._tables_stats[table]
         assert stats["rows"] == len(df)
         assert stats["columns"] == len(df.columns)
         pd.testing.assert_frame_equal(stats["preview"], df.head(5))
     assert ds.tables_rows == {
-        "speaker": 3,
+        "actors": 8,
         "files": 12,
         "segments": 6,
         "segments2": 3,
@@ -777,7 +781,7 @@ def test_dataset_tables_stats(
     assert np.isnan(ds.segment_durations[-1])
 
     # Header still holds complete misc table
-    assert list(ds.header["speaker"].index) == speakers
+    assert list(ds.header["actors"].index) == speakers
 
 
 class TestDatasetLoadTables:
