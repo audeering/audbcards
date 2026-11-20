@@ -673,7 +673,7 @@ class _Dataset:
         # Fix RST used signs
         description = description.replace("`", "'")
         if len(description) > length:
-            description = f"{description[:length - 3]}..."
+            description = f"{description[: length - 3]}..."
         return description
 
     @functools.cached_property
@@ -954,7 +954,7 @@ class _Dataset:
                 if isinstance(mappings[0], dict):
                     # e.g. {'s1': {'gender': 'male', 'age': 21}}
                     mappings = sorted(list(mappings[0].keys()))
-                    mappings = f'{", ".join(mappings)}'
+                    mappings = f"{', '.join(mappings)}"
                 else:
                     # e.g. {'f': 'female', 'm': 'male'}
                     mappings = "✓"
@@ -975,31 +975,34 @@ class _Dataset:
         Tables stored as CSV files
         are loaded completely.
 
+        To reduce memory consumption
+        for datasets with millions of segments,
+        files are represented by integer codes
+        instead of file names,
+        and duplicated segments
+        are removed by sorting integer arrays.
+
         Returns:
             table with columns ``"file"``, ``"start"``, ``"end"``,
             holding every segment once,
-            in order of first occurrence
+            in order of first occurrence.
+            ``"file"`` holds an integer code per file
 
         """
-        index_columns = [
-            audformat.define.IndexField.FILE,
-            audformat.define.IndexField.START,
-            audformat.define.IndexField.END,
-        ]
-        schema = pa.schema(
-            [
-                (audformat.define.IndexField.FILE, pa.string()),
-                (audformat.define.IndexField.START, pa.duration("ns")),
-                (audformat.define.IndexField.END, pa.duration("ns")),
-            ]
-        )
-        segments = [schema.empty_table()]
+        file_column = audformat.define.IndexField.FILE
+        start_column = audformat.define.IndexField.START
+        end_column = audformat.define.IndexField.END
+        index_columns = [file_column, start_column, end_column]
+
+        # Index columns of segmented tables,
+        # with dictionary encoded file column
+        indices = []
         for table in self.header.tables:
             if not self.header.tables[table].is_segmented:
                 continue
             if f"db.{table}.parquet" in self.deps.tables:
                 with self._open_parquet_table(table) as file:
-                    parquet_file = pq.ParquetFile(file)
+                    parquet_file = pq.ParquetFile(file, read_dictionary=[file_column])
                     index = parquet_file.read(columns=index_columns)
             else:
                 df = audb.load_table(
@@ -1012,21 +1015,77 @@ class _Dataset:
                     df.index.to_frame(index=False),
                     preserve_index=False,
                 )
-            segments.append(index.select(index_columns).cast(schema))
-        segments = pa.concat_tables(segments)
+                del df
+                index = index.set_column(
+                    index.schema.get_field_index(file_column),
+                    file_column,
+                    pc.dictionary_encode(index[file_column]),
+                )
+            indices.append(index.select(index_columns))
+
+        # Map dictionary indices of all tables
+        # to codes of a single list of files
+        dictionaries = [
+            chunk.dictionary.cast(pa.string())
+            for index in indices
+            for chunk in index[file_column].chunks
+        ]
+        if len(dictionaries) > 0:
+            files = pc.unique(pa.concat_arrays(dictionaries))
+        codes, starts, ends = [], [], []
+        for index in indices:
+            for chunk in index[file_column].chunks:
+                mapping = pc.index_in(chunk.dictionary.cast(pa.string()), files)
+                codes.append(pc.take(mapping, chunk.indices).to_numpy())
+            starts.append(self._duration_to_int(index[start_column]))
+            ends.append(self._duration_to_int(index[end_column]))
+        del indices
+        codes = np.concatenate(codes or [np.array([], dtype=np.int32)])
+        starts = np.concatenate(starts or [np.array([], dtype=np.int64)])
+        ends = np.concatenate(ends or [np.array([], dtype=np.int64)])
+
         # Remove duplicates,
-        # and keep order of first occurrence
-        # by sorting by the first position of each segment
-        segments = segments.append_column(
-            "position",
-            pa.array(np.arange(segments.num_rows, dtype="int64")),
+        # and keep order of first occurrence.
+        # As np.lexsort() is stable,
+        # the first entry of identical segments
+        # is the one with the lowest position
+        if len(codes) > 0:
+            order = np.lexsort((ends, starts, codes))
+            keep = np.ones(len(order), dtype=bool)
+            keep[1:] = (
+                (np.diff(codes[order]) != 0)
+                | (np.diff(starts[order]) != 0)
+                | (np.diff(ends[order]) != 0)
+            )
+            keep = np.sort(order[keep])
+            codes = codes[keep]
+            starts = starts[keep]
+            ends = ends[keep]
+
+        null = np.iinfo(np.int64).min
+        return pa.table(
+            {
+                file_column: pa.array(codes, type=pa.int32()),
+                start_column: pa.array(starts).cast(pa.duration("ns")),
+                end_column: pa.array(ends, mask=ends == null).cast(pa.duration("ns")),
+            }
         )
-        segments = (
-            segments.group_by(index_columns)
-            .aggregate([("position", "min")])
-            .sort_by("position_min")
-        )
-        return segments.select(index_columns)
+
+    @staticmethod
+    def _duration_to_int(column: pa.ChunkedArray) -> np.ndarray:
+        r"""Convert start or end column to integer array in nanoseconds.
+
+        Missing values are set to the minimum value of ``np.int64``.
+
+        Args:
+            column: column holding durations
+
+        Returns:
+            array with durations in nanoseconds
+
+        """
+        column = pc.cast(pc.cast(column, pa.duration("ns")), pa.int64())
+        return pc.fill_null(column, np.iinfo(np.int64).min).to_numpy()
 
     @functools.cached_property
     def _tables_stats(self) -> dict[str, dict]:
