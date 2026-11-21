@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.1 (2026-11-21)
+--------------------------
+
+* Changed: reduce memory consumption
+  when removing duplicated segments
+  of a dataset,
+  e.g. when calculating segment durations
+  for datasets with millions of segments
+
+
 Version 1.0.0 (2026-11-20)
 --------------------------
 
