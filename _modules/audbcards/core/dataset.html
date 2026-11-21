@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.0.0
+                v1.0.1
               </div>
             
           
@@ -821,7 +821,7 @@
         <span class="c1"># Fix RST used signs</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"`"</span><span class="p">,</span> <span class="s2">"'"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">description</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">:</span>
-            <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">description</span><span class="p">[:</span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">description</span><span class="p">[:</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span>
         <span class="k">return</span> <span class="n">description</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
@@ -1102,7 +1102,7 @@
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
                     <span class="c1"># e.g. {'s1': {'gender': 'male', 'age': 21}}</span>
                     <span class="n">mappings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mappings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                    <span class="n">mappings</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
+                    <span class="n">mappings</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># e.g. {'f': 'female', 'm': 'male'}</span>
                     <span class="n">mappings</span> <span class="o">=</span> <span class="s2">"✓"</span>
@@ -1123,31 +1123,34 @@
 <span class="sd">        Tables stored as CSV files</span>
 <span class="sd">        are loaded completely.</span>
 
+<span class="sd">        To reduce memory consumption</span>
+<span class="sd">        for datasets with millions of segments,</span>
+<span class="sd">        files are represented by integer codes</span>
+<span class="sd">        instead of file names,</span>
+<span class="sd">        and duplicated segments</span>
+<span class="sd">        are removed by sorting integer arrays.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            table with columns ``"file"``, ``"start"``, ``"end"``,</span>
 <span class="sd">            holding every segment once,</span>
-<span class="sd">            in order of first occurrence</span>
+<span class="sd">            in order of first occurrence.</span>
+<span class="sd">            ``"file"`` holds an integer code per file</span>
 
 <span class="sd">        """</span>
-        <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
-            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">START</span><span class="p">,</span>
-            <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">END</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">schema</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span>
-                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">START</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
-                <span class="p">(</span><span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">empty_table</span><span class="p">()]</span>
+        <span class="n">file_column</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">FILE</span>
+        <span class="n">start_column</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">START</span>
+        <span class="n">end_column</span> <span class="o">=</span> <span class="n">audformat</span><span class="o">.</span><span class="n">define</span><span class="o">.</span><span class="n">IndexField</span><span class="o">.</span><span class="n">END</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_column</span><span class="p">,</span> <span class="n">start_column</span><span class="p">,</span> <span class="n">end_column</span><span class="p">]</span>
+
+        <span class="c1"># Index columns of segmented tables,</span>
+        <span class="c1"># with dictionary encoded file column</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">is_segmented</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="sa">f</span><span class="s2">"db.</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">.parquet"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_parquet_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-                    <span class="n">parquet_file</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="n">parquet_file</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">read_dictionary</span><span class="o">=</span><span class="p">[</span><span class="n">file_column</span><span class="p">])</span>
                     <span class="n">index</span> <span class="o">=</span> <span class="n">parquet_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">index_columns</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">audb</span><span class="o">.</span><span class="n">load_table</span><span class="p">(</span>
@@ -1160,21 +1163,78 @@
                     <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                     <span class="n">preserve_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">schema</span><span class="p">))</span>
-        <span class="n">segments</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">concat_tables</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">df</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span>
+                    <span class="n">index</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">get_field_index</span><span class="p">(</span><span class="n">file_column</span><span class="p">),</span>
+                    <span class="n">file_column</span><span class="p">,</span>
+                    <span class="n">pc</span><span class="o">.</span><span class="n">dictionary_encode</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">file_column</span><span class="p">]),</span>
+                <span class="p">)</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">index_columns</span><span class="p">))</span>
+
+        <span class="c1"># Map dictionary indices of all tables</span>
+        <span class="c1"># to codes of a single list of files</span>
+        <span class="n">dictionaries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">chunk</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span>
+            <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">index</span><span class="p">[</span><span class="n">file_column</span><span class="p">]</span><span class="o">.</span><span class="n">chunks</span>
+        <span class="p">]</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dictionaries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">concat_arrays</span><span class="p">(</span><span class="n">dictionaries</span><span class="p">))</span>
+        <span class="n">codes</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">index</span><span class="p">[</span><span class="n">file_column</span><span class="p">]</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span>
+                <span class="n">mapping</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">index_in</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">()),</span> <span class="n">files</span><span class="p">)</span>
+                <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">chunk</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+            <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_duration_to_int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">start_column</span><span class="p">]))</span>
+            <span class="n">ends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_duration_to_int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">end_column</span><span class="p">]))</span>
+        <span class="k">del</span> <span class="n">indices</span><span class="p">,</span> <span class="n">dictionaries</span><span class="p">,</span> <span class="n">files</span>
+        <span class="n">codes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">codes</span> <span class="ow">or</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)])</span>
+        <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">starts</span> <span class="ow">or</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)])</span>
+        <span class="n">ends</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ends</span> <span class="ow">or</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)])</span>
+
         <span class="c1"># Remove duplicates,</span>
-        <span class="c1"># and keep order of first occurrence</span>
-        <span class="c1"># by sorting by the first position of each segment</span>
-        <span class="n">segments</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">append_column</span><span class="p">(</span>
-            <span class="s2">"position"</span><span class="p">,</span>
-            <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"int64"</span><span class="p">)),</span>
+        <span class="c1"># and keep order of first occurrence.</span>
+        <span class="c1"># As np.lexsort() is stable,</span>
+        <span class="c1"># the first entry of identical segments</span>
+        <span class="c1"># is the one with the lowest position</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">ends</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">codes</span><span class="p">))</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">keep</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">codes</span><span class="p">[</span><span class="n">order</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">|</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">starts</span><span class="p">[</span><span class="n">order</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="o">|</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ends</span><span class="p">[</span><span class="n">order</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="n">keep</span><span class="p">])</span>
+            <span class="n">codes</span> <span class="o">=</span> <span class="n">codes</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="n">starts</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="n">ends</span> <span class="o">=</span> <span class="n">ends</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+
+        <span class="n">null</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">min</span>
+        <span class="k">return</span> <span class="n">pa</span><span class="o">.</span><span class="n">table</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">file_column</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">pa</span><span class="o">.</span><span class="n">int32</span><span class="p">()),</span>
+                <span class="n">start_column</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
+                <span class="n">end_column</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ends</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">ends</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span>
+            <span class="p">}</span>
         <span class="p">)</span>
-        <span class="n">segments</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">segments</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">aggregate</span><span class="p">([(</span><span class="s2">"position"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">)])</span>
-            <span class="o">.</span><span class="n">sort_by</span><span class="p">(</span><span class="s2">"position_min"</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">segments</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_duration_to_int</span><span class="p">(</span><span class="n">column</span><span class="p">:</span> <span class="n">pa</span><span class="o">.</span><span class="n">ChunkedArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Convert start or end column to integer array in nanoseconds.</span>
+
+<span class="sd">        Missing values are set to the minimum value of ``np.int64``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            column: column holding durations</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array with durations in nanoseconds</span>
+
+<span class="sd">        """</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">duration</span><span class="p">(</span><span class="s2">"ns"</span><span class="p">)),</span> <span class="n">pa</span><span class="o">.</span><span class="n">int64</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_tables_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
@@ -1534,7 +1594,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/20 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/21 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
