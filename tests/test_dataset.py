@@ -672,7 +672,8 @@ def test_dataset_cache_content(tmpdir, monkeypatch, medium_db, load_tables_first
     def assert_clean(dataset):
         content = cache_file_content()
         assert len(content) > 0
-        assert all(name in public_cached_properties for name in content)
+        stored_attributes = public_cached_properties + ["_cached_repository"]
+        assert all(name in stored_attributes for name in content)
         for name in private_attributes:
             assert name not in dataset.__dict__
 
@@ -1152,6 +1153,81 @@ def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_d
     assert "outdated" not in dataset.repository_link
     for name in dataset_cls._uncached_properties:
         assert name not in cache_file_content()
+
+
+def test_dataset_publication_after_move(tmpdir, monkeypatch, repository, medium_db):
+    """Test publication details of a moved dataset.
+
+    Publication date and owner are stored in the cache file,
+    together with the repository they were requested from.
+    They should only be requested again,
+    if the repository of the dataset has changed,
+    or the cache file does not store the repository,
+    as written by older versions of audbcards.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        repository: repository fixture
+        medium_db: medium_db fixture
+
+    """
+    dataset_cls = audbcards.core.dataset._Dataset
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = dataset_cls._dataset_cache_path(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+    repository_key = dataset_cls._repository_key(repository)
+
+    def load_dataset():
+        return audbcards.Dataset(
+            medium_db.name,
+            pytest.VERSION,
+            cache_root=cache_root,
+            repository=repository,
+        )
+
+    def cache_file_content() -> dict:
+        with open(cache_file, "rb") as fp:
+            return pickle.load(fp).__dict__
+
+    def store_cache_file(dataset, cached_repository):
+        dataset.__dict__["publication_date"] = "outdated-date"
+        dataset.__dict__["publication_owner"] = "outdated-owner"
+        if cached_repository is None:
+            dataset.__dict__.pop("_cached_repository", None)
+        else:
+            dataset.__dict__["_cached_repository"] = cached_repository
+        dataset_cls._save_pickled(dataset, cache_file)
+
+    # Create dataset and cache file
+    dataset = load_dataset()
+    publication_date = dataset.publication_date
+    publication_owner = dataset.publication_owner
+    assert cache_file_content()["_cached_repository"] == repository_key
+
+    # Same repository:
+    # cached publication details are used
+    store_cache_file(dataset, repository_key)
+    dataset = load_dataset()
+    assert dataset.publication_date == "outdated-date"
+    assert dataset.publication_owner == "outdated-owner"
+
+    # Moved to another repository,
+    # or cache file written by older versions of audbcards:
+    # publication details are requested again
+    # and cache file is updated
+    for cached_repository in [("other", "host", "backend"), None]:
+        store_cache_file(dataset, cached_repository)
+        dataset = load_dataset()
+        assert dataset.publication_date == publication_date
+        assert dataset.publication_owner == publication_owner
+        content = cache_file_content()
+        assert content["_cached_repository"] == repository_key
+        assert content["publication_date"] == publication_date
+        assert content["publication_owner"] == publication_owner
 
 
 @pytest.mark.parametrize("cached", [False, True])
