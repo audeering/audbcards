@@ -247,8 +247,6 @@ def test_dataset(
     # repository
     assert dataset.repository == repository.name
 
-    # repository_link : skipped for now
-
     # sampling_rates
     expected_sampling_rates = sorted(
         list(
@@ -1142,6 +1140,7 @@ def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_d
     # Simulate cache file written by older versions of audbcards,
     # which stored an outdated repository
     dataset.__dict__["repository"] = "outdated"
+    # Obsolete property of older versions
     dataset.__dict__["repository_link"] = "outdated-link"
     with monkeypatch.context() as m:
         m.setattr(dataset_cls, "__getstate__", lambda self: self.__dict__)
@@ -1150,8 +1149,8 @@ def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_d
 
     dataset = load_dataset()
     assert dataset.repository == repository.name
-    assert "outdated" not in dataset.repository_link
-    for name in dataset_cls._uncached_properties:
+    assert "repository_link" not in dataset.__dict__
+    for name in dataset_cls._uncached_properties + ["repository_link"]:
         assert name not in cache_file_content()
 
 
@@ -1265,4 +1264,3 @@ def test_dataset_repository_argument(
     )
     assert dataset.repository_object == repository
     assert dataset.repository == repository.name
-    assert medium_db.name in dataset.repository_link

@@ -69,7 +69,6 @@ class _Dataset:
 
     _uncached_properties = [
         "repository",
-        "repository_link",
     ]
     """Public cached properties not stored in the cache file.
 
@@ -640,18 +639,6 @@ class _Dataset:
     def repository(self) -> str:
         r"""Repository containing the dataset."""
         return f"{self.repository_object.name}"
-
-    @functools.cached_property
-    def repository_link(self) -> str:
-        r"""Link to repository in Artifactory web UI."""
-        # NOTE: this needs to be changed
-        # as we want to support different backends
-        return (
-            f"{self.repository_object.host}/"
-            f"webapp/#/artifacts/browse/tree/General/"
-            f"{self.repository}/"
-            f"{self.name}"
-        )
 
     @functools.cached_property
     def sampling_rates(self) -> list[int]:

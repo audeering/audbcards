@@ -11,6 +11,6 @@ usage         unrestricted
 languages     
 format        
 files         0
-repository    `data-local <.../data-local/bare_db>`__
+repository    data-local
 published     2023-04-05 by author
 ============= ======================
