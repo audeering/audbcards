@@ -98,10 +98,6 @@ repository
 ----------
 .. autoattribute:: Dataset.repository
     
-repository\_link
-----------------
-.. autoattribute:: Dataset.repository_link
-    
 repository\_object
 ------------------
 .. autoattribute:: Dataset.repository_object

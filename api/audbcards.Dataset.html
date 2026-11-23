@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.0.1
+                v1.1.0
               </div>
             
           
@@ -131,7 +131,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#publication-date">publication_date</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#publication-owner">publication_owner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repository">repository</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#repository-link">repository_link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repository-object">repository_object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sampling-rates">sampling_rates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schemes">schemes</a></li>
@@ -199,7 +198,7 @@
 <h1>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="audbcards.Dataset">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audbcards.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audbcards/core/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audbcards.Dataset" title="Link to this definition">¶</a></dt>
 <dd><p>Dataset representation.</p>
 <p>Dataset object that represents a dataset
 that can be loaded with <a class="reference external" href="https://audeering.github.io/audb/api/audb.load.html#audb.load" title="(in audb v1.15.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.load()</span></code></a>.</p>
@@ -218,6 +217,11 @@ it caches values extracted from tables.
 Set this to <code class="docutils literal notranslate"><span class="pre">False</span></code>,
 if loading the tables takes too long,
 or does not fit into memory</p></li>
+<li><p><strong>repository</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://audeering.github.io/audb/api/audb.Repository.html#audb.Repository" title="(in audb v1.15.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></span></span>) – repository containing the dataset.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+it is looked up with <a class="reference external" href="https://audeering.github.io/audb/api/audb.repository.html#audb.repository" title="(in audb v1.15.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">audb.repository()</span></code></a>,
+which requires to access the backends
+of all repositories in <a class="reference external" href="https://audeering.github.io/audb/api/audb.config.html#audb.config.REPOSITORIES" title="(in audb v1.15.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audb.config.REPOSITORIES</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -467,15 +471,6 @@ and the arrays are empty</p>
 </dd></dl>
 
 </section>
-<section id="repository-link">
-<h2>repository_link<a class="headerlink" href="#repository-link" title="Link to this heading">¶</a></h2>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="audbcards.Dataset.repository_link">
-<span class="sig-prename descclassname"><span class="pre">Dataset.</span></span><span class="sig-name descname"><span class="pre">repository_link</span></span><a class="headerlink" href="#audbcards.Dataset.repository_link" title="Link to this definition">¶</a></dt>
-<dd><p>Link to repository in Artifactory web UI.</p>
-</dd></dl>
-
-</section>
 <section id="repository-object">
 <h2>repository_object<a class="headerlink" href="#repository-object" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
@@ -714,7 +709,7 @@ and number of rows as values</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/21 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.0.1
+                v1.1.0
               </div>
             
           
@@ -215,6 +215,41 @@
 
 <span class="sd">    """</span>
 
+    <span class="n">_uncached_properties</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"repository"</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Public cached properties not stored in the cache file.</span>
+
+<span class="sd">    The repository of a dataset version</span>
+<span class="sd">    might change after it was cached,</span>
+<span class="sd">    e.g. when a dataset is moved to another repository.</span>
+<span class="sd">    Hence,</span>
+<span class="sd">    those properties are derived from</span>
+<span class="sd">    :attr:`audbcards.Dataset.repository_object`</span>
+<span class="sd">    every time a dataset is created or loaded from cache.</span>
+
+<span class="sd">    """</span>
+
+    <span class="n">_repository_related_cached_properties</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"publication_date"</span><span class="p">,</span>
+        <span class="s2">"publication_owner"</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Cached properties relying on the repository.</span>
+
+<span class="sd">    Those properties are stored in the cache file,</span>
+<span class="sd">    as requesting them from the backend</span>
+<span class="sd">    for every build is slow.</span>
+<span class="sd">    The repository they were requested from</span>
+<span class="sd">    is stored as well,</span>
+<span class="sd">    see :meth:`audbcards.Dataset._repository_key`.</span>
+<span class="sd">    If a dataset is loaded from cache</span>
+<span class="sd">    and its repository has changed,</span>
+<span class="sd">    e.g. when a dataset was moved to another repository,</span>
+<span class="sd">    they are requested again</span>
+<span class="sd">    and the cache file is updated.</span>
+
+<span class="sd">    """</span>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -223,6 +258,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">repository</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Instantiate Dataset Object."""</span>
         <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -241,6 +277,24 @@
             <span class="c1"># e.g. `file_durations`,</span>
             <span class="c1"># which might require a lot of memory</span>
             <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
+            <span class="c1"># Repository is not stored in the cache file,</span>
+            <span class="c1"># as the dataset might have been moved</span>
+            <span class="c1"># to another repository.</span>
+            <span class="c1"># It is set before loading table related properties,</span>
+            <span class="c1"># as they might need the backend</span>
+            <span class="k">if</span> <span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_repository_object</span> <span class="o">=</span> <span class="n">repository</span>
+            <span class="c1"># Request repository related properties again,</span>
+            <span class="c1"># if the dataset was moved to another repository,</span>
+            <span class="c1"># or the cache file was written by an older version of audbcards,</span>
+            <span class="c1"># that did not store the repository</span>
+            <span class="n">repository_key</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_repository_key</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">repository_object</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"_cached_repository"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">repository_key</span><span class="p">:</span>
+                <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_cached_repository</span> <span class="o">=</span> <span class="n">repository_key</span>
+                <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_repository_related_cached_properties</span><span class="p">:</span>
+                    <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cached_property</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
             <span class="c1"># Load cached properties,</span>
             <span class="c1"># that require to load filewise or segmented tables,</span>
             <span class="c1"># if they haven't been cached before.</span>
@@ -262,13 +316,14 @@
             <span class="n">obj</span><span class="o">.</span><span class="n">_release_memory</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">obj</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">load_tables</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">,</span> <span class="n">load_tables</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
         <span class="c1"># Visit cached properties to fill their cache values</span>
         <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
             <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">exclude</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">_cached_properties</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_cached_repository</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_repository_key</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">repository_object</span><span class="p">)</span>
 
         <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">_release_memory</span><span class="p">()</span>
@@ -280,6 +335,7 @@
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">repository</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
@@ -294,7 +350,10 @@
         <span class="c1"># used inside corresponding properties.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_header</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_dependencies</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_repository_object</span><span class="p">()</span>  <span class="c1"># load before backend</span>
+        <span class="c1"># Load repository before backend</span>
+        <span class="k">if</span> <span class="n">repository</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">repository</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_repository_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repository_object</span> <span class="o">=</span> <span class="n">repository</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_backend</span><span class="p">()</span>
 
         <span class="c1"># Clean up cache</span>
@@ -313,7 +372,13 @@
 
 <span class="sd">        Only public cached properties,</span>
 <span class="sd">        that have already been computed,</span>
-<span class="sd">        are stored.</span>
+<span class="sd">        are stored,</span>
+<span class="sd">        except the ones listed in ``_uncached_properties``.</span>
+<span class="sd">        In addition,</span>
+<span class="sd">        ``_cached_repository`` is stored,</span>
+<span class="sd">        which identifies the repository</span>
+<span class="sd">        the properties listed in ``_repository_related_cached_properties``</span>
+<span class="sd">        were requested from.</span>
 <span class="sd">        Private attributes,</span>
 <span class="sd">        like the header,</span>
 <span class="sd">        the dependency table,</span>
@@ -326,11 +391,29 @@
 
 <span class="sd">        """</span>
         <span class="n">public_cached_properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_property_names</span><span class="p">(</span><span class="n">private</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">stored_attributes</span> <span class="o">=</span> <span class="n">public_cached_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"_cached_repository"</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">value</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">public_cached_properties</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stored_attributes</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uncached_properties</span>
         <span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repository_key</span><span class="p">(</span><span class="n">repository</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Identifier of a repository stored in the cache file.</span>
+
+<span class="sd">        A tuple of plain strings is stored</span>
+<span class="sd">        instead of the :class:`audb.Repository` object,</span>
+<span class="sd">        to not depend on its pickled representation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repository: repository object</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            name, host, and backend of repository</span>
+
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">repository</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">repository</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">repository</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_cached_property_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">private</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -704,18 +787,6 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository containing the dataset."""</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
-
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">repository_link</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">"""Link to repository in Artifactory web UI."""</span>
-        <span class="c1"># NOTE: this needs to be changed</span>
-        <span class="c1"># as we want to support different backends</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository_object</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">/"</span>
-            <span class="sa">f</span><span class="s2">"webapp/#/artifacts/browse/tree/General/"</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="si">}</span><span class="s2">/"</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
-        <span class="p">)</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sampling_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
@@ -1435,6 +1506,11 @@
 <span class="sd">            Set this to ``False``,</span>
 <span class="sd">            if loading the tables takes too long,</span>
 <span class="sd">            or does not fit into memory</span>
+<span class="sd">        repository: repository containing the dataset.</span>
+<span class="sd">            If ``None``,</span>
+<span class="sd">            it is looked up with :func:`audb.repository`,</span>
+<span class="sd">            which requires to access the backends</span>
+<span class="sd">            of all repositories in :attr:`audb.config.REPOSITORIES`</span>
 
 <span class="sd">    """</span>
 
@@ -1445,6 +1521,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">repository</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Create Dataset Instance."""</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="n">_Dataset</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
@@ -1452,6 +1529,7 @@
             <span class="n">version</span><span class="p">,</span>
             <span class="n">cache_root</span><span class="o">=</span><span class="n">cache_root</span><span class="p">,</span>
             <span class="n">load_tables</span><span class="o">=</span><span class="n">load_tables</span><span class="p">,</span>
+            <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span>
 
@@ -1464,6 +1542,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_tables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">repository</span><span class="p">:</span> <span class="n">audb</span><span class="o">.</span><span class="n">Repository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""Cache root folder."""</span>
@@ -1520,7 +1599,8 @@
 <span class="sd">    description,</span>
 <span class="sd">    license,</span>
 <span class="sd">    version,</span>
-<span class="sd">    schemes.</span>
+<span class="sd">    schemes,</span>
+<span class="sd">    repository.</span>
 <span class="sd">    The name column does also contain a link</span>
 <span class="sd">    to the corresponding data card.</span>
 
@@ -1542,12 +1622,20 @@
             <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">license_link</span><span class="si">}</span><span class="s2">&gt;`__"</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">.</span><span class="n">schemes_summary</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">repository</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span>
     <span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
         <span class="n">tuples</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"name"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">,</span> <span class="s2">"license"</span><span class="p">,</span> <span class="s2">"version"</span><span class="p">,</span> <span class="s2">"schemes"</span><span class="p">],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">"name"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">,</span>
+            <span class="s2">"license"</span><span class="p">,</span>
+            <span class="s2">"version"</span><span class="p">,</span>
+            <span class="s2">"schemes"</span><span class="p">,</span>
+            <span class="s2">"repository"</span><span class="p">,</span>
+        <span class="p">],</span>
         <span class="n">index</span><span class="o">=</span><span class="s2">"name"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">csv_file</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">replace_file_extension</span><span class="p">(</span><span class="n">rst_file</span><span class="p">,</span> <span class="s2">"csv"</span><span class="p">)</span>
@@ -1594,7 +1682,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/21 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
