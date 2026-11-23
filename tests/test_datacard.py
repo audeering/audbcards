@@ -554,3 +554,15 @@ def load_rendered_template(name: str) -> str:
     with open(fpath, "r") as file:
         rendered_rst = file.read().rstrip()
     return rendered_rst
+
+
+def test_datacard_repository(tmpdir, medium_db, cache):
+    r"""Test repository is shown without link."""
+    dataset = audbcards.Dataset(medium_db.name, pytest.VERSION, cache_root=cache)
+    datacard = audbcards.Datacard(dataset, cache_root=cache)
+    datacard.sphinx_build_dir = audeer.mkdir(tmpdir, "build", "html")
+    datacard.sphinx_src_dir = audeer.mkdir(tmpdir, "docs")
+
+    content = datacard._render_template()
+    lines = [line for line in content.splitlines() if line.startswith("repository")]
+    assert lines == [f"repository    {dataset.repository}"]
