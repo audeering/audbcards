@@ -140,10 +140,17 @@ def builder_inited(app: sphinx.application.Sphinx):
             # Iterate datasets and create data card pages
             names = list(df.index)
             versions = list(df["version"])
+            # Pass repository of each dataset,
+            # as returned by audb.available(),
+            # to avoid looking it up again
+            repositories = [
+                audb.Repository(row["repository"], row["host"], row["backend"])
+                for _, row in df.iterrows()
+            ]
             datasets = []
-            for name, version in zip(names, versions):
+            for name, version, repository in zip(names, versions, repositories):
                 print(f"Parse {name}-{version}... ", end="", flush=True)
-                dataset = Dataset(name, version)
+                dataset = Dataset(name, version, repository=repository)
                 datacard = Datacard(
                     dataset,
                     path=path,

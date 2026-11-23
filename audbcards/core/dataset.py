@@ -67,6 +67,42 @@ class _Dataset:
 
     """
 
+    _uncached_properties = [
+        "repository",
+        "repository_link",
+    ]
+    """Public cached properties not stored in the cache file.
+
+    The repository of a dataset version
+    might change after it was cached,
+    e.g. when a dataset is moved to another repository.
+    Hence,
+    those properties are derived from
+    :attr:`audbcards.Dataset.repository_object`
+    every time a dataset is created or loaded from cache.
+
+    """
+
+    _repository_related_cached_properties = [
+        "publication_date",
+        "publication_owner",
+    ]
+    """Cached properties relying on the repository.
+
+    Those properties are stored in the cache file,
+    as requesting them from the backend
+    for every build is slow.
+    The repository they were requested from
+    is stored as well,
+    see :meth:`audbcards.Dataset._repository_key`.
+    If a dataset is loaded from cache
+    and its repository has changed,
+    e.g. when a dataset was moved to another repository,
+    they are requested again
+    and the cache file is updated.
+
+    """
+
     @classmethod
     def create(
         cls,
@@ -75,6 +111,7 @@ class _Dataset:
         *,
         cache_root: str | None = None,
         load_tables: bool = True,
+        repository: audb.Repository | None = None,
     ):
         r"""Instantiate Dataset Object."""
         if cache_root is None:
@@ -93,6 +130,24 @@ class _Dataset:
             # e.g. `file_durations`,
             # which might require a lot of memory
             obj.__dict__ = obj.__getstate__()
+            # Repository is not stored in the cache file,
+            # as the dataset might have been moved
+            # to another repository.
+            # It is set before loading table related properties,
+            # as they might need the backend
+            if repository is not None:
+                obj._repository_object = repository
+            # Request repository related properties again,
+            # if the dataset was moved to another repository,
+            # or the cache file was written by an older version of audbcards,
+            # that did not store the repository
+            repository_key = cls._repository_key(obj.repository_object)
+            if obj.__dict__.get("_cached_repository") != repository_key:
+                cache_again = True
+                obj._cached_repository = repository_key
+                for cached_property in cls._repository_related_cached_properties:
+                    obj.__dict__.pop(cached_property, None)
+                    getattr(obj, cached_property)
             # Load cached properties,
             # that require to load filewise or segmented tables,
             # if they haven't been cached before.
@@ -114,13 +169,14 @@ class _Dataset:
             obj._release_memory()
             return obj
 
-        obj = cls(name, version, cache_root, load_tables)
+        obj = cls(name, version, cache_root, load_tables, repository)
         # Visit cached properties to fill their cache values
         if load_tables:
             exclude = []
         else:
             exclude = cls._table_related_cached_properties
         obj._cached_properties(exclude=exclude)
+        obj._cached_repository = cls._repository_key(obj.repository_object)
 
         cls._save_pickled(obj, dataset_cache_filename)
         obj._release_memory()
@@ -132,6 +188,7 @@ class _Dataset:
         version: str,
         cache_root: str | None = None,
         load_tables: bool = True,
+        repository: audb.Repository | None = None,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""
@@ -146,7 +203,10 @@ class _Dataset:
         # used inside corresponding properties.
         self._header = self._load_header()
         self._deps = self._load_dependencies()
-        self._repository_object = self._load_repository_object()  # load before backend
+        # Load repository before backend
+        if repository is None:
+            repository = self._load_repository_object()
+        self._repository_object = repository
         self._backend = self._load_backend()
 
         # Clean up cache
@@ -165,7 +225,13 @@ class _Dataset:
 
         Only public cached properties,
         that have already been computed,
-        are stored.
+        are stored,
+        except the ones listed in ``_uncached_properties``.
+        In addition,
+        ``_cached_repository`` is stored,
+        which identifies the repository
+        the properties listed in ``_repository_related_cached_properties``
+        were requested from.
         Private attributes,
         like the header,
         the dependency table,
@@ -178,11 +244,29 @@ class _Dataset:
 
         """
         public_cached_properties = self._cached_property_names(private=False)
+        stored_attributes = public_cached_properties + ["_cached_repository"]
         return {
             name: value
             for name, value in self.__dict__.items()
-            if name in public_cached_properties
+            if name in stored_attributes and name not in self._uncached_properties
         }
+
+    @staticmethod
+    def _repository_key(repository: audb.Repository) -> tuple[str, str, str]:
+        r"""Identifier of a repository stored in the cache file.
+
+        A tuple of plain strings is stored
+        instead of the :class:`audb.Repository` object,
+        to not depend on its pickled representation.
+
+        Args:
+            repository: repository object
+
+        Returns:
+            name, host, and backend of repository
+
+        """
+        return (repository.name, repository.host, repository.backend)
 
     @classmethod
     def _cached_property_names(cls, *, private: bool) -> list[str]:
@@ -1285,6 +1369,11 @@ class Dataset(object):
             Set this to ``False``,
             if loading the tables takes too long,
             or does not fit into memory
+        repository: repository containing the dataset.
+            If ``None``,
+            it is looked up with :func:`audb.repository`,
+            which requires to access the backends
+            of all repositories in :attr:`audb.config.REPOSITORIES`
 
     """
 
@@ -1295,6 +1384,7 @@ class Dataset(object):
         *,
         cache_root: str | None = None,
         load_tables: bool = True,
+        repository: audb.Repository | None = None,
     ):
         r"""Create Dataset Instance."""
         instance = _Dataset.create(
@@ -1302,6 +1392,7 @@ class Dataset(object):
             version,
             cache_root=cache_root,
             load_tables=load_tables,
+            repository=repository,
         )
         return instance
 
@@ -1314,6 +1405,7 @@ class Dataset(object):
         *,
         cache_root: str | None = None,
         load_tables: bool = True,
+        repository: audb.Repository | None = None,
     ):
         self.cache_root = audeer.mkdir(cache_root)
         r"""Cache root folder."""

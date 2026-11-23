@@ -14,6 +14,19 @@ import audbcards.sphinx
 REPOSITORY = audb.Repository("repo", "host", "file-system")
 
 
+def available_df(names, versions, repository=REPOSITORY):
+    r"""Datasets as returned by audb.available()."""
+    return pd.DataFrame(
+        {
+            "backend": [repository.backend] * len(names),
+            "host": [repository.host] * len(names),
+            "repository": [repository.name] * len(names),
+            "version": versions,
+        },
+        index=names,
+    )
+
+
 @pytest.fixture(autouse=True)
 def audbcards_cache(tmpdir, monkeypatch):
     r"""Use temporary audbcards cache.
@@ -183,7 +196,7 @@ def test_builder_inited(tmpdir, monkeypatch, sections, expected):
 
     def available(*args, **kwargs):
         calls.append({"repositories": audb.config.REPOSITORIES})
-        return pd.DataFrame({"version": ["1.0.0"]}, index=["db"])
+        return available_df(["db"], ["1.0.0"])
 
     class Datacard:
         def __init__(self, dataset, *, path, example, table_preview, **kwargs):
@@ -201,7 +214,7 @@ def test_builder_inited(tmpdir, monkeypatch, sections, expected):
     monkeypatch.setattr(
         audbcards.sphinx,
         "Dataset",
-        lambda name, version: types.SimpleNamespace(
+        lambda name, version, repository: types.SimpleNamespace(
             name=name,
             _release_memory=lambda cached_properties=(): None,
         ),
@@ -481,8 +494,8 @@ def test_builder_inited_dfs(tmpdir, monkeypatch):
     ]
     app = sphinx_app(src_dir, build_dir, sections)
     dfs = {
-        repo_a: pd.DataFrame({"version": ["1.0.0"]}, index=["db-a"]),
-        repo_b: pd.DataFrame({"version": ["2.0.0"]}, index=["db-b"]),
+        repo_a: available_df(["db-a"], ["1.0.0"], repo_a),
+        repo_b: available_df(["db-b"], ["2.0.0"], repo_b),
     }
 
     def available(*args, **kwargs):
@@ -492,7 +505,7 @@ def test_builder_inited_dfs(tmpdir, monkeypatch):
     monkeypatch.setattr(
         audbcards.sphinx,
         "Dataset",
-        lambda name, version: types.SimpleNamespace(
+        lambda name, version, repository: types.SimpleNamespace(
             name=name,
             _release_memory=lambda cached_properties=(): None,
         ),
@@ -515,3 +528,50 @@ def test_builder_inited_dfs(tmpdir, monkeypatch):
     pd.testing.assert_frame_equal(app.audbcards["dfs"]["data-b"], dfs[repo_b])
     # "df" holds the datasets of the last section
     pd.testing.assert_frame_equal(app.audbcards["df"], dfs[repo_b])
+
+
+def test_builder_inited_repository(tmpdir, monkeypatch):
+    r"""Test repository returned by audb.available() is passed to datasets.
+
+    The repository should not be looked up again,
+    and not be taken from the audbcards cache,
+    which might contain an outdated repository.
+
+    """
+    src_dir = audeer.mkdir(tmpdir, "docs")
+    build_dir = audeer.mkdir(tmpdir, "build")
+    repo_a = audb.Repository("repo-a", "host-a", "file-system")
+    repo_b = audb.Repository("repo-b", "host-b", "file-system")
+    sections = [{"folder": "data", "repositories": [repo_a, repo_b]}]
+    app = sphinx_app(src_dir, build_dir, sections)
+    df = pd.concat(
+        [
+            available_df(["db-a"], ["1.0.0"], repo_a),
+            available_df(["db-b"], ["2.0.0"], repo_b),
+        ]
+    )
+    repositories = {}
+
+    def dataset(name, version, *, repository):
+        repositories[name] = repository
+        return types.SimpleNamespace(
+            name=name,
+            _release_memory=lambda cached_properties=(): None,
+        )
+
+    monkeypatch.setattr(audb, "available", lambda *args, **kwargs: df)
+    monkeypatch.setattr(audbcards.sphinx, "Dataset", dataset)
+    monkeypatch.setattr(
+        audbcards.sphinx,
+        "Datacard",
+        lambda *args, **kwargs: types.SimpleNamespace(save=lambda file: None),
+    )
+    monkeypatch.setattr(
+        audbcards.sphinx,
+        "create_datasets_page",
+        lambda *args, **kwargs: None,
+    )
+
+    audbcards.sphinx.builder_inited(app)
+
+    assert repositories == {"db-a": repo_a, "db-b": repo_b}
