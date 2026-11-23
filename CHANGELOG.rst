@@ -7,6 +7,27 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.0 (2026-11-23)
+--------------------------
+
+* Added: ``repository`` argument to ``audbcards.Dataset``
+  to provide the repository of the dataset
+* Added: ``repository`` column
+  to the datasets overview page
+* Changed: the sphinx extension passes the repository
+  returned by ``audb.available()``
+* Changed: show repository
+  without a link on the data card
+* Fixed: do not store ``audbcards.Dataset.repository``
+  in the cache file of a dataset,
+  as it might be outdated
+  when a dataset is moved to another repository.
+  Existing cache files are updated automatically
+* Removed: ``audbcards.Dataset.repository_link``,
+  as it pointed to the Artifactory web UI,
+  which is not available for other backends
+
+
 Version 1.0.1 (2026-11-21)
 --------------------------
 
