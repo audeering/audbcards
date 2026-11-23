@@ -545,7 +545,27 @@ def test_create_datasets_page(tmpdir, dbs, cache, request):
     rst_file = audeer.path(tmpdir, "datasets_page.rst")
     create_datasets_page(datasets, rst_file=rst_file)
     assert os.path.exists(rst_file)
-    assert os.path.exists(audeer.replace_file_extension(rst_file, "csv"))
+    csv_file = audeer.replace_file_extension(rst_file, "csv")
+    assert os.path.exists(csv_file)
+
+    # Columns of overview table
+    with open(csv_file, newline="") as fp:
+        rows = list(csv.reader(fp))
+    assert rows[0] == [
+        "name",
+        "description",
+        "license",
+        "version",
+        "schemes",
+        "repository",
+    ]
+    assert [row[-1] for row in rows[1:]] == [dataset.repository for dataset in datasets]
+
+    # Each column needs a width
+    with open(rst_file) as fp:
+        content = fp.read()
+    widths = re.search(r":widths: (.+)", content).group(1).split(",")
+    assert len(widths) == len(rows[0])
 
 
 def load_rendered_template(name: str) -> str:

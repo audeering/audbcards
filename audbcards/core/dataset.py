@@ -1448,7 +1448,8 @@ def create_datasets_page(
     description,
     license,
     version,
-    schemes.
+    schemes,
+    repository.
     The name column does also contain a link
     to the corresponding data card.
 
@@ -1470,12 +1471,20 @@ def create_datasets_page(
             f"`{dataset.license} <{dataset.license_link}>`__",
             dataset.version,
             dataset.schemes_summary,
+            dataset.repository,
         )
         for dataset in datasets
     ]
     df = pd.DataFrame.from_records(
         tuples,
-        columns=["name", "description", "license", "version", "schemes"],
+        columns=[
+            "name",
+            "description",
+            "license",
+            "version",
+            "schemes",
+            "repository",
+        ],
         index="name",
     )
     csv_file = audeer.replace_file_extension(rst_file, "csv")
