@@ -1097,3 +1097,96 @@ class TestDatasetLoadTables:
         self.assert_has_table_properties(True)
         self.load_dataset(load_tables=load_tables_first)
         self.assert_has_table_properties(True)
+
+
+def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_db):
+    """Test repository is not read from cache.
+
+    The cache file should not store the repository,
+    as a dataset might be moved to another repository
+    after it was cached.
+    An outdated repository stored in a cache file
+    by older versions of audbcards
+    should be replaced,
+    and removed from the cache file.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        repository: repository fixture
+        medium_db: medium_db fixture
+
+    """
+    dataset_cls = audbcards.core.dataset._Dataset
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = dataset_cls._dataset_cache_path(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+
+    def load_dataset():
+        return audbcards.Dataset(medium_db.name, pytest.VERSION, cache_root=cache_root)
+
+    def cache_file_content() -> dict:
+        with open(cache_file, "rb") as fp:
+            return pickle.load(fp).__dict__
+
+    # Create dataset and cache file
+    dataset = load_dataset()
+    assert dataset.repository == repository.name
+    for name in dataset_cls._uncached_properties:
+        assert name not in cache_file_content()
+
+    # Simulate cache file written by older versions of audbcards,
+    # which stored an outdated repository
+    dataset.__dict__["repository"] = "outdated"
+    dataset.__dict__["repository_link"] = "outdated-link"
+    with monkeypatch.context() as m:
+        m.setattr(dataset_cls, "__getstate__", lambda self: self.__dict__)
+        dataset_cls._save_pickled(dataset, cache_file)
+    assert cache_file_content()["repository"] == "outdated"
+
+    dataset = load_dataset()
+    assert dataset.repository == repository.name
+    assert "outdated" not in dataset.repository_link
+    for name in dataset_cls._uncached_properties:
+        assert name not in cache_file_content()
+
+
+@pytest.mark.parametrize("cached", [False, True])
+def test_dataset_repository_argument(
+    tmpdir, monkeypatch, repository, medium_db, cached
+):
+    """Test repository given as argument.
+
+    The given repository should be used,
+    without looking it up with audb.repository(),
+    for new datasets and datasets loaded from cache.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        repository: repository fixture
+        medium_db: medium_db fixture
+        cached: if ``True``,
+            the dataset is loaded from cache
+
+    """
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    if cached:
+        audbcards.Dataset(medium_db.name, pytest.VERSION, cache_root=cache_root)
+
+    def raise_error(*args, **kwargs):
+        raise AssertionError("audb.repository() should not be called")
+
+    monkeypatch.setattr(audb, "repository", raise_error)
+    dataset = audbcards.Dataset(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root=cache_root,
+        repository=repository,
+    )
+    assert dataset.repository_object == repository
+    assert dataset.repository == repository.name
+    assert medium_db.name in dataset.repository_link
