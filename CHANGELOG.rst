@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.1.1 (2026-11-24)
+--------------------------
+
+* Fixed: cached properties missing
+  in the cache file of a dataset,
+  are now calculated and stored in the cache file
+  when loading the dataset from cache,
+  instead of being calculated again
+  by every data card using the dataset
+
+
 Version 1.1.0 (2026-11-23)
 --------------------------
 
