@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.1.0
+                v1.1.1
               </div>
             
           
@@ -296,16 +296,29 @@
                     <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cached_property</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                     <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
             <span class="c1"># Load cached properties,</span>
-            <span class="c1"># that require to load filewise or segmented tables,</span>
-            <span class="c1"># if they haven't been cached before.</span>
+            <span class="c1"># if they haven't been cached before,</span>
+            <span class="c1"># e.g. properties added in newer versions of audbcards,</span>
+            <span class="c1"># or properties that require to load filewise or segmented tables.</span>
+            <span class="c1"># Otherwise,</span>
+            <span class="c1"># they would be calculated again</span>
+            <span class="c1"># by every datacard using the dataset,</span>
+            <span class="c1"># without being stored in the cache file</span>
             <span class="k">if</span> <span class="n">load_tables</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span><span class="p">:</span>
-                    <span class="c1"># Check if property has been cached,</span>
-                    <span class="c1"># see https://stackoverflow.com/a/59740750</span>
-                    <span class="k">if</span> <span class="n">cached_property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
-                        <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="c1"># Request property to fill their cached value</span>
-                        <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
+                <span class="n">exclude</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">exclude</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_table_related_cached_properties</span>
+            <span class="k">for</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_cached_property_names</span><span class="p">(</span><span class="n">private</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">cached_property</span> <span class="ow">in</span> <span class="n">exclude</span>
+                    <span class="ow">or</span> <span class="n">cached_property</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_uncached_properties</span>
+                <span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Check if property has been cached,</span>
+                <span class="c1"># see https://stackoverflow.com/a/59740750</span>
+                <span class="k">if</span> <span class="n">cached_property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                    <span class="n">cache_again</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># Request property to fill their cached value</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cache_again</span><span class="p">:</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_save_pickled</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataset_cache_filename</span><span class="p">)</span>
             <span class="c1"># Cache root is not stored in the cache file,</span>
@@ -1682,7 +1695,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/23 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/11/24 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
