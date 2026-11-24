@@ -1154,6 +1154,69 @@ def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_d
         assert name not in cache_file_content()
 
 
+def test_dataset_missing_cached_properties(tmpdir, monkeypatch, medium_db):
+    """Test cached properties missing in cache file are added.
+
+    Cache files written by older versions of audbcards
+    might not contain cached properties
+    added in newer versions.
+    Those properties should be calculated
+    when loading the dataset from cache,
+    and stored in the cache file,
+    to not calculate them again
+    every time the dataset is loaded.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        medium_db: medium_db fixture
+
+    """
+    dataset_cls = audbcards.core.dataset._Dataset
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = dataset_cls._dataset_cache_path(
+        medium_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+    missing_properties = ["file_duration_histogram", "example_json"]
+
+    def load_dataset():
+        return audbcards.Dataset(medium_db.name, pytest.VERSION, cache_root=cache_root)
+
+    def cache_file_content() -> dict:
+        with open(cache_file, "rb") as fp:
+            return pickle.load(fp).__dict__
+
+    # Create dataset and cache file
+    dataset = load_dataset()
+    expected = {name: cache_file_content()[name] for name in missing_properties}
+
+    # Simulate cache file written by older versions of audbcards,
+    # which did not contain some of the cached properties
+    content = cache_file_content()
+    for name in missing_properties:
+        content.pop(name)
+    dataset.__dict__ = content
+    dataset_cls._save_pickled(dataset, cache_file)
+    for name in missing_properties:
+        assert name not in cache_file_content()
+
+    # Missing properties are added when loading from cache
+    dataset = load_dataset()
+    for name in missing_properties:
+        assert name in dataset.__dict__
+        np.testing.assert_equal(cache_file_content()[name], expected[name])
+
+    # Loading again does not write the cache file again
+    def fail_save_pickled(obj, path):
+        raise AssertionError("cache file should not be written again")
+
+    with monkeypatch.context() as m:
+        m.setattr(dataset_cls, "_save_pickled", staticmethod(fail_save_pickled))
+        load_dataset()
+
+
 def test_dataset_publication_after_move(tmpdir, monkeypatch, repository, medium_db):
     """Test publication details of a moved dataset.
 
