@@ -148,16 +148,29 @@ class _Dataset:
                     obj.__dict__.pop(cached_property, None)
                     getattr(obj, cached_property)
             # Load cached properties,
-            # that require to load filewise or segmented tables,
-            # if they haven't been cached before.
+            # if they haven't been cached before,
+            # e.g. properties added in newer versions of audbcards,
+            # or properties that require to load filewise or segmented tables.
+            # Otherwise,
+            # they would be calculated again
+            # by every datacard using the dataset,
+            # without being stored in the cache file
             if load_tables:
-                for cached_property in cls._table_related_cached_properties:
-                    # Check if property has been cached,
-                    # see https://stackoverflow.com/a/59740750
-                    if cached_property not in obj.__dict__:
-                        cache_again = True
-                        # Request property to fill their cached value
-                        getattr(obj, cached_property)
+                exclude = []
+            else:
+                exclude = cls._table_related_cached_properties
+            for cached_property in cls._cached_property_names(private=False):
+                if (
+                    cached_property in exclude
+                    or cached_property in cls._uncached_properties
+                ):
+                    continue
+                # Check if property has been cached,
+                # see https://stackoverflow.com/a/59740750
+                if cached_property not in obj.__dict__:
+                    cache_again = True
+                    # Request property to fill their cached value
+                    getattr(obj, cached_property)
             if cache_again:
                 cls._save_pickled(obj, dataset_cache_filename)
             # Cache root is not stored in the cache file,

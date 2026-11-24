@@ -1,6 +1,7 @@
 import os
 import pickle
 import posixpath
+import random
 
 import numpy as np
 import pandas as pd
@@ -1152,6 +1153,94 @@ def test_dataset_repository_not_cached(tmpdir, monkeypatch, repository, medium_d
     assert "repository_link" not in dataset.__dict__
     for name in dataset_cls._uncached_properties + ["repository_link"]:
         assert name not in cache_file_content()
+
+
+@pytest.mark.parametrize("load_tables", [True, False])
+def test_dataset_missing_cached_properties(tmpdir, monkeypatch, json_db, load_tables):
+    """Test cached properties missing in cache file are added.
+
+    Cache files written by older versions of audbcards
+    might not contain cached properties
+    added in newer versions.
+    Those properties should be calculated
+    when loading the dataset from cache,
+    and stored in the cache file,
+    to not calculate them again
+    every time the dataset is loaded.
+    Table related cached properties
+    should only be added,
+    if ``load_tables`` is ``True``.
+
+    Args:
+        tmpdir: tmpdir fixture
+        monkeypatch: monkeypatch fixture
+        json_db: json_db fixture
+        load_tables: if tables should be loaded
+
+    """
+    dataset_cls = audbcards.core.dataset._Dataset
+    cache_root = audeer.mkdir(tmpdir, "cache")
+    cache_file = dataset_cls._dataset_cache_path(
+        json_db.name,
+        pytest.VERSION,
+        cache_root,
+    )
+    table_property = "tables_preview"
+    assert table_property in dataset_cls._table_related_cached_properties
+    missing_properties = ["file_duration_histogram", "example_json", table_property]
+    if load_tables:
+        refilled_properties = missing_properties
+    else:
+        refilled_properties = [p for p in missing_properties if p != table_property]
+
+    def load_dataset(load_tables: bool):
+        # Reset random generator used by `example_json`,
+        # to ensure the same file is selected every time
+        monkeypatch.setattr(audbcards.core.dataset, "rng", random.Random(123))
+        return audbcards.Dataset(
+            json_db.name,
+            pytest.VERSION,
+            cache_root=cache_root,
+            load_tables=load_tables,
+        )
+
+    def cache_file_content() -> dict:
+        with open(cache_file, "rb") as fp:
+            return pickle.load(fp).__dict__
+
+    # Create dataset and cache file,
+    # including table related properties
+    dataset = load_dataset(load_tables=True)
+    expected = {name: cache_file_content()[name] for name in missing_properties}
+    assert expected["example_json"] is not None
+
+    # Simulate cache file written by older versions of audbcards,
+    # which did not contain some of the cached properties
+    content = cache_file_content()
+    for name in missing_properties:
+        content.pop(name)
+    dataset.__dict__ = content
+    dataset_cls._save_pickled(dataset, cache_file)
+    for name in missing_properties:
+        assert name not in cache_file_content()
+
+    # Missing properties are added when loading from cache,
+    # table related properties only if requested
+    dataset = load_dataset(load_tables)
+    for name in refilled_properties:
+        assert name in dataset.__dict__
+        np.testing.assert_equal(cache_file_content()[name], expected[name])
+    for name in set(missing_properties) - set(refilled_properties):
+        assert name not in dataset.__dict__
+        assert name not in cache_file_content()
+
+    # Loading again does not write the cache file again
+    def fail_save_pickled(obj, path):
+        raise AssertionError("cache file should not be written again")
+
+    with monkeypatch.context() as m:
+        m.setattr(dataset_cls, "_save_pickled", staticmethod(fail_save_pickled))
+        load_dataset(load_tables)
 
 
 def test_dataset_publication_after_move(tmpdir, monkeypatch, repository, medium_db):
